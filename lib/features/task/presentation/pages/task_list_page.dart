@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
 
 class TaskListPage extends StatelessWidget {
   const TaskListPage({super.key});
@@ -6,12 +7,14 @@ class TaskListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Task List'),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          AppNavigation.navigateToTask(context);
+        },
+        child: const Icon(Icons.add),
       ),
-      body: const Center(
-        child: Text('List of Tasks Goes Here'),
-      ),
+      appBar: AppBar(title: const Text('Task List')),
+      body: const Center(child: Text('List of Tasks Goes Here')),
     );
   }
 }

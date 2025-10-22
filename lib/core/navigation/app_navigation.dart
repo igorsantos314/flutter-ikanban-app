@@ -23,19 +23,20 @@ class AppNavigation {
             path: home,
             builder: (context, state) => const TaskListPage(),
           ),
-          GoRoute(
-            path: createTask,
-            builder: (context, state) => const TaskCreatePage(),
-          ),
-          GoRoute(
-            path: editTask,
-            builder: (context, state) => const TaskEditPage(),
-          ),
+
           GoRoute(
             path: settings,
             builder: (context, state) => const SettingsPage(),
           ),
         ],
+      ),
+      GoRoute(
+        path: createTask,
+        builder: (context, state) => const TaskCreatePage(),
+      ),
+      GoRoute(
+        path: editTask,
+        builder: (context, state) => const TaskEditPage(),
       ),
     ],
   );
@@ -54,4 +55,3 @@ class AppNavigation {
     context.go(settings);
   }
 }
-
