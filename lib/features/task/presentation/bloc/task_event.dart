@@ -32,12 +32,12 @@ class LoadTasksEvent extends TaskEvent {
 }
 
 class CreateTaskEvent extends TaskEvent {
-  final TaskModel taskModel;
+  final TaskModel? taskModel;
 
-  const CreateTaskEvent({required this.taskModel});
+  const CreateTaskEvent({this.taskModel});
 
   @override
-  List<Object> get props => [taskModel];
+  List<Object> get props => [?taskModel];
 }
 
 class UpdateTaskEvent extends TaskEvent {

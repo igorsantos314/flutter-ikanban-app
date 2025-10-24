@@ -46,34 +46,24 @@ class $TaskEntityTable extends TaskEntity
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
-  late final GeneratedColumn<String> status = GeneratedColumn<String>(
-    'status',
-    aliasedName,
-    false,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
-      maxTextLength: 50,
-    ),
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _priorityMeta = const VerificationMeta(
-    'priority',
-  );
+  late final GeneratedColumnWithTypeConverter<TaskStatus, String> status =
+      GeneratedColumn<String>(
+        'status',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<TaskStatus>($TaskEntityTable.$converterstatus);
   @override
-  late final GeneratedColumn<String> priority = GeneratedColumn<String>(
-    'priority',
-    aliasedName,
-    false,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
-      maxTextLength: 50,
-    ),
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
+  late final GeneratedColumnWithTypeConverter<TaskPriority, String> priority =
+      GeneratedColumn<String>(
+        'priority',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<TaskPriority>($TaskEntityTable.$converterpriority);
   static const VerificationMeta _dueDateMeta = const VerificationMeta(
     'dueDate',
   );
@@ -85,34 +75,24 @@ class $TaskEntityTable extends TaskEntity
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _complexityMeta = const VerificationMeta(
-    'complexity',
-  );
   @override
-  late final GeneratedColumn<String> complexity = GeneratedColumn<String>(
+  late final GeneratedColumnWithTypeConverter<TaskComplexity, String>
+  complexity = GeneratedColumn<String>(
     'complexity',
     aliasedName,
     false,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
-      maxTextLength: 50,
-    ),
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-  );
-  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  ).withConverter<TaskComplexity>($TaskEntityTable.$convertercomplexity);
   @override
-  late final GeneratedColumn<String> type = GeneratedColumn<String>(
-    'type',
-    aliasedName,
-    false,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
-      maxTextLength: 50,
-    ),
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
+  late final GeneratedColumnWithTypeConverter<TaskType, String> type =
+      GeneratedColumn<String>(
+        'type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<TaskType>($TaskEntityTable.$convertertype);
   static const VerificationMeta _isActiveMeta = const VerificationMeta(
     'isActive',
   );
@@ -172,43 +152,11 @@ class $TaskEntityTable extends TaskEntity
         ),
       );
     }
-    if (data.containsKey('status')) {
-      context.handle(
-        _statusMeta,
-        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_statusMeta);
-    }
-    if (data.containsKey('priority')) {
-      context.handle(
-        _priorityMeta,
-        priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_priorityMeta);
-    }
     if (data.containsKey('due_date')) {
       context.handle(
         _dueDateMeta,
         dueDate.isAcceptableOrUnknown(data['due_date']!, _dueDateMeta),
       );
-    }
-    if (data.containsKey('complexity')) {
-      context.handle(
-        _complexityMeta,
-        complexity.isAcceptableOrUnknown(data['complexity']!, _complexityMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_complexityMeta);
-    }
-    if (data.containsKey('type')) {
-      context.handle(
-        _typeMeta,
-        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_typeMeta);
     }
     if (data.containsKey('is_active')) {
       context.handle(
@@ -237,26 +185,34 @@ class $TaskEntityTable extends TaskEntity
         DriftSqlType.string,
         data['${effectivePrefix}description'],
       ),
-      status: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}status'],
-      )!,
-      priority: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}priority'],
-      )!,
+      status: $TaskEntityTable.$converterstatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}status'],
+        )!,
+      ),
+      priority: $TaskEntityTable.$converterpriority.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}priority'],
+        )!,
+      ),
       dueDate: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}due_date'],
       ),
-      complexity: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}complexity'],
-      )!,
-      type: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}type'],
-      )!,
+      complexity: $TaskEntityTable.$convertercomplexity.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}complexity'],
+        )!,
+      ),
+      type: $TaskEntityTable.$convertertype.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}type'],
+        )!,
+      ),
       isActive: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
@@ -268,17 +224,26 @@ class $TaskEntityTable extends TaskEntity
   $TaskEntityTable createAlias(String alias) {
     return $TaskEntityTable(attachedDatabase, alias);
   }
+
+  static TypeConverter<TaskStatus, String> $converterstatus =
+      GenericSqlTypeConverter(TaskStatus.values);
+  static TypeConverter<TaskPriority, String> $converterpriority =
+      GenericSqlTypeConverter(TaskPriority.values);
+  static TypeConverter<TaskComplexity, String> $convertercomplexity =
+      GenericSqlTypeConverter(TaskComplexity.values);
+  static TypeConverter<TaskType, String> $convertertype =
+      GenericSqlTypeConverter(TaskType.values);
 }
 
 class TaskData extends DataClass implements Insertable<TaskData> {
   final int id;
   final String title;
   final String? description;
-  final String status;
-  final String priority;
+  final TaskStatus status;
+  final TaskPriority priority;
   final DateTime? dueDate;
-  final String complexity;
-  final String type;
+  final TaskComplexity complexity;
+  final TaskType type;
   final bool isActive;
   const TaskData({
     required this.id,
@@ -299,13 +264,29 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
-    map['status'] = Variable<String>(status);
-    map['priority'] = Variable<String>(priority);
+    {
+      map['status'] = Variable<String>(
+        $TaskEntityTable.$converterstatus.toSql(status),
+      );
+    }
+    {
+      map['priority'] = Variable<String>(
+        $TaskEntityTable.$converterpriority.toSql(priority),
+      );
+    }
     if (!nullToAbsent || dueDate != null) {
       map['due_date'] = Variable<DateTime>(dueDate);
     }
-    map['complexity'] = Variable<String>(complexity);
-    map['type'] = Variable<String>(type);
+    {
+      map['complexity'] = Variable<String>(
+        $TaskEntityTable.$convertercomplexity.toSql(complexity),
+      );
+    }
+    {
+      map['type'] = Variable<String>(
+        $TaskEntityTable.$convertertype.toSql(type),
+      );
+    }
     map['is_active'] = Variable<bool>(isActive);
     return map;
   }
@@ -337,11 +318,11 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       id: serializer.fromJson<int>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       description: serializer.fromJson<String?>(json['description']),
-      status: serializer.fromJson<String>(json['status']),
-      priority: serializer.fromJson<String>(json['priority']),
+      status: serializer.fromJson<TaskStatus>(json['status']),
+      priority: serializer.fromJson<TaskPriority>(json['priority']),
       dueDate: serializer.fromJson<DateTime?>(json['dueDate']),
-      complexity: serializer.fromJson<String>(json['complexity']),
-      type: serializer.fromJson<String>(json['type']),
+      complexity: serializer.fromJson<TaskComplexity>(json['complexity']),
+      type: serializer.fromJson<TaskType>(json['type']),
       isActive: serializer.fromJson<bool>(json['isActive']),
     );
   }
@@ -352,11 +333,11 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       'id': serializer.toJson<int>(id),
       'title': serializer.toJson<String>(title),
       'description': serializer.toJson<String?>(description),
-      'status': serializer.toJson<String>(status),
-      'priority': serializer.toJson<String>(priority),
+      'status': serializer.toJson<TaskStatus>(status),
+      'priority': serializer.toJson<TaskPriority>(priority),
       'dueDate': serializer.toJson<DateTime?>(dueDate),
-      'complexity': serializer.toJson<String>(complexity),
-      'type': serializer.toJson<String>(type),
+      'complexity': serializer.toJson<TaskComplexity>(complexity),
+      'type': serializer.toJson<TaskType>(type),
       'isActive': serializer.toJson<bool>(isActive),
     };
   }
@@ -365,11 +346,11 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     int? id,
     String? title,
     Value<String?> description = const Value.absent(),
-    String? status,
-    String? priority,
+    TaskStatus? status,
+    TaskPriority? priority,
     Value<DateTime?> dueDate = const Value.absent(),
-    String? complexity,
-    String? type,
+    TaskComplexity? complexity,
+    TaskType? type,
     bool? isActive,
   }) => TaskData(
     id: id ?? this.id,
@@ -447,11 +428,11 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
   final Value<int> id;
   final Value<String> title;
   final Value<String?> description;
-  final Value<String> status;
-  final Value<String> priority;
+  final Value<TaskStatus> status;
+  final Value<TaskPriority> priority;
   final Value<DateTime?> dueDate;
-  final Value<String> complexity;
-  final Value<String> type;
+  final Value<TaskComplexity> complexity;
+  final Value<TaskType> type;
   final Value<bool> isActive;
   const TaskEntityCompanion({
     this.id = const Value.absent(),
@@ -468,11 +449,11 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     this.id = const Value.absent(),
     required String title,
     this.description = const Value.absent(),
-    required String status,
-    required String priority,
+    required TaskStatus status,
+    required TaskPriority priority,
     this.dueDate = const Value.absent(),
-    required String complexity,
-    required String type,
+    required TaskComplexity complexity,
+    required TaskType type,
     this.isActive = const Value.absent(),
   }) : title = Value(title),
        status = Value(status),
@@ -507,11 +488,11 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Value<int>? id,
     Value<String>? title,
     Value<String?>? description,
-    Value<String>? status,
-    Value<String>? priority,
+    Value<TaskStatus>? status,
+    Value<TaskPriority>? priority,
     Value<DateTime?>? dueDate,
-    Value<String>? complexity,
-    Value<String>? type,
+    Value<TaskComplexity>? complexity,
+    Value<TaskType>? type,
     Value<bool>? isActive,
   }) {
     return TaskEntityCompanion(
@@ -540,19 +521,27 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       map['description'] = Variable<String>(description.value);
     }
     if (status.present) {
-      map['status'] = Variable<String>(status.value);
+      map['status'] = Variable<String>(
+        $TaskEntityTable.$converterstatus.toSql(status.value),
+      );
     }
     if (priority.present) {
-      map['priority'] = Variable<String>(priority.value);
+      map['priority'] = Variable<String>(
+        $TaskEntityTable.$converterpriority.toSql(priority.value),
+      );
     }
     if (dueDate.present) {
       map['due_date'] = Variable<DateTime>(dueDate.value);
     }
     if (complexity.present) {
-      map['complexity'] = Variable<String>(complexity.value);
+      map['complexity'] = Variable<String>(
+        $TaskEntityTable.$convertercomplexity.toSql(complexity.value),
+      );
     }
     if (type.present) {
-      map['type'] = Variable<String>(type.value);
+      map['type'] = Variable<String>(
+        $TaskEntityTable.$convertertype.toSql(type.value),
+      );
     }
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
@@ -593,11 +582,11 @@ typedef $$TaskEntityTableCreateCompanionBuilder =
       Value<int> id,
       required String title,
       Value<String?> description,
-      required String status,
-      required String priority,
+      required TaskStatus status,
+      required TaskPriority priority,
       Value<DateTime?> dueDate,
-      required String complexity,
-      required String type,
+      required TaskComplexity complexity,
+      required TaskType type,
       Value<bool> isActive,
     });
 typedef $$TaskEntityTableUpdateCompanionBuilder =
@@ -605,11 +594,11 @@ typedef $$TaskEntityTableUpdateCompanionBuilder =
       Value<int> id,
       Value<String> title,
       Value<String?> description,
-      Value<String> status,
-      Value<String> priority,
+      Value<TaskStatus> status,
+      Value<TaskPriority> priority,
       Value<DateTime?> dueDate,
-      Value<String> complexity,
-      Value<String> type,
+      Value<TaskComplexity> complexity,
+      Value<TaskType> type,
       Value<bool> isActive,
     });
 
@@ -637,14 +626,16 @@ class $$TaskEntityTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get status => $composableBuilder(
-    column: $table.status,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnWithTypeConverterFilters<TaskStatus, TaskStatus, String> get status =>
+      $composableBuilder(
+        column: $table.status,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
 
-  ColumnFilters<String> get priority => $composableBuilder(
+  ColumnWithTypeConverterFilters<TaskPriority, TaskPriority, String>
+  get priority => $composableBuilder(
     column: $table.priority,
-    builder: (column) => ColumnFilters(column),
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnFilters<DateTime> get dueDate => $composableBuilder(
@@ -652,15 +643,17 @@ class $$TaskEntityTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get complexity => $composableBuilder(
+  ColumnWithTypeConverterFilters<TaskComplexity, TaskComplexity, String>
+  get complexity => $composableBuilder(
     column: $table.complexity,
-    builder: (column) => ColumnFilters(column),
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
-  ColumnFilters<String> get type => $composableBuilder(
-    column: $table.type,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnWithTypeConverterFilters<TaskType, TaskType, String> get type =>
+      $composableBuilder(
+        column: $table.type,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
 
   ColumnFilters<bool> get isActive => $composableBuilder(
     column: $table.isActive,
@@ -743,21 +736,22 @@ class $$TaskEntityTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get status =>
+  GeneratedColumnWithTypeConverter<TaskStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
-  GeneratedColumn<String> get priority =>
+  GeneratedColumnWithTypeConverter<TaskPriority, String> get priority =>
       $composableBuilder(column: $table.priority, builder: (column) => column);
 
   GeneratedColumn<DateTime> get dueDate =>
       $composableBuilder(column: $table.dueDate, builder: (column) => column);
 
-  GeneratedColumn<String> get complexity => $composableBuilder(
-    column: $table.complexity,
-    builder: (column) => column,
-  );
+  GeneratedColumnWithTypeConverter<TaskComplexity, String> get complexity =>
+      $composableBuilder(
+        column: $table.complexity,
+        builder: (column) => column,
+      );
 
-  GeneratedColumn<String> get type =>
+  GeneratedColumnWithTypeConverter<TaskType, String> get type =>
       $composableBuilder(column: $table.type, builder: (column) => column);
 
   GeneratedColumn<bool> get isActive =>
@@ -795,11 +789,11 @@ class $$TaskEntityTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> title = const Value.absent(),
                 Value<String?> description = const Value.absent(),
-                Value<String> status = const Value.absent(),
-                Value<String> priority = const Value.absent(),
+                Value<TaskStatus> status = const Value.absent(),
+                Value<TaskPriority> priority = const Value.absent(),
                 Value<DateTime?> dueDate = const Value.absent(),
-                Value<String> complexity = const Value.absent(),
-                Value<String> type = const Value.absent(),
+                Value<TaskComplexity> complexity = const Value.absent(),
+                Value<TaskType> type = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
               }) => TaskEntityCompanion(
                 id: id,
@@ -817,11 +811,11 @@ class $$TaskEntityTableTableManager
                 Value<int> id = const Value.absent(),
                 required String title,
                 Value<String?> description = const Value.absent(),
-                required String status,
-                required String priority,
+                required TaskStatus status,
+                required TaskPriority priority,
                 Value<DateTime?> dueDate = const Value.absent(),
-                required String complexity,
-                required String type,
+                required TaskComplexity complexity,
+                required TaskType type,
                 Value<bool> isActive = const Value.absent(),
               }) => TaskEntityCompanion.insert(
                 id: id,

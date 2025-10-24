@@ -1,6 +1,9 @@
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
+import 'package:flutter_ikanban_app/features/task/domain/errors/task_repository_errors.dart';
+import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_state.dart';
@@ -9,6 +12,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
   final TaskRepository taskRepository;
   TaskFormBloc(this.taskRepository) : super(TaskFormState.initial()) {
     on<TaskFormUpdateFieldsEvent>(_onUpdateFields);
+    on<CreateTaskEvent>(_onCreateTask);
   }
 
   void _onUpdateFields(
@@ -29,5 +33,61 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         dueDate: event.dueDate,
       ),
     );
+  }
+
+  Future<void> _onCreateTask(
+    CreateTaskEvent event,
+    Emitter<TaskFormState> emit,
+  ) async {
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+    try {
+      final outcome = await taskRepository.createTask(
+        TaskModel(
+          title: state.title,
+          description: state.description,
+          status: state.status,
+          priority: state.priority,
+          complexity: state.complexity,
+          type: state.type,
+          dueDate: state.dueDate,
+        ),
+      );
+
+      outcome.when(
+        success: (task) {
+          log('Task created successfully');
+          emit(state.copyWith(isLoading: false));
+        },
+        failure: (error, message, throwable) {
+          log('Failed to create task: $message');
+          _handleTaskRepositoryError(error, emit);
+        },
+      );
+    } catch (e) {
+      log('Error creating task: $e');
+      _handleTaskRepositoryError(GenericError(), emit);
+    }
+  }
+
+  void _handleTaskRepositoryError(TaskRepositoryErrors error, Emitter<TaskFormState> emit,) {
+    String message = "";
+    error.when(
+      genericError: (message, throwable) {
+        message = 'An unexpected error occurred.';
+      },
+      validationError: (message, throwable) {
+        message = 'Verifique os campos e tente novamente.';
+      },
+      databaseError: (message, throwable) {
+        message = 'Erro ao acessar o banco de dados.';
+      },
+      networkError: (message, throwable) {
+        message = 'Erro de rede. Verifique sua conexão.';
+      },
+      notFound: (message, throwable) {
+        message = 'Recurso não encontrado.';
+      },
+    );
+    emit(state.copyWith(isLoading: false, errorMessage: message));
   }
 }

@@ -29,7 +29,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
     return (select(db.taskEntity)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
 
-  Future<bool> updateTask(TaskData task) {
+  Future<bool> updateTask(TaskEntityCompanion task) {
     return update(db.taskEntity).replace(task);
   }
 

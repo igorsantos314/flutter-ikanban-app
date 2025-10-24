@@ -8,7 +8,7 @@ import 'package:flutter_ikanban_app/features/task/domain/errors/task_repository_
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 
 abstract class TaskRepository {
-  Stream<Outcome<ResultPage<TaskModel>, TaskRepositoryError>> watchTasks({
+  Stream<Outcome<ResultPage<TaskModel>, TaskRepositoryErrors>> watchTasks({
     required int page,
     required int limitPerPage,
     String? search,
@@ -22,7 +22,7 @@ abstract class TaskRepository {
     bool onlyActive = true,
     bool ascending = true,
   });
-  Future<Outcome<void, TaskRepositoryError>> createTask(TaskModel task);
-  Future<Outcome<void, TaskRepositoryError>> updateTask(TaskModel task);
-  Future<Outcome<void, TaskRepositoryError>> deleteTask(int id);
+  Future<Outcome<void, TaskRepositoryErrors>> createTask(TaskModel task);
+  Future<Outcome<void, TaskRepositoryErrors>> updateTask(TaskModel task);
+  Future<Outcome<void, TaskRepositoryErrors>> deleteTask(int id);
 }

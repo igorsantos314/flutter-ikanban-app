@@ -8,31 +8,58 @@ import 'package:flutter_ikanban_app/features/task/domain/errors/task_repository_
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/features/task/infra/local/task_local_data_source.dart';
+import 'package:flutter_ikanban_app/features/task/infra/local/mapper/task_mapper.dart';
 
 class TaskRepositoryImpl implements TaskRepository {
   final TaskLocalDataSource _localDataSource;
   TaskRepositoryImpl(this._localDataSource);
 
   @override
-  Future<Outcome<void, TaskRepositoryError>> createTask(TaskModel task) {
-    // TODO: implement createTask
-    throw UnimplementedError();
+  Future<Outcome<void, TaskRepositoryErrors>> createTask(TaskModel task) async {
+    try {
+      final entity = TaskMapper.toEntity(task);
+      await _localDataSource.insertTask(entity);
+      return const Outcome.success();
+    } catch (e) {
+      return Outcome.failure(
+        error: GenericError(),
+        message: 'Failed to create task',
+        throwable: e,
+      );
+    }
   }
 
   @override
-  Future<Outcome<void, TaskRepositoryError>> deleteTask(int id) {
-    // TODO: implement deleteTask
-    throw UnimplementedError();
+  Future<Outcome<void, TaskRepositoryErrors>> deleteTask(int id) async {
+    try {
+      await _localDataSource.deleteTask(id);
+      return const Outcome.success();
+    } catch (e) {
+      return Outcome.failure(
+        error: GenericError(),
+        message: 'Failed to delete task',
+        throwable: e,
+      );
+    }
   }
 
   @override
-  Future<Outcome<void, TaskRepositoryError>> updateTask(TaskModel task) {
-    // TODO: implement updateTask
-    throw UnimplementedError();
+  Future<Outcome<void, TaskRepositoryErrors>> updateTask(TaskModel task) async {
+    try {
+      final entity = TaskMapper.toEntity(task);
+      await _localDataSource.updateTask(entity);
+      return const Outcome.success();
+    } catch (e) {
+      return Outcome.failure(
+        error: GenericError(),
+        message: 'Failed to update task',
+        throwable: e,
+      );
+    }
   }
 
   @override
-  Stream<Outcome<ResultPage<TaskModel>, TaskRepositoryError>> watchTasks({
+  Stream<Outcome<ResultPage<TaskModel>, TaskRepositoryErrors>> watchTasks({
     required int page,
     required int limitPerPage,
     String? search,
@@ -46,7 +73,34 @@ class TaskRepositoryImpl implements TaskRepository {
     bool onlyActive = true,
     bool ascending = true,
   }) {
-    // TODO: implement watchTasks
-    throw UnimplementedError();
+    return _localDataSource
+    .watchTasks(page: page, limitPerPage: limitPerPage)
+    .map<ResultPage<TaskModel>>((event) {
+          final result = event.items
+              .map((data) => TaskMapper.fromEntity(data))
+              .toList();
+
+          return ResultPage(
+            items: result,
+            totalItems: event.totalItems,
+            number: page,
+            totalPages: event.totalPages,
+            limitPerPage: limitPerPage,
+          );
+        })
+        .map<Outcome<ResultPage<TaskModel>, TaskRepositoryErrors>>((
+          pageResult,
+        ) {
+          return Outcome<
+            ResultPage<TaskModel>,
+            TaskRepositoryErrors
+          >.success(value: pageResult);
+        })
+        .handleError((error, stack) {
+          return Outcome<
+            ResultPage<TaskModel>,
+            TaskRepositoryErrors
+          >.failure(error: TaskRepositoryErrors.databaseError());
+        });
   }
 }
