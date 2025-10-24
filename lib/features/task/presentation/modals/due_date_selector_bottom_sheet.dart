@@ -43,19 +43,19 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
       ),
       DateOption(
         label: 'Esta semana',
-        date: now.add(Duration(days: 7 - now.weekday)),
+        date: _getEndOfWeek(now),
         icon: Icons.date_range,
         color: Colors.orange,
       ),
       DateOption(
         label: 'Próxima semana',
-        date: now.add(Duration(days: 14 - now.weekday)),
+        date: _getEndOfWeek(now.add(const Duration(days: 7))),
         icon: Icons.next_week,
         color: Colors.purple,
       ),
       DateOption(
         label: 'Este mês',
-        date: DateTime(now.year, now.month + 1, 0),
+        date: _getEndOfMonth(now),
         icon: Icons.calendar_month,
         color: Colors.indigo,
       ),
@@ -317,21 +317,33 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
 
   Future<void> _showDatePicker() async {
     final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? now,
-      firstDate: now,
-      lastDate: DateTime(now.year + 5),
-      locale: const Locale('pt', 'BR'),
-      helpText: 'Selecione a data de vencimento',
-      cancelText: 'Cancelar',
-      confirmText: 'Confirmar',
-      fieldLabelText: 'Data de vencimento',
-      fieldHintText: 'dd/mm/aaaa',
-    );
+    final today = DateTime(now.year, now.month, now.day);
+    
+    // Garante que a data inicial não seja anterior ao dia de hoje
+    DateTime initialDate;
+    if (_selectedDate != null && _selectedDate!.isAfter(today.subtract(const Duration(days: 1)))) {
+      initialDate = _selectedDate!;
+    } else {
+      initialDate = today;
+    }
+    
+    try {
+      final picked = await showDatePicker(
+        context: context,
+        initialDate: initialDate,
+        firstDate: today,
+        lastDate: DateTime(now.year + 5),
+        helpText: 'Selecione a data de vencimento',
+        cancelText: 'Cancelar',
+        confirmText: 'Confirmar',
+      );
 
-    if (picked != null) {
-      setState(() => _selectedDate = picked);
+      if (picked != null) {
+        setState(() => _selectedDate = picked);
+      }
+    } catch (e) {
+      // Se der erro, não faz nada - apenas não seleciona a data
+      debugPrint('Erro ao abrir DatePicker: $e');
     }
   }
 
@@ -341,6 +353,18 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
            date1.day == date2.day;
   }
 
+  DateTime _getEndOfWeek(DateTime date) {
+    // Calcula o domingo da semana (considerando domingo como fim de semana)
+    final daysUntilSunday = 7 - date.weekday;
+    return date.add(Duration(days: daysUntilSunday));
+  }
+
+  DateTime _getEndOfMonth(DateTime date) {
+    // Calcula o último dia do mês atual
+    return DateTime(date.year, date.month + 1, 0);
+  }
+
+  // ignore: unused_element
   static Future<void> show({
     required BuildContext context,
     required DateTime? selectedDueDate,

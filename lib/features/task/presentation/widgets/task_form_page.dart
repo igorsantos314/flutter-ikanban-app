@@ -46,9 +46,19 @@ class _TaskFormPageState extends State<TaskFormPage> {
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
-      body: BlocBuilder<TaskFormBloc, TaskFormState>(
-        builder: (context, state) {
-          return Padding(
+      body: BlocListener<TaskFormBloc, TaskFormState>(
+        listener: (context, state) {
+          // Sincroniza os controllers com o estado quando necessário
+          if (_titleController.text != state.title) {
+            _titleController.text = state.title;
+          }
+          if (_descriptionController.text != state.description) {
+            _descriptionController.text = state.description;
+          }
+        },
+        child: BlocBuilder<TaskFormBloc, TaskFormState>(
+          builder: (context, state) {
+            return Padding(
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
               child: Column(
@@ -88,6 +98,7 @@ class _TaskFormPageState extends State<TaskFormPage> {
             ),
           );
         },
+        ),
       ),
     );
   }
@@ -161,59 +172,61 @@ class _TaskFormPageState extends State<TaskFormPage> {
   }
 
   void _showStatusSelector(BuildContext context, TaskFormState state) {
+    final bloc = context.read<TaskFormBloc>();
+    
     StatusSelectorBottomSheet.show(
       context: context,
       selectedStatus: state.status,
       onStatusSelected: (status) {
-        context.read<TaskFormBloc>().add(
-          TaskFormUpdateFieldsEvent(status: status),
-        );
+        bloc.add(TaskFormUpdateFieldsEvent(status: status));
       },
     );
   }
 
   void _showPrioritySelector(BuildContext context, TaskFormState state) {
+    final bloc = context.read<TaskFormBloc>();
+    
     PrioritySelectorBottomSheet.show(
       context: context,
       selectedPriority: state.priority,
       onPrioritySelected: (priority) {
-        context.read<TaskFormBloc>().add(
-          TaskFormUpdateFieldsEvent(priority: priority),
-        );
+        bloc.add(TaskFormUpdateFieldsEvent(priority: priority));
       },
     );
   }
 
   void _showComplexitySelector(BuildContext context, TaskFormState state) {
+    final bloc = context.read<TaskFormBloc>();
+    
     ComplexitySelectorBottomSheet.show(
       context: context,
       selectedComplexity: state.complexity,
       onComplexitySelected: (complexity) {
-        context.read<TaskFormBloc>().add(
-          TaskFormUpdateFieldsEvent(complexity: complexity),
-        );
+        bloc.add(TaskFormUpdateFieldsEvent(complexity: complexity));
       },
     );
   }
 
   void _showTypeSelector(BuildContext context, TaskFormState state) {
+    final bloc = context.read<TaskFormBloc>();
+    
     TypeSelectorBottomSheet.show(
       context: context,
       selectedType: state.type,
       onTypeSelected: (type) {
-        context.read<TaskFormBloc>().add(
-          TaskFormUpdateFieldsEvent(type: type),
-        );
+        bloc.add(TaskFormUpdateFieldsEvent(type: type));
       },
     );
   }
 
   void _showDueDateSelector(BuildContext context, TaskFormState state) {
+    final bloc = context.read<TaskFormBloc>(); // Captura o bloc antes de abrir o modal
+    
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
+      builder: (modalContext) => Container(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
@@ -224,9 +237,7 @@ class _TaskFormPageState extends State<TaskFormPage> {
         child: DueDateSelectorBottomSheet(
           selectedDueDate: state.dueDate,
           onDueDateSelected: (dueDate) {
-            context.read<TaskFormBloc>().add(
-              TaskFormUpdateFieldsEvent(dueDate: dueDate),
-            );
+            bloc.add(TaskFormUpdateFieldsEvent(dueDate: dueDate));
           },
         ),
       ),
@@ -235,49 +246,7 @@ class _TaskFormPageState extends State<TaskFormPage> {
 
   Widget _buildDueDateSection(BuildContext context, TaskFormState state) {
     final theme = Theme.of(context);
-    final dateFormat = DateFormat('dd/MM/yyyy');
-    final now = DateTime.now();
     
-    // Calcula se a data está atrasada
-    final isOverdue = state.dueDate != null && 
-        state.dueDate!.isBefore(DateTime(now.year, now.month, now.day));
-    
-    // Calcula se é hoje
-    final isToday = state.dueDate != null &&
-        state.dueDate!.year == now.year &&
-        state.dueDate!.month == now.month &&
-        state.dueDate!.day == now.day;
-        
-    // Calcula se é amanhã
-    final tomorrow = now.add(const Duration(days: 1));
-    final isTomorrow = state.dueDate != null &&
-        state.dueDate!.year == tomorrow.year &&
-        state.dueDate!.month == tomorrow.month &&
-        state.dueDate!.day == tomorrow.day;
-    
-    Color getDateColor() {
-      if (isOverdue) return Colors.red;
-      if (isToday) return Colors.orange;
-      if (isTomorrow) return Colors.blue;
-      return Colors.green;
-    }
-    
-    String getDateText() {
-      if (state.dueDate == null) return 'Definir data de vencimento';
-      if (isOverdue) return 'Atrasada - ${dateFormat.format(state.dueDate!)}';
-      if (isToday) return 'Hoje - ${dateFormat.format(state.dueDate!)}';
-      if (isTomorrow) return 'Amanhã - ${dateFormat.format(state.dueDate!)}';
-      return dateFormat.format(state.dueDate!);
-    }
-    
-    IconData getDateIcon() {
-      if (state.dueDate == null) return Icons.calendar_today;
-      if (isOverdue) return Icons.warning;
-      if (isToday) return Icons.today;
-      if (isTomorrow) return Icons.wb_sunny;
-      return Icons.schedule;
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -288,89 +257,136 @@ class _TaskFormPageState extends State<TaskFormPage> {
           ),
         ),
         const SizedBox(height: 8),
-        InkWell(
-          onTap: () => _showDueDateSelector(context, state),
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: state.dueDate != null 
-                    ? getDateColor().withAlpha(100)
-                    : theme.colorScheme.onSurface.withAlpha(300)
-              ),
+        BlocBuilder<TaskFormBloc, TaskFormState>(
+          builder: (context, currentState) {
+            final dateFormat = DateFormat('dd/MM/yyyy');
+            final now = DateTime.now();
+            
+
+            
+            // Calcula se a data está atrasada
+            final isOverdue = currentState.dueDate != null && 
+                currentState.dueDate!.isBefore(DateTime(now.year, now.month, now.day));
+            
+            // Calcula se é hoje
+            final isToday = currentState.dueDate != null &&
+                currentState.dueDate!.year == now.year &&
+                currentState.dueDate!.month == now.month &&
+                currentState.dueDate!.day == now.day;
+                
+            // Calcula se é amanhã
+            final tomorrow = now.add(const Duration(days: 1));
+            final isTomorrow = currentState.dueDate != null &&
+                currentState.dueDate!.year == tomorrow.year &&
+                currentState.dueDate!.month == tomorrow.month &&
+                currentState.dueDate!.day == tomorrow.day;
+            
+            Color getDateColor() {
+              if (isOverdue) return Colors.red;
+              if (isToday) return Colors.orange;
+              if (isTomorrow) return Colors.blue;
+              return Colors.green;
+            }
+            
+            String getDateText() {
+              if (currentState.dueDate == null) return 'Definir data de vencimento';
+              if (isOverdue) return 'Atrasada - ${dateFormat.format(currentState.dueDate!)}';
+              if (isToday) return 'Hoje - ${dateFormat.format(currentState.dueDate!)}';
+              if (isTomorrow) return 'Amanhã - ${dateFormat.format(currentState.dueDate!)}';
+              return dateFormat.format(currentState.dueDate!);
+            }
+            
+            IconData getDateIcon() {
+              if (currentState.dueDate == null) return Icons.calendar_today;
+              if (isOverdue) return Icons.warning;
+              if (isToday) return Icons.today;
+              if (isTomorrow) return Icons.wb_sunny;
+              return Icons.schedule;
+            }
+
+            return InkWell(
+              onTap: () => _showDueDateSelector(context, currentState),
               borderRadius: BorderRadius.circular(12),
-              color: state.dueDate != null 
-                  ? getDateColor().withValues(alpha: 0.05)
-                  : null,
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: (state.dueDate != null ? getDateColor() : Colors.grey)
-                        .withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: currentState.dueDate != null 
+                        ? getDateColor().withAlpha(100)
+                        : theme.colorScheme.onSurface.withAlpha(300)
                   ),
-                  child: Icon(
-                    getDateIcon(),
-                    color: state.dueDate != null ? getDateColor() : Colors.grey,
-                    size: 20,
-                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  color: currentState.dueDate != null 
+                      ? getDateColor().withValues(alpha: 0.05)
+                      : null,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        getDateText(),
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: state.dueDate != null ? getDateColor() : null,
-                        ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: (currentState.dueDate != null ? getDateColor() : Colors.grey)
+                            .withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      if (state.dueDate != null)
-                        Text(
-                          isOverdue 
-                              ? 'Esta tarefa está atrasada'
-                              : isToday
-                                  ? 'Vence hoje'
-                                  : isTomorrow
-                                      ? 'Vence amanhã'
-                                      : 'Vencimento futuro',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: getDateColor().withAlpha(180),
-                            fontWeight: FontWeight.w500,
+                      child: Icon(
+                        getDateIcon(),
+                        color: currentState.dueDate != null ? getDateColor() : Colors.grey,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            getDateText(),
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontWeight: FontWeight.w500,
+                              color: currentState.dueDate != null ? getDateColor() : null,
+                            ),
                           ),
-                        )
-                      else
-                        Text(
-                          'Clique para definir quando a tarefa deve ser concluída',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withAlpha(600),
-                          ),
-                        ),
-                    ],
-                  ),
+                          if (currentState.dueDate != null)
+                            Text(
+                              isOverdue 
+                                  ? 'Esta tarefa está atrasada'
+                                  : isToday
+                                      ? 'Vence hoje'
+                                      : isTomorrow
+                                          ? 'Vence amanhã'
+                                          : 'Vencimento futuro',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: getDateColor().withAlpha(180),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
+                          else
+                            Text(
+                              'Clique para definir quando a tarefa deve ser concluída',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurface.withAlpha(600),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      color: currentState.dueDate != null 
+                          ? getDateColor().withAlpha(150)
+                          : theme.colorScheme.onSurface.withAlpha(600),
+                    ),
+                  ],
                 ),
-                Icon(
-                  Icons.keyboard_arrow_down,
-                  color: state.dueDate != null 
-                      ? getDateColor().withAlpha(150)
-                      : theme.colorScheme.onSurface.withAlpha(600),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ],
     );
-  }
-
-  Widget _buildPrioritySection(BuildContext context, TaskFormState state) {
+  }  Widget _buildPrioritySection(BuildContext context, TaskFormState state) {
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
