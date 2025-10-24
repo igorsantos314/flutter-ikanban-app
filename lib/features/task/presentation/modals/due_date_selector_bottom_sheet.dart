@@ -1,0 +1,382 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class DueDateSelectorBottomSheet extends StatefulWidget {
+  final DateTime? selectedDueDate;
+  final Function(DateTime?) onDueDateSelected;
+
+  const DueDateSelectorBottomSheet({
+    super.key,
+    required this.selectedDueDate,
+    required this.onDueDateSelected,
+  });
+
+  @override
+  State<DueDateSelectorBottomSheet> createState() => _DueDateSelectorBottomSheetState();
+}
+
+class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet> {
+  DateTime? _selectedDate;
+  final DateFormat _dateFormat = DateFormat('dd/MM/yyyy');
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDate = widget.selectedDueDate;
+  }
+
+  // Opções predefinidas de datas
+  List<DateOption> get _quickOptions {
+    final now = DateTime.now();
+    return [
+      DateOption(
+        label: 'Hoje',
+        date: now,
+        icon: Icons.today,
+        color: Colors.green,
+      ),
+      DateOption(
+        label: 'Amanhã',
+        date: now.add(const Duration(days: 1)),
+        icon: Icons.wb_sunny,
+        color: Colors.blue,
+      ),
+      DateOption(
+        label: 'Esta semana',
+        date: now.add(Duration(days: 7 - now.weekday)),
+        icon: Icons.date_range,
+        color: Colors.orange,
+      ),
+      DateOption(
+        label: 'Próxima semana',
+        date: now.add(Duration(days: 14 - now.weekday)),
+        icon: Icons.next_week,
+        color: Colors.purple,
+      ),
+      DateOption(
+        label: 'Este mês',
+        date: DateTime(now.year, now.month + 1, 0),
+        icon: Icons.calendar_month,
+        color: Colors.indigo,
+      ),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Text(
+            'Selecione a Data de Vencimento',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          if (_selectedDate != null)
+            Text(
+              'Data selecionada: ${_dateFormat.format(_selectedDate!)}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: Colors.grey[600],
+              ),
+            )
+          else
+            Text(
+              'Nenhuma data selecionada',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: Colors.grey[600],
+              ),
+            ),
+          const SizedBox(height: 16),
+          Flexible(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Opção para remover data
+                  _buildRemoveDateOption(theme),
+                  const SizedBox(height: 16),
+                  
+                  // Opções rápidas
+                  Text(
+                    'Opções Rápidas',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ..._quickOptions.map((option) => _buildQuickOption(option)),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Seleção personalizada
+                  Text(
+                    'Data Personalizada',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildCustomDateOption(theme),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancelar'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    widget.onDueDateSelected(_selectedDate);
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Confirmar'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRemoveDateOption(ThemeData theme) {
+    final isSelected = _selectedDate == null;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        onTap: () => setState(() => _selectedDate = null),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.grey[100] : Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isSelected ? Colors.grey[400]! : Colors.grey[300]!,
+              width: isSelected ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.clear,
+                color: Colors.grey[600],
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Sem data de vencimento',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ),
+              if (isSelected)
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.grey[600],
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickOption(DateOption option) {
+    final isSelected = _selectedDate != null && 
+        _isSameDay(_selectedDate!, option.date);
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        onTap: () => setState(() => _selectedDate = option.date),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isSelected 
+                ? option.color.withValues(alpha: 0.1)
+                : Colors.grey[100],
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isSelected ? option.color : Colors.grey[300]!,
+              width: isSelected ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                option.icon,
+                color: option.color,
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      option.label,
+                      style: TextStyle(
+                        fontWeight: isSelected 
+                            ? FontWeight.bold 
+                            : FontWeight.normal,
+                        color: option.color,
+                      ),
+                    ),
+                    Text(
+                      _dateFormat.format(option.date),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isSelected)
+                Icon(
+                  Icons.check_circle,
+                  color: option.color,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomDateOption(ThemeData theme) {
+    return InkWell(
+      onTap: _showDatePicker,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.blue[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.blue[200]!),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.calendar_today,
+              color: Colors.blue[700],
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Escolher data específica',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.blue[700],
+                ),
+              ),
+            ),
+            Icon(
+              Icons.keyboard_arrow_right,
+              color: Colors.blue[700],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showDatePicker() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? now,
+      firstDate: now,
+      lastDate: DateTime(now.year + 5),
+      locale: const Locale('pt', 'BR'),
+      helpText: 'Selecione a data de vencimento',
+      cancelText: 'Cancelar',
+      confirmText: 'Confirmar',
+      fieldLabelText: 'Data de vencimento',
+      fieldHintText: 'dd/mm/aaaa',
+    );
+
+    if (picked != null) {
+      setState(() => _selectedDate = picked);
+    }
+  }
+
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+           date1.month == date2.month &&
+           date1.day == date2.day;
+  }
+
+  static Future<void> show({
+    required BuildContext context,
+    required DateTime? selectedDueDate,
+    required Function(DateTime?) onDueDateSelected,
+  }) {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: DueDateSelectorBottomSheet(
+          selectedDueDate: selectedDueDate,
+          onDueDateSelected: onDueDateSelected,
+        ),
+      ),
+    );
+  }
+}
+
+class DateOption {
+  final String label;
+  final DateTime date;
+  final IconData icon;
+  final Color color;
+
+  const DateOption({
+    required this.label,
+    required this.date,
+    required this.icon,
+    required this.color,
+  });
+}

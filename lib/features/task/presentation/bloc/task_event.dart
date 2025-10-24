@@ -1,4 +1,8 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 
 abstract class TaskEvent extends Equatable {
@@ -11,8 +15,13 @@ abstract class TaskEvent extends Equatable {
 class TaskFormUpdateFieldsEvent extends TaskEvent {
   final String? title;
   final String? description;
+  final TaskStatus? status;
+  final TaskPriority? priority;
+  final DateTime? dueDate;
+  final TaskComplexity? complexity;
+  final TaskType? type;
 
-  const TaskFormUpdateFieldsEvent({this.title, this.description});
+  const TaskFormUpdateFieldsEvent({this.title, this.description, this.status, this.priority, this.dueDate, this.complexity, this.type});
 
   @override
   List<Object> get props => [?title, ?description];

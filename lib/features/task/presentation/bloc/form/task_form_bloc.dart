@@ -16,12 +16,17 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     Emitter<TaskFormState> emit,
   ) {
     log(
-      'Updating fields: title=${event.title}, description=${event.description}',
+      'Updating fields: title=${event.title}, description=${event.description}, status=${event.status}, priority=${event.priority}, complexity=${event.complexity}, type=${event.type}, dueDate=${event.dueDate}',
     );
     emit(
       state.copyWith(
         title: event.title ?? state.title,
         description: event.description ?? state.description,
+        status: event.status ?? state.status,
+        priority: event.priority ?? state.priority,
+        complexity: event.complexity ?? state.complexity,
+        type: event.type ?? state.type,
+        dueDate: event.dueDate,
       ),
     );
   }
