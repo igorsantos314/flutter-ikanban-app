@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TaskFormState {
 
- String get title; String get description; TaskStatus get status; TaskPriority get priority; String get dueDate; TaskComplexity get complexity; TaskType get type; bool get isLoading; String? get errorMessage;
+ String get title; String? get titleError; String get description; String? get descriptionError; TaskStatus get status; TaskPriority get priority; String get dueDate; TaskComplexity get complexity; TaskType get type; bool get isLoading; String? get errorMessage;
 /// Create a copy of TaskFormState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $TaskFormStateCopyWith<TaskFormState> get copyWith => _$TaskFormStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskFormState&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.complexity, complexity) || other.complexity == complexity)&&(identical(other.type, type) || other.type == type)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskFormState&&(identical(other.title, title) || other.title == title)&&(identical(other.titleError, titleError) || other.titleError == titleError)&&(identical(other.description, description) || other.description == description)&&(identical(other.descriptionError, descriptionError) || other.descriptionError == descriptionError)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.complexity, complexity) || other.complexity == complexity)&&(identical(other.type, type) || other.type == type)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,title,description,status,priority,dueDate,complexity,type,isLoading,errorMessage);
+int get hashCode => Object.hash(runtimeType,title,titleError,description,descriptionError,status,priority,dueDate,complexity,type,isLoading,errorMessage);
 
 @override
 String toString() {
-  return 'TaskFormState(title: $title, description: $description, status: $status, priority: $priority, dueDate: $dueDate, complexity: $complexity, type: $type, isLoading: $isLoading, errorMessage: $errorMessage)';
+  return 'TaskFormState(title: $title, titleError: $titleError, description: $description, descriptionError: $descriptionError, status: $status, priority: $priority, dueDate: $dueDate, complexity: $complexity, type: $type, isLoading: $isLoading, errorMessage: $errorMessage)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $TaskFormStateCopyWith<$Res>  {
   factory $TaskFormStateCopyWith(TaskFormState value, $Res Function(TaskFormState) _then) = _$TaskFormStateCopyWithImpl;
 @useResult
 $Res call({
- String title, String description, TaskStatus status, TaskPriority priority, String dueDate, TaskComplexity complexity, TaskType type, bool isLoading, String? errorMessage
+ String title, String? titleError, String description, String? descriptionError, TaskStatus status, TaskPriority priority, String dueDate, TaskComplexity complexity, TaskType type, bool isLoading, String? errorMessage
 });
 
 
@@ -62,11 +62,13 @@ class _$TaskFormStateCopyWithImpl<$Res>
 
 /// Create a copy of TaskFormState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? description = null,Object? status = null,Object? priority = null,Object? dueDate = null,Object? complexity = null,Object? type = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? titleError = freezed,Object? description = null,Object? descriptionError = freezed,Object? status = null,Object? priority = null,Object? dueDate = null,Object? complexity = null,Object? type = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,titleError: freezed == titleError ? _self.titleError : titleError // ignore: cast_nullable_to_non_nullable
+as String?,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String,descriptionError: freezed == descriptionError ? _self.descriptionError : descriptionError // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as TaskStatus,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as TaskPriority,dueDate: null == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
 as String,complexity: null == complexity ? _self.complexity : complexity // ignore: cast_nullable_to_non_nullable
@@ -158,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String description,  TaskStatus status,  TaskPriority priority,  String dueDate,  TaskComplexity complexity,  TaskType type,  bool isLoading,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String? titleError,  String description,  String? descriptionError,  TaskStatus status,  TaskPriority priority,  String dueDate,  TaskComplexity complexity,  TaskType type,  bool isLoading,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TaskFormState() when $default != null:
-return $default(_that.title,_that.description,_that.status,_that.priority,_that.dueDate,_that.complexity,_that.type,_that.isLoading,_that.errorMessage);case _:
+return $default(_that.title,_that.titleError,_that.description,_that.descriptionError,_that.status,_that.priority,_that.dueDate,_that.complexity,_that.type,_that.isLoading,_that.errorMessage);case _:
   return orElse();
 
 }
@@ -179,10 +181,10 @@ return $default(_that.title,_that.description,_that.status,_that.priority,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String description,  TaskStatus status,  TaskPriority priority,  String dueDate,  TaskComplexity complexity,  TaskType type,  bool isLoading,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String? titleError,  String description,  String? descriptionError,  TaskStatus status,  TaskPriority priority,  String dueDate,  TaskComplexity complexity,  TaskType type,  bool isLoading,  String? errorMessage)  $default,) {final _that = this;
 switch (_that) {
 case _TaskFormState():
-return $default(_that.title,_that.description,_that.status,_that.priority,_that.dueDate,_that.complexity,_that.type,_that.isLoading,_that.errorMessage);case _:
+return $default(_that.title,_that.titleError,_that.description,_that.descriptionError,_that.status,_that.priority,_that.dueDate,_that.complexity,_that.type,_that.isLoading,_that.errorMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +201,10 @@ return $default(_that.title,_that.description,_that.status,_that.priority,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String description,  TaskStatus status,  TaskPriority priority,  String dueDate,  TaskComplexity complexity,  TaskType type,  bool isLoading,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String? titleError,  String description,  String? descriptionError,  TaskStatus status,  TaskPriority priority,  String dueDate,  TaskComplexity complexity,  TaskType type,  bool isLoading,  String? errorMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _TaskFormState() when $default != null:
-return $default(_that.title,_that.description,_that.status,_that.priority,_that.dueDate,_that.complexity,_that.type,_that.isLoading,_that.errorMessage);case _:
+return $default(_that.title,_that.titleError,_that.description,_that.descriptionError,_that.status,_that.priority,_that.dueDate,_that.complexity,_that.type,_that.isLoading,_that.errorMessage);case _:
   return null;
 
 }
@@ -214,11 +216,13 @@ return $default(_that.title,_that.description,_that.status,_that.priority,_that.
 
 
 class _TaskFormState implements TaskFormState {
-  const _TaskFormState({this.title = "", this.description = "", this.status = TaskStatus.backlog, this.priority = TaskPriority.low, this.dueDate = "", this.complexity = TaskComplexity.easy, this.type = TaskType.personal, this.isLoading = false, this.errorMessage});
+  const _TaskFormState({this.title = "", this.titleError = null, this.description = "", this.descriptionError = null, this.status = TaskStatus.backlog, this.priority = TaskPriority.low, this.dueDate = "", this.complexity = TaskComplexity.easy, this.type = TaskType.personal, this.isLoading = false, this.errorMessage});
   
 
 @override@JsonKey() final  String title;
+@override@JsonKey() final  String? titleError;
 @override@JsonKey() final  String description;
+@override@JsonKey() final  String? descriptionError;
 @override@JsonKey() final  TaskStatus status;
 @override@JsonKey() final  TaskPriority priority;
 @override@JsonKey() final  String dueDate;
@@ -237,16 +241,16 @@ _$TaskFormStateCopyWith<_TaskFormState> get copyWith => __$TaskFormStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskFormState&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.complexity, complexity) || other.complexity == complexity)&&(identical(other.type, type) || other.type == type)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskFormState&&(identical(other.title, title) || other.title == title)&&(identical(other.titleError, titleError) || other.titleError == titleError)&&(identical(other.description, description) || other.description == description)&&(identical(other.descriptionError, descriptionError) || other.descriptionError == descriptionError)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.complexity, complexity) || other.complexity == complexity)&&(identical(other.type, type) || other.type == type)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,title,description,status,priority,dueDate,complexity,type,isLoading,errorMessage);
+int get hashCode => Object.hash(runtimeType,title,titleError,description,descriptionError,status,priority,dueDate,complexity,type,isLoading,errorMessage);
 
 @override
 String toString() {
-  return 'TaskFormState(title: $title, description: $description, status: $status, priority: $priority, dueDate: $dueDate, complexity: $complexity, type: $type, isLoading: $isLoading, errorMessage: $errorMessage)';
+  return 'TaskFormState(title: $title, titleError: $titleError, description: $description, descriptionError: $descriptionError, status: $status, priority: $priority, dueDate: $dueDate, complexity: $complexity, type: $type, isLoading: $isLoading, errorMessage: $errorMessage)';
 }
 
 
@@ -257,7 +261,7 @@ abstract mixin class _$TaskFormStateCopyWith<$Res> implements $TaskFormStateCopy
   factory _$TaskFormStateCopyWith(_TaskFormState value, $Res Function(_TaskFormState) _then) = __$TaskFormStateCopyWithImpl;
 @override @useResult
 $Res call({
- String title, String description, TaskStatus status, TaskPriority priority, String dueDate, TaskComplexity complexity, TaskType type, bool isLoading, String? errorMessage
+ String title, String? titleError, String description, String? descriptionError, TaskStatus status, TaskPriority priority, String dueDate, TaskComplexity complexity, TaskType type, bool isLoading, String? errorMessage
 });
 
 
@@ -274,11 +278,13 @@ class __$TaskFormStateCopyWithImpl<$Res>
 
 /// Create a copy of TaskFormState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? description = null,Object? status = null,Object? priority = null,Object? dueDate = null,Object? complexity = null,Object? type = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? titleError = freezed,Object? description = null,Object? descriptionError = freezed,Object? status = null,Object? priority = null,Object? dueDate = null,Object? complexity = null,Object? type = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
   return _then(_TaskFormState(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,titleError: freezed == titleError ? _self.titleError : titleError // ignore: cast_nullable_to_non_nullable
+as String?,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String,descriptionError: freezed == descriptionError ? _self.descriptionError : descriptionError // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as TaskStatus,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as TaskPriority,dueDate: null == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
 as String,complexity: null == complexity ? _self.complexity : complexity // ignore: cast_nullable_to_non_nullable

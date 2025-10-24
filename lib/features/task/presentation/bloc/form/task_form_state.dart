@@ -10,13 +10,14 @@ part 'task_form_state.freezed.dart';
 abstract class TaskFormState with _$TaskFormState {
   const factory TaskFormState({
     @Default("") String title,
-    @Default("") String description,
+    @Default(null) String? titleError,
 
+    @Default("") String description,
+    @Default(null) String? descriptionError,
 
     @Default(TaskStatus.backlog) TaskStatus status,
     @Default(TaskPriority.low) TaskPriority priority,
     @Default("") String dueDate,
-
 
     @Default(TaskComplexity.easy) TaskComplexity complexity,
     @Default(TaskType.personal) TaskType type,

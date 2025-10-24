@@ -8,6 +8,16 @@ abstract class TaskEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class TaskFormUpdateFieldsEvent extends TaskEvent {
+  final String? title;
+  final String? description;
+
+  const TaskFormUpdateFieldsEvent({this.title, this.description});
+
+  @override
+  List<Object> get props => [?title, ?description];
+}
+
 class LoadTasksEvent extends TaskEvent {
   const LoadTasksEvent();
 }

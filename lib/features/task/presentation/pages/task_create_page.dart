@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_bloc.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_state.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_form_page.dart';
 
 class TaskCreatePage extends StatelessWidget {
   const TaskCreatePage({super.key});
@@ -21,13 +23,12 @@ class TaskCreatePageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Task'),
+    return MultiBlocListener(listeners: [
+      BlocListener<TaskFormBloc, TaskFormState>(
+        listener: (context, state) {
+          
+        },
       ),
-      body: const Center(
-        child: Text('Task Creation Form Goes Here'),
-      ),
-    );
+    ], child: const TaskFormPage(title: 'Criar nova tarefa', isEditMode: false));
   }
 }
