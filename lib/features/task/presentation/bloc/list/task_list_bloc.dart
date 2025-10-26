@@ -39,6 +39,9 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     on<TasksStreamDataReceived>(_onTasksStreamDataReceived);
     on<TasksPageDataReceived>(_onTasksPageDataReceived);
     
+    on<ToggleTaskCompletion>(_onToggleTaskCompletion);
+    on<TaskSelectedEvent>(_onTaskSelected);
+
     // UI events
     on<TaskFormResetEvent>(_onTaskFormReset);
   }
@@ -306,5 +309,12 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     log('  - Loading More: ${state.isLoadingMore}');
     log('  - Search: "${state.searchQuery}"');
     log('  - Has Error: ${state.hasError}');
+  }
+
+  FutureOr<void> _onToggleTaskCompletion(ToggleTaskCompletion event, Emitter<TaskListState> emit) {
+  }
+
+  FutureOr<void> _onTaskSelected(TaskSelectedEvent event, Emitter<TaskListState> emit) {
+    
   }
 }

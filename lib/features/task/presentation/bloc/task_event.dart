@@ -21,7 +21,15 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
   final TaskComplexity? complexity;
   final TaskType? type;
 
-  const TaskFormUpdateFieldsEvent({this.title, this.description, this.status, this.priority, this.dueDate, this.complexity, this.type});
+  const TaskFormUpdateFieldsEvent({
+    this.title,
+    this.description,
+    this.status,
+    this.priority,
+    this.dueDate,
+    this.complexity,
+    this.type,
+  });
 
   @override
   List<Object> get props => [?title, ?description];
@@ -69,12 +77,19 @@ class UpdateTaskEvent extends TaskEvent {
 }
 
 class DeleteTaskEvent extends TaskEvent {
-  final int id;
-
-  const DeleteTaskEvent({required this.id});
+  const DeleteTaskEvent();
 
   @override
-  List<Object> get props => [id];
+  List<Object> get props => [];
+}
+
+class TaskSelectedEvent extends TaskEvent {
+  final TaskModel task;
+
+  const TaskSelectedEvent({required this.task});
+
+  @override
+  List<Object> get props => [task];
 }
 
 class ToggleTaskCompletion extends TaskEvent {
@@ -106,9 +121,9 @@ class RefreshTasksEvent extends TaskEvent {
 
 class TasksStreamDataReceived extends TaskEvent {
   final dynamic outcome; // Outcome from stream
-  
+
   const TasksStreamDataReceived(this.outcome);
-  
+
   @override
   List<Object> get props => [outcome];
 }
@@ -116,9 +131,9 @@ class TasksStreamDataReceived extends TaskEvent {
 class TasksPageDataReceived extends TaskEvent {
   final dynamic outcome; // Outcome from pagination API
   final int page;
-  
+
   const TasksPageDataReceived(this.outcome, this.page);
-  
+
   @override
   List<Object> get props => [outcome, page];
 }

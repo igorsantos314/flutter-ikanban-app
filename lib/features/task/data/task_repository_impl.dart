@@ -74,8 +74,8 @@ class TaskRepositoryImpl implements TaskRepository {
     bool ascending = true,
   }) {
     return _localDataSource
-    .watchTasks(page: page, limitPerPage: limitPerPage)
-    .map<ResultPage<TaskModel>>((event) {
+        .watchTasks(page: page, limitPerPage: limitPerPage)
+        .map<ResultPage<TaskModel>>((event) {
           final result = event.items
               .map((data) => TaskMapper.fromEntity(data))
               .toList();
@@ -91,16 +91,38 @@ class TaskRepositoryImpl implements TaskRepository {
         .map<Outcome<ResultPage<TaskModel>, TaskRepositoryErrors>>((
           pageResult,
         ) {
-          return Outcome<
-            ResultPage<TaskModel>,
-            TaskRepositoryErrors
-          >.success(value: pageResult);
+          return Outcome<ResultPage<TaskModel>, TaskRepositoryErrors>.success(
+            value: pageResult,
+          );
         })
         .handleError((error, stack) {
-          return Outcome<
-            ResultPage<TaskModel>,
-            TaskRepositoryErrors
-          >.failure(error: TaskRepositoryErrors.databaseError());
+          return Outcome<ResultPage<TaskModel>, TaskRepositoryErrors>.failure(
+            error: TaskRepositoryErrors.databaseError(),
+          );
         });
+  }
+
+  @override
+  Future<Outcome<TaskModel, TaskRepositoryErrors>> getTaskById(
+    int taskId,
+  ) async {
+    try {
+      final entity = await _localDataSource.getTaskById(taskId);
+      if (entity == null) {
+        return Outcome.failure(
+          error: TaskRepositoryErrors.notFound(
+            message: 'Task not found',
+            throwable: null,
+          ),
+        );
+      }
+      return Outcome.success(value: TaskMapper.fromEntity(entity));
+    } catch (e) {
+      return Outcome.failure(
+        error: GenericError(),
+        message: 'Failed to get task',
+        throwable: e,
+      );
+    }
   }
 }

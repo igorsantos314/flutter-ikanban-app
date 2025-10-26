@@ -43,7 +43,7 @@ class AppNavigation {
             throw Exception('Task ID is required to edit a task.');
           }
 
-          return TaskEditPage(taskId: taskId as int);
+          return TaskEditPage(taskId: int.parse(taskId) );
         },
       ),
     ],
@@ -53,9 +53,9 @@ class AppNavigation {
     context.go(home);
   }
 
-  static void navigateToTask(BuildContext context, {String? taskId}) {
+  static void navigateToTask(BuildContext context, {int? taskId}) {
     context.push(
-      taskId == null ? createTask : editTask.replaceFirst(':id', taskId),
+      taskId == null ? createTask : editTask.replaceFirst(':id', taskId.toString()),
     );
   }
 

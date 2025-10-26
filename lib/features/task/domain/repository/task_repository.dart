@@ -25,4 +25,5 @@ abstract class TaskRepository {
   Future<Outcome<void, TaskRepositoryErrors>> createTask(TaskModel task);
   Future<Outcome<void, TaskRepositoryErrors>> updateTask(TaskModel task);
   Future<Outcome<void, TaskRepositoryErrors>> deleteTask(int id);
+  Future<Outcome<TaskModel, TaskRepositoryErrors>> getTaskById(int taskId);
 }

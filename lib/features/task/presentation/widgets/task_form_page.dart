@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/bloc_text_field.dart';
+import 'package:flutter_ikanban_app/core/ui/widgets/multi_line_bloc_text_field.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_bloc.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_state.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.dart';
@@ -60,7 +61,7 @@ class _TaskFormPageState extends State<TaskFormPage>
               heroTag: 'delete_button',
               backgroundColor: Colors.red,
               onPressed: () {
-                // Lógica para deletar a tarefa
+                bloc.add(DeleteTaskEvent());
               },
               child: const Icon(Icons.delete),
             ),
@@ -88,7 +89,7 @@ class _TaskFormPageState extends State<TaskFormPage>
                       label: "Título",
                     ),
                     const SizedBox(height: 16),
-                    BlocTextField<TaskFormBloc, TaskFormState>(
+                    MultilineBlocTextField<TaskFormBloc, TaskFormState>(
                       valueSelector: (state) => state.description,
                       errorSelector: (state) => state.descriptionError,
                       onChanged: (value) => bloc.add(

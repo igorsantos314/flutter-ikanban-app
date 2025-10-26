@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,12 +16,11 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     on<TaskFormUpdateFieldsEvent>(_onUpdateFields);
     on<CreateTaskEvent>(_onCreateTask);
     on<TaskFormResetEvent>(_onResetForm);
+    on<DeleteTaskEvent>(_onDeleteTask);
+    on<LoadTaskFormEvent>(_onLoadTaskForm);
   }
 
-  void _onResetForm(
-    TaskFormResetEvent event,
-    Emitter<TaskFormState> emit,
-  ) {
+  void _onResetForm(TaskFormResetEvent event, Emitter<TaskFormState> emit) {
     emit(
       state.copyWith(
         showNotification: event.showNotification ?? state.showNotification,
@@ -63,27 +63,34 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     }
 
     try {
-      final outcome = await taskRepository.createTask(
-        TaskModel(
-          title: state.title,
-          description: state.description,
-          status: state.status,
-          priority: state.priority,
-          complexity: state.complexity,
-          type: state.type,
-          dueDate: state.dueDate,
-        ),
+      final task = TaskModel(
+        id: state.taskId,
+        title: state.title,
+        description: state.description,
+        status: state.status,
+        priority: state.priority,
+        complexity: state.complexity,
+        type: state.type,
+        dueDate: state.dueDate,
       );
+      Outcome<void, TaskRepositoryErrors> outcome;
+
+      outcome = await taskRepository.createTask(task);
+      if (state.taskId != null) {
+        // If taskId is not null, we are updating an existing task
+        outcome = await taskRepository.updateTask(task);
+      }
 
       outcome.when(
         success: (task) {
-          log('Task created successfully');
+          log('Action completed successfully');
           emit(
             state.copyWith(
               isLoading: false,
               showNotification: true,
               notificationType: NotificationType.success,
-              notificationMessage: 'Tarefa criada com sucesso!',
+              notificationMessage:
+                  'Tarefa ${state.taskId == null ? 'criada' : 'atualizada'} com sucesso!',
               closeScreen: true,
             ),
           );
@@ -122,5 +129,100 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
       },
     );
     emit(state.copyWith(isLoading: false, errorMessage: message));
+  }
+
+  FutureOr<void> _onDeleteTask(
+    DeleteTaskEvent event,
+    Emitter<TaskFormState> emit,
+  ) async {
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+
+    try {
+      if (state.taskId == null) {
+        log('Task ID is null, cannot delete task');
+        _handleTaskRepositoryError(
+          TaskRepositoryErrors.validationError(
+            message: 'Task ID is required for deletion',
+            throwable: null,
+          ),
+          emit,
+        );
+        return;
+      }
+
+      final outcome = await taskRepository.deleteTask(state.taskId!);
+
+      outcome.when(
+        success: (_) {
+          log('Task deleted successfully');
+          emit(
+            state.copyWith(
+              isLoading: false,
+              showNotification: true,
+              notificationType: NotificationType.success,
+              notificationMessage: 'Tarefa deletada com sucesso!',
+              closeScreen: true,
+            ),
+          );
+        },
+        failure: (error, message, throwable) {
+          log('Failed to delete task: $message');
+          _handleTaskRepositoryError(error, emit);
+        },
+      );
+    } catch (e) {
+      log('Error deleting task: $e');
+      _handleTaskRepositoryError(GenericError(), emit);
+    }
+  }
+
+  FutureOr<void> _onLoadTaskForm(
+    LoadTaskFormEvent event,
+    Emitter<TaskFormState> emit,
+  ) async {
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+
+    try {
+      final outcome = await taskRepository.getTaskById(event.taskId);
+
+      outcome.when(
+        success: (task) {
+          log('Task loaded successfully');
+
+          if (task == null) {
+            log('Task not found with id: ${event.taskId}');
+            _handleTaskRepositoryError(
+              TaskRepositoryErrors.notFound(
+                message: 'Task not found',
+                throwable: null,
+              ),
+              emit,
+            );
+            return;
+          }
+
+          emit(
+            state.copyWith(
+              isLoading: false,
+              taskId: task.id,
+              title: task.title,
+              description: task.description ?? "",
+              status: task.status,
+              priority: task.priority,
+              complexity: task.complexity,
+              type: task.type,
+              dueDate: task.dueDate,
+            ),
+          );
+        },
+        failure: (error, message, throwable) {
+          log('Failed to load task: $message');
+          _handleTaskRepositoryError(error, emit);
+        },
+      );
+    } catch (e) {
+      log('Error loading task: $e');
+      _handleTaskRepositoryError(GenericError(), emit);
+    }
   }
 }
