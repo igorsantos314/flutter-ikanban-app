@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/errors/task_repository_errors.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
@@ -13,6 +14,19 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
   TaskFormBloc(this.taskRepository) : super(TaskFormState.initial()) {
     on<TaskFormUpdateFieldsEvent>(_onUpdateFields);
     on<CreateTaskEvent>(_onCreateTask);
+    on<TaskFormResetEvent>(_onResetForm);
+  }
+
+  void _onResetForm(
+    TaskFormResetEvent event,
+    Emitter<TaskFormState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        showNotification: event.showNotification ?? state.showNotification,
+        closeScreen: event.closeScreen ?? state.closeScreen,
+      ),
+    );
   }
 
   void _onUpdateFields(
@@ -40,6 +54,14 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     Emitter<TaskFormState> emit,
   ) async {
     emit(state.copyWith(isLoading: true, errorMessage: null));
+
+    if (state.title.isEmpty) {
+      emit(
+        state.copyWith(isLoading: false, titleError: 'O título é obrigatório.'),
+      );
+      return;
+    }
+
     try {
       final outcome = await taskRepository.createTask(
         TaskModel(
@@ -56,7 +78,15 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
       outcome.when(
         success: (task) {
           log('Task created successfully');
-          emit(state.copyWith(isLoading: false));
+          emit(
+            state.copyWith(
+              isLoading: false,
+              showNotification: true,
+              notificationType: NotificationType.success,
+              notificationMessage: 'Tarefa criada com sucesso!',
+              closeScreen: true,
+            ),
+          );
         },
         failure: (error, message, throwable) {
           log('Failed to create task: $message');
@@ -69,11 +99,14 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     }
   }
 
-  void _handleTaskRepositoryError(TaskRepositoryErrors error, Emitter<TaskFormState> emit,) {
+  void _handleTaskRepositoryError(
+    TaskRepositoryErrors error,
+    Emitter<TaskFormState> emit,
+  ) {
     String message = "";
     error.when(
       genericError: (message, throwable) {
-        message = 'An unexpected error occurred.';
+        message = 'Ocorreu um erro inesperado.';
       },
       validationError: (message, throwable) {
         message = 'Verifique os campos e tente novamente.';

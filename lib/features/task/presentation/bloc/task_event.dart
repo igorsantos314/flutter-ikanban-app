@@ -27,6 +27,25 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
   List<Object> get props => [?title, ?description];
 }
 
+class LoadTaskFormEvent extends TaskEvent {
+  final int taskId;
+
+  const LoadTaskFormEvent(this.taskId);
+
+  @override
+  List<Object> get props => [taskId];
+}
+
+class TaskFormResetEvent extends TaskEvent {
+  final bool? closeScreen;
+  final bool? showNotification;
+
+  const TaskFormResetEvent({this.closeScreen, this.showNotification});
+
+  @override
+  List<Object> get props => [];
+}
+
 class LoadTasksEvent extends TaskEvent {
   const LoadTasksEvent();
 }

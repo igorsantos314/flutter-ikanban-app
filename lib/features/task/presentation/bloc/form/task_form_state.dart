@@ -1,3 +1,4 @@
+import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
@@ -22,6 +23,12 @@ abstract class TaskFormState with _$TaskFormState {
     @Default(TaskComplexity.easy) TaskComplexity complexity,
     @Default(TaskType.personal) TaskType type,
 
+    @Default(false) bool showNotification,
+    @Default(NotificationType.info) NotificationType notificationType,
+    @Default("") String notificationMessage,
+    
+    @Default(false) bool closeScreen,
+    
     @Default(false) bool isLoading,
     String? errorMessage,
   }) = _TaskFormState;

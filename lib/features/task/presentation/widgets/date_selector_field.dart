@@ -76,15 +76,15 @@ class DateSelectorField<TBloc extends StateStreamable<TState>, TState>
                       decoration: BoxDecoration(
                         color: (selectedDate != null 
                                 ? dateData.color 
-                                : Colors.grey)
+                                : theme.colorScheme.onSurface)
                             .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         dateData.icon,
-                        color: selectedDate != null 
-                            ? dateData.color 
-                            : Colors.grey,
+                        color: selectedDate != null
+                            ? dateData.color
+                            : theme.colorScheme.onSurface,
                         size: 20,
                       ),
                     ),
