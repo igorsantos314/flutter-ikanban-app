@@ -1,3 +1,4 @@
+import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -9,7 +10,15 @@ abstract class TaskListState with _$TaskListState {
     @Default("") String searchQuery,
     @Default([]) List<TaskModel> tasks,
     @Default(false) bool isLoading,
-    String? errorMessage,
+    @Default(false) bool isLoadingMore,
+    @Default(true) bool hasMorePages,
+    @Default(1) int currentPage,
+    @Default(false) bool hasError,
+    @Default("") String errorMessage,
+
+    @Default(false) bool showNotification,
+    @Default("") String notificationMessage,
+    @Default(NotificationType.info) NotificationType notificationType,
   }) = _TaskListState;
 
   factory TaskListState.initial() =>

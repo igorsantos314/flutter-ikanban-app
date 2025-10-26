@@ -24,15 +24,21 @@ class LoadingModal extends StatelessWidget {
     );
   }
 
+  static bool _isLoading = false;
+
   static void displayLoading(BuildContext context, {required bool isShow}) {
-    if (isShow) {
+    if (isShow && !_isLoading) {
+      _isLoading = true;
       showDialog(
         context: context,
         barrierDismissible: false,
         barrierColor: Colors.black54,
         builder: (_) => const LoadingModal(),
-      );
-    } else {
+      ).then((_) {
+        _isLoading = false;
+      });
+    } else if (!isShow && _isLoading) {
+      _isLoading = false;
       // Fecha o dialog se estiver aberto
       if (Navigator.canPop(context)) {
         Navigator.of(context, rootNavigator: true).pop();

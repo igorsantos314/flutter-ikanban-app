@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TaskListState {
 
- String get searchQuery; List<TaskModel> get tasks; bool get isLoading; String? get errorMessage;
+ String get searchQuery; List<TaskModel> get tasks; bool get isLoading; bool get isLoadingMore; bool get hasMorePages; int get currentPage; bool get hasError; String get errorMessage; bool get showNotification; String get notificationMessage; NotificationType get notificationType;
 /// Create a copy of TaskListState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $TaskListStateCopyWith<TaskListState> get copyWith => _$TaskListStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskListState&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&const DeepCollectionEquality().equals(other.tasks, tasks)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskListState&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&const DeepCollectionEquality().equals(other.tasks, tasks)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.hasMorePages, hasMorePages) || other.hasMorePages == hasMorePages)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.hasError, hasError) || other.hasError == hasError)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,searchQuery,const DeepCollectionEquality().hash(tasks),isLoading,errorMessage);
+int get hashCode => Object.hash(runtimeType,searchQuery,const DeepCollectionEquality().hash(tasks),isLoading,isLoadingMore,hasMorePages,currentPage,hasError,errorMessage,showNotification,notificationMessage,notificationType);
 
 @override
 String toString() {
-  return 'TaskListState(searchQuery: $searchQuery, tasks: $tasks, isLoading: $isLoading, errorMessage: $errorMessage)';
+  return 'TaskListState(searchQuery: $searchQuery, tasks: $tasks, isLoading: $isLoading, isLoadingMore: $isLoadingMore, hasMorePages: $hasMorePages, currentPage: $currentPage, hasError: $hasError, errorMessage: $errorMessage, showNotification: $showNotification, notificationMessage: $notificationMessage, notificationType: $notificationType)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $TaskListStateCopyWith<$Res>  {
   factory $TaskListStateCopyWith(TaskListState value, $Res Function(TaskListState) _then) = _$TaskListStateCopyWithImpl;
 @useResult
 $Res call({
- String searchQuery, List<TaskModel> tasks, bool isLoading, String? errorMessage
+ String searchQuery, List<TaskModel> tasks, bool isLoading, bool isLoadingMore, bool hasMorePages, int currentPage, bool hasError, String errorMessage, bool showNotification, String notificationMessage, NotificationType notificationType
 });
 
 
@@ -62,13 +62,20 @@ class _$TaskListStateCopyWithImpl<$Res>
 
 /// Create a copy of TaskListState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? searchQuery = null,Object? tasks = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? searchQuery = null,Object? tasks = null,Object? isLoading = null,Object? isLoadingMore = null,Object? hasMorePages = null,Object? currentPage = null,Object? hasError = null,Object? errorMessage = null,Object? showNotification = null,Object? notificationMessage = null,Object? notificationType = null,}) {
   return _then(_self.copyWith(
 searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
 as String,tasks: null == tasks ? _self.tasks : tasks // ignore: cast_nullable_to_non_nullable
 as List<TaskModel>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as bool,isLoadingMore: null == isLoadingMore ? _self.isLoadingMore : isLoadingMore // ignore: cast_nullable_to_non_nullable
+as bool,hasMorePages: null == hasMorePages ? _self.hasMorePages : hasMorePages // ignore: cast_nullable_to_non_nullable
+as bool,currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
+as int,hasError: null == hasError ? _self.hasError : hasError // ignore: cast_nullable_to_non_nullable
+as bool,errorMessage: null == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
+as bool,notificationMessage: null == notificationMessage ? _self.notificationMessage : notificationMessage // ignore: cast_nullable_to_non_nullable
+as String,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
+as NotificationType,
   ));
 }
 
@@ -153,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String searchQuery,  List<TaskModel> tasks,  bool isLoading,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String searchQuery,  List<TaskModel> tasks,  bool isLoading,  bool isLoadingMore,  bool hasMorePages,  int currentPage,  bool hasError,  String errorMessage,  bool showNotification,  String notificationMessage,  NotificationType notificationType)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TaskListState() when $default != null:
-return $default(_that.searchQuery,_that.tasks,_that.isLoading,_that.errorMessage);case _:
+return $default(_that.searchQuery,_that.tasks,_that.isLoading,_that.isLoadingMore,_that.hasMorePages,_that.currentPage,_that.hasError,_that.errorMessage,_that.showNotification,_that.notificationMessage,_that.notificationType);case _:
   return orElse();
 
 }
@@ -174,10 +181,10 @@ return $default(_that.searchQuery,_that.tasks,_that.isLoading,_that.errorMessage
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String searchQuery,  List<TaskModel> tasks,  bool isLoading,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String searchQuery,  List<TaskModel> tasks,  bool isLoading,  bool isLoadingMore,  bool hasMorePages,  int currentPage,  bool hasError,  String errorMessage,  bool showNotification,  String notificationMessage,  NotificationType notificationType)  $default,) {final _that = this;
 switch (_that) {
 case _TaskListState():
-return $default(_that.searchQuery,_that.tasks,_that.isLoading,_that.errorMessage);case _:
+return $default(_that.searchQuery,_that.tasks,_that.isLoading,_that.isLoadingMore,_that.hasMorePages,_that.currentPage,_that.hasError,_that.errorMessage,_that.showNotification,_that.notificationMessage,_that.notificationType);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -194,10 +201,10 @@ return $default(_that.searchQuery,_that.tasks,_that.isLoading,_that.errorMessage
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String searchQuery,  List<TaskModel> tasks,  bool isLoading,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String searchQuery,  List<TaskModel> tasks,  bool isLoading,  bool isLoadingMore,  bool hasMorePages,  int currentPage,  bool hasError,  String errorMessage,  bool showNotification,  String notificationMessage,  NotificationType notificationType)?  $default,) {final _that = this;
 switch (_that) {
 case _TaskListState() when $default != null:
-return $default(_that.searchQuery,_that.tasks,_that.isLoading,_that.errorMessage);case _:
+return $default(_that.searchQuery,_that.tasks,_that.isLoading,_that.isLoadingMore,_that.hasMorePages,_that.currentPage,_that.hasError,_that.errorMessage,_that.showNotification,_that.notificationMessage,_that.notificationType);case _:
   return null;
 
 }
@@ -209,7 +216,7 @@ return $default(_that.searchQuery,_that.tasks,_that.isLoading,_that.errorMessage
 
 
 class _TaskListState implements TaskListState {
-  const _TaskListState({this.searchQuery = "", final  List<TaskModel> tasks = const [], this.isLoading = false, this.errorMessage}): _tasks = tasks;
+  const _TaskListState({this.searchQuery = "", final  List<TaskModel> tasks = const [], this.isLoading = false, this.isLoadingMore = false, this.hasMorePages = true, this.currentPage = 1, this.hasError = false, this.errorMessage = "", this.showNotification = false, this.notificationMessage = "", this.notificationType = NotificationType.info}): _tasks = tasks;
   
 
 @override@JsonKey() final  String searchQuery;
@@ -221,7 +228,14 @@ class _TaskListState implements TaskListState {
 }
 
 @override@JsonKey() final  bool isLoading;
-@override final  String? errorMessage;
+@override@JsonKey() final  bool isLoadingMore;
+@override@JsonKey() final  bool hasMorePages;
+@override@JsonKey() final  int currentPage;
+@override@JsonKey() final  bool hasError;
+@override@JsonKey() final  String errorMessage;
+@override@JsonKey() final  bool showNotification;
+@override@JsonKey() final  String notificationMessage;
+@override@JsonKey() final  NotificationType notificationType;
 
 /// Create a copy of TaskListState
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +247,16 @@ _$TaskListStateCopyWith<_TaskListState> get copyWith => __$TaskListStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskListState&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&const DeepCollectionEquality().equals(other._tasks, _tasks)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskListState&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&const DeepCollectionEquality().equals(other._tasks, _tasks)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.hasMorePages, hasMorePages) || other.hasMorePages == hasMorePages)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.hasError, hasError) || other.hasError == hasError)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,searchQuery,const DeepCollectionEquality().hash(_tasks),isLoading,errorMessage);
+int get hashCode => Object.hash(runtimeType,searchQuery,const DeepCollectionEquality().hash(_tasks),isLoading,isLoadingMore,hasMorePages,currentPage,hasError,errorMessage,showNotification,notificationMessage,notificationType);
 
 @override
 String toString() {
-  return 'TaskListState(searchQuery: $searchQuery, tasks: $tasks, isLoading: $isLoading, errorMessage: $errorMessage)';
+  return 'TaskListState(searchQuery: $searchQuery, tasks: $tasks, isLoading: $isLoading, isLoadingMore: $isLoadingMore, hasMorePages: $hasMorePages, currentPage: $currentPage, hasError: $hasError, errorMessage: $errorMessage, showNotification: $showNotification, notificationMessage: $notificationMessage, notificationType: $notificationType)';
 }
 
 
@@ -253,7 +267,7 @@ abstract mixin class _$TaskListStateCopyWith<$Res> implements $TaskListStateCopy
   factory _$TaskListStateCopyWith(_TaskListState value, $Res Function(_TaskListState) _then) = __$TaskListStateCopyWithImpl;
 @override @useResult
 $Res call({
- String searchQuery, List<TaskModel> tasks, bool isLoading, String? errorMessage
+ String searchQuery, List<TaskModel> tasks, bool isLoading, bool isLoadingMore, bool hasMorePages, int currentPage, bool hasError, String errorMessage, bool showNotification, String notificationMessage, NotificationType notificationType
 });
 
 
@@ -270,13 +284,20 @@ class __$TaskListStateCopyWithImpl<$Res>
 
 /// Create a copy of TaskListState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? searchQuery = null,Object? tasks = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? searchQuery = null,Object? tasks = null,Object? isLoading = null,Object? isLoadingMore = null,Object? hasMorePages = null,Object? currentPage = null,Object? hasError = null,Object? errorMessage = null,Object? showNotification = null,Object? notificationMessage = null,Object? notificationType = null,}) {
   return _then(_TaskListState(
 searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
 as String,tasks: null == tasks ? _self._tasks : tasks // ignore: cast_nullable_to_non_nullable
 as List<TaskModel>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as bool,isLoadingMore: null == isLoadingMore ? _self.isLoadingMore : isLoadingMore // ignore: cast_nullable_to_non_nullable
+as bool,hasMorePages: null == hasMorePages ? _self.hasMorePages : hasMorePages // ignore: cast_nullable_to_non_nullable
+as bool,currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
+as int,hasError: null == hasError ? _self.hasError : hasError // ignore: cast_nullable_to_non_nullable
+as bool,errorMessage: null == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
+as bool,notificationMessage: null == notificationMessage ? _self.notificationMessage : notificationMessage // ignore: cast_nullable_to_non_nullable
+as String,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
+as NotificationType,
   ));
 }
 

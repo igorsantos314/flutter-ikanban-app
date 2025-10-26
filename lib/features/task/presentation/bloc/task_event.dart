@@ -94,3 +94,31 @@ class SearchTasksEvent extends TaskEvent {
   @override
   List<Object> get props => [query];
 }
+
+// Novos eventos para paginação híbrida
+class LoadMoreTasksEvent extends TaskEvent {
+  const LoadMoreTasksEvent();
+}
+
+class RefreshTasksEvent extends TaskEvent {
+  const RefreshTasksEvent();
+}
+
+class TasksStreamDataReceived extends TaskEvent {
+  final dynamic outcome; // Outcome from stream
+  
+  const TasksStreamDataReceived(this.outcome);
+  
+  @override
+  List<Object> get props => [outcome];
+}
+
+class TasksPageDataReceived extends TaskEvent {
+  final dynamic outcome; // Outcome from pagination API
+  final int page;
+  
+  const TasksPageDataReceived(this.outcome, this.page);
+  
+  @override
+  List<Object> get props => [outcome, page];
+}
