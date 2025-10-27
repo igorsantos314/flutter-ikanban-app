@@ -38,6 +38,7 @@ class _TaskListPageContentState extends State<TaskListPageContent> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return MultiBlocListener(
       listeners: [
         BlocListener<TaskListBloc, TaskListState>(
@@ -62,7 +63,7 @@ class _TaskListPageContentState extends State<TaskListPageContent> {
         ),
       ],
       child: Scaffold(
-        appBar: AppBar(title: const Text('Task List')),
+        appBar: AppBar(title: const Text('iKanban - Tarefas')),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             AppNavigation.navigateToTask(context);
@@ -116,10 +117,10 @@ class _TaskListPageContentState extends State<TaskListPageContent> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.task_alt,
                             size: 64,
-                            color: Colors.grey,
+                            color: theme.colorScheme.onSurface.withAlpha(100),
                           ),
                           const SizedBox(height: 16),
                           Text(

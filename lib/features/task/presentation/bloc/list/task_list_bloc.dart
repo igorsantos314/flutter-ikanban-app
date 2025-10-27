@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_list_state.dart';
@@ -311,7 +312,31 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     log('  - Has Error: ${state.hasError}');
   }
 
-  FutureOr<void> _onToggleTaskCompletion(ToggleTaskCompletion event, Emitter<TaskListState> emit) {
+  FutureOr<void> _onToggleTaskCompletion(ToggleTaskCompletion event, Emitter<TaskListState> emit) async {
+    final task = state.tasks.firstWhere((t) => t.id == event.id);
+    final updatedStatus = task.status == TaskStatus.done ? TaskStatus.todo : TaskStatus.done;
+    final updatedTask = task.copyWith(status: updatedStatus);
+    
+    // Atualiza no repositório
+    var outcome = await taskRepository.updateTask(updatedTask);
+
+    outcome.when(
+      success: (_) {
+        // Atualiza localmente o estado
+        final updatedTasks = state.tasks.map((t) => t.id == updatedTask.id ? updatedTask : t).toList();
+        emit(state.copyWith(tasks: updatedTasks));
+      },
+      failure: (error, message, throwable) {
+        log('[TaskListBloc] Error toggling task completion: $error, message: $message');
+        emit(state.copyWith(
+          showNotification: true,
+          notificationMessage: message ?? 'Erro ao atualizar tarefa',
+          notificationType: NotificationType.error,
+        ));
+      },
+    );
+    
+    log('[TaskListBloc] Toggled task ${task.id} to status $updatedStatus');
   }
 
   FutureOr<void> _onTaskSelected(TaskSelectedEvent event, Emitter<TaskListState> emit) {

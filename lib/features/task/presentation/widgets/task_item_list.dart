@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 
@@ -11,9 +12,9 @@ class TaskItemList extends StatelessWidget {
   final Color? borderColor;
 
   const TaskItemList({
-    super.key, 
-    required this.task, 
-    this.onTap, 
+    super.key,
+    required this.task,
+    this.onTap,
     this.onToggleCompletion,
     this.onStatusTap,
     this.cardColor,
@@ -24,13 +25,13 @@ class TaskItemList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final effectiveCardColor = cardColor ?? theme.cardColor;
-    
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       color: effectiveCardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: borderColor != null 
+        side: borderColor != null
             ? BorderSide(color: borderColor!, width: 1.5)
             : BorderSide.none,
       ),
@@ -56,21 +57,22 @@ class TaskItemList extends StatelessWidget {
                         fontSize: 16,
                       ),
                     ),
-                    
+
                     // Descrição
-                    if (task.description != null && task.description!.isNotEmpty) ...[
+                    if (task.description != null &&
+                        task.description!.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Text(
                         task.description!,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Colors.grey[600],
+                          color: theme.colorScheme.onSurface.withAlpha(150),
                           fontSize: 14,
                         ),
                       ),
                     ],
-                    
+
                     // Data de vencimento
                     if (task.dueDate != null) ...[
                       const SizedBox(height: 8),
@@ -81,7 +83,7 @@ class TaskItemList extends StatelessWidget {
                             size: 14,
                             color: task.dueDate!.isBefore(DateTime.now())
                                 ? Colors.red
-                                : Colors.grey[600],
+                                : theme.colorScheme.onSurface.withAlpha(150),
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -90,7 +92,7 @@ class TaskItemList extends StatelessWidget {
                               fontSize: 12,
                               color: task.dueDate!.isBefore(DateTime.now())
                                   ? Colors.red
-                                  : Colors.grey[600],
+                                  : theme.colorScheme.onSurface.withAlpha(150),
                               fontWeight: task.dueDate!.isBefore(DateTime.now())
                                   ? FontWeight.w600
                                   : FontWeight.normal,
@@ -102,9 +104,9 @@ class TaskItemList extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(width: 12),
-              
+
               // Status e Prioridade
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -116,8 +118,10 @@ class TaskItemList extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        border: onStatusTap != null 
-                            ? Border.all(color: task.status.color.withOpacity(0.3))
+                        border: onStatusTap != null
+                            ? Border.all(
+                                color: task.status.color.withValues(alpha: 0.3),
+                              )
                             : null,
                       ),
                       child: Chip(
@@ -138,21 +142,20 @@ class TaskItemList extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Indicador de Prioridade
                   if (task.priority.name != 'low') ...[
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: task.priority.name == 'high'
-                            ? Colors.red.withOpacity(0.1)
-                            : Colors.orange.withOpacity(0.1),
+                        color: task.priority.color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: task.priority.name == 'high'
-                              ? Colors.red.withOpacity(0.3)
-                              : Colors.orange.withOpacity(0.3),
+                          color: task.priority.color.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(
@@ -161,26 +164,22 @@ class TaskItemList extends StatelessWidget {
                           Icon(
                             Icons.priority_high,
                             size: 12,
-                            color: task.priority.name == 'high'
-                                ? Colors.red
-                                : Colors.orange,
+                            color: task.priority.color,
                           ),
                           const SizedBox(width: 2),
                           Text(
-                            task.priority.name == 'high' ? 'Alta' : 'Média',
+                            task.priority.displayName,
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
-                              color: task.priority.name == 'high'
-                                  ? Colors.red[700]
-                                  : Colors.orange[700],
+                              color: task.priority.color.withValues(alpha: 0.7),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ],
-                  
+
                   // Botão de toggle completion (se fornecido)
                   if (onToggleCompletion != null) ...[
                     const SizedBox(height: 8),
@@ -192,7 +191,7 @@ class TaskItemList extends StatelessWidget {
                             : Icons.radio_button_unchecked,
                         color: task.status == TaskStatus.done
                             ? Colors.green
-                            : Colors.grey,
+                            : theme.colorScheme.onSurface,
                       ),
                       visualDensity: VisualDensity.compact,
                       constraints: const BoxConstraints(
