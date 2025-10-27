@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter_ikanban_app/core/utils/mapper/generic_sql_type_converter.dart';
+import 'package:flutter_ikanban_app/features/board/infra/local/tables/board_entity_table.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
@@ -14,7 +15,7 @@ import 'package:path_provider/path_provider.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [TaskEntity])
+@DriftDatabase(tables: [TaskEntity, BoardEntity])
 class AppDatabase extends _$AppDatabase {
   static const String dbName = 'ikanban_app.db';
   AppDatabase() : super(_openConnection(dbName));

@@ -42,6 +42,7 @@ class _TaskFormPageState extends State<TaskFormPage>
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TaskFormBloc>();
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
@@ -50,6 +51,8 @@ class _TaskFormPageState extends State<TaskFormPage>
         children: [
           FloatingActionButton(
             heroTag: 'save_button',
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: theme.colorScheme.onPrimary,
             onPressed: () {
               bloc.add(CreateTaskEvent());
             },
@@ -59,7 +62,8 @@ class _TaskFormPageState extends State<TaskFormPage>
             const SizedBox(height: 16),
             FloatingActionButton(
               heroTag: 'delete_button',
-              backgroundColor: Colors.red,
+              backgroundColor: theme.colorScheme.error,
+              foregroundColor: theme.colorScheme.onError,
               onPressed: () {
                 bloc.add(DeleteTaskEvent());
               },
