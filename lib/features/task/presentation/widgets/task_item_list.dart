@@ -6,6 +6,7 @@ import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 class TaskItemList extends StatelessWidget {
   final TaskModel task;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final VoidCallback? onToggleCompletion;
   final VoidCallback? onStatusTap;
   final Color? cardColor;
@@ -15,6 +16,7 @@ class TaskItemList extends StatelessWidget {
     super.key,
     required this.task,
     this.onTap,
+    this.onLongPress,
     this.onToggleCompletion,
     this.onStatusTap,
     this.cardColor,
@@ -38,6 +40,7 @@ class TaskItemList extends StatelessWidget {
       elevation: 2,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),

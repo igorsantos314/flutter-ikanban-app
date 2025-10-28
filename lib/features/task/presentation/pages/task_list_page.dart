@@ -6,6 +6,8 @@ import 'package:flutter_ikanban_app/core/ui/widgets/snackbars.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_list_bloc.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_list_state.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/modals/status_selector_bottom_sheet.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_form_selectors_mixin.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_item_list.dart';
 
 class TaskListPage extends StatelessWidget {
@@ -27,7 +29,8 @@ class TaskListPageContent extends StatefulWidget {
   State<TaskListPageContent> createState() => _TaskListPageContentState();
 }
 
-class _TaskListPageContentState extends State<TaskListPageContent> {
+class _TaskListPageContentState extends State<TaskListPageContent>
+    with TaskFormSelectorsMixin {
   @override
   void initState() {
     super.initState();
@@ -61,6 +64,29 @@ class _TaskListPageContentState extends State<TaskListPageContent> {
             });
           },
         ),
+        BlocListener<TaskListBloc, TaskListState>(
+          listenWhen: (previous, current) =>
+              previous.showStatusSelector != current.showStatusSelector,
+          listener: (context, state) {
+            if (state.showStatusSelector) {
+              final task = state.selectedTask;
+              if (task == null) return;
+
+              StatusSelectorBottomSheet.show(
+                context: context,
+                selectedStatus: task.status,
+                onStatusSelected: (status) {
+                  context.read<TaskListBloc>().add(
+                    TaskListUpdateStatus(status: status),
+                  );
+                },
+              );
+              context.read<TaskListBloc>().add(
+                TaskFormResetEvent(showStatusSelector: false),
+              );
+            }
+          },
+        ),
       ],
       child: Scaffold(
         appBar: AppBar(title: const Text('iKanban - Tarefas')),
@@ -81,7 +107,8 @@ class _TaskListPageContentState extends State<TaskListPageContent> {
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
                 ),
-                onChanged: (value) {
+                onChanged: (value) {},
+                onSubmitted: (value) {
                   context.read<TaskListBloc>().add(
                     SearchTasksEvent(query: value),
                   );
@@ -127,9 +154,9 @@ class _TaskListPageContentState extends State<TaskListPageContent> {
                             state.searchQuery.isNotEmpty
                                 ? 'Nenhuma tarefa encontrada para "${state.searchQuery}"'
                                 : 'Nenhuma tarefa encontrada',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
-                              color: Colors.grey,
+                              color: theme.colorScheme.onSurface,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -194,7 +221,15 @@ class _TaskListPageContentState extends State<TaskListPageContent> {
                         return TaskItemList(
                           task: task,
                           onTap: () {
-                            AppNavigation.navigateToTask(context, taskId: task.id);
+                            AppNavigation.navigateToTask(
+                              context,
+                              taskId: task.id,
+                            );
+                          },
+                          onLongPress: () {
+                            context.read<TaskListBloc>().add(
+                              TaskSelectedEvent(task: task),
+                            );
                           },
                           onToggleCompletion: () {
                             context.read<TaskListBloc>().add(

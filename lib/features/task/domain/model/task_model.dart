@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
@@ -17,6 +18,7 @@ abstract class TaskModel with _$TaskModel {
     DateTime? dueDate,
     @Default(TaskComplexity.easy) TaskComplexity complexity,
     @Default(TaskType.personal) TaskType type,
+    Color? color,
     @Default(true) bool isActive,
   }) = _TaskModel;
 }

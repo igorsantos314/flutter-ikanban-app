@@ -15,6 +15,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
   TaskFormBloc(this.taskRepository) : super(TaskFormState.initial()) {
     on<TaskFormUpdateFieldsEvent>(_onUpdateFields);
     on<CreateTaskEvent>(_onCreateTask);
+    on<UpdateTaskEvent>(_onUpdateTask);
     on<TaskFormResetEvent>(_onResetForm);
     on<DeleteTaskEvent>(_onDeleteTask);
     on<LoadTaskFormEvent>(_onLoadTaskForm);
@@ -45,6 +46,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         complexity: event.complexity ?? state.complexity,
         type: event.type ?? state.type,
         dueDate: event.dueDate,
+        color: event.color ?? state.color,
       ),
     );
   }
@@ -72,6 +74,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         complexity: state.complexity,
         type: state.type,
         dueDate: state.dueDate,
+        color: state.color,
       );
       Outcome<void, TaskRepositoryErrors> outcome;
 
@@ -106,29 +109,56 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     }
   }
 
-  void _handleTaskRepositoryError(
-    TaskRepositoryErrors error,
+  FutureOr<void> _onUpdateTask(
+    UpdateTaskEvent event,
     Emitter<TaskFormState> emit,
-  ) {
-    String message = "";
-    error.when(
-      genericError: (message, throwable) {
-        message = 'Ocorreu um erro inesperado.';
-      },
-      validationError: (message, throwable) {
-        message = 'Verifique os campos e tente novamente.';
-      },
-      databaseError: (message, throwable) {
-        message = 'Erro ao acessar o banco de dados.';
-      },
-      networkError: (message, throwable) {
-        message = 'Erro de rede. Verifique sua conexão.';
-      },
-      notFound: (message, throwable) {
-        message = 'Recurso não encontrado.';
-      },
-    );
-    emit(state.copyWith(isLoading: false, errorMessage: message));
+  ) async {
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+
+    if (state.title.isEmpty) {
+      emit(
+        state.copyWith(isLoading: false, titleError: 'O título é obrigatório.'),
+      );
+      return;
+    }
+
+    try {
+      final task = TaskModel(
+        id: state.taskId,
+        title: state.title,
+        description: state.description,
+        status: state.status,
+        priority: state.priority,
+        complexity: state.complexity,
+        type: state.type,
+        dueDate: state.dueDate,
+        color: state.color,
+      );
+
+      final outcome = await taskRepository.updateTask(task);
+
+      outcome.when(
+        success: (task) {
+          log('Update completed successfully');
+          emit(
+            state.copyWith(
+              isLoading: false,
+              showNotification: true,
+              notificationType: NotificationType.success,
+              notificationMessage: 'Tarefa atualizada com sucesso!',
+              closeScreen: true,
+            ),
+          );
+        },
+        failure: (error, message, throwable) {
+          log('Failed to update task: $message');
+          _handleTaskRepositoryError(error, emit);
+        },
+      );
+    } catch (e) {
+      log('Error to update task: $e');
+      _handleTaskRepositoryError(GenericError(), emit);
+    }
   }
 
   FutureOr<void> _onDeleteTask(
@@ -224,5 +254,30 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
       log('Error loading task: $e');
       _handleTaskRepositoryError(GenericError(), emit);
     }
+  }
+
+  void _handleTaskRepositoryError(
+    TaskRepositoryErrors error,
+    Emitter<TaskFormState> emit,
+  ) {
+    String message = "";
+    error.when(
+      genericError: (message, throwable) {
+        message = 'Ocorreu um erro inesperado.';
+      },
+      validationError: (message, throwable) {
+        message = 'Verifique os campos e tente novamente.';
+      },
+      databaseError: (message, throwable) {
+        message = 'Erro ao acessar o banco de dados.';
+      },
+      networkError: (message, throwable) {
+        message = 'Erro de rede. Verifique sua conexão.';
+      },
+      notFound: (message, throwable) {
+        message = 'Recurso não encontrado.';
+      },
+    );
+    emit(state.copyWith(isLoading: false, errorMessage: message));
   }
 }

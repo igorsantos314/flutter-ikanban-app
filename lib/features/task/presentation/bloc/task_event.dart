@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
@@ -20,6 +21,7 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
   final DateTime? dueDate;
   final TaskComplexity? complexity;
   final TaskType? type;
+  final Color? color;
 
   const TaskFormUpdateFieldsEvent({
     this.title,
@@ -29,10 +31,11 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
     this.dueDate,
     this.complexity,
     this.type,
+    this.color,
   });
 
   @override
-  List<Object> get props => [?title, ?description];
+  List<Object> get props => [?title, ?description, ?status, ?priority, ?dueDate, ?complexity, ?type, ?color];
 }
 
 class LoadTaskFormEvent extends TaskEvent {
@@ -47,11 +50,21 @@ class LoadTaskFormEvent extends TaskEvent {
 class TaskFormResetEvent extends TaskEvent {
   final bool? closeScreen;
   final bool? showNotification;
+  final bool? showStatusSelector;
 
-  const TaskFormResetEvent({this.closeScreen, this.showNotification});
+  const TaskFormResetEvent({this.closeScreen, this.showNotification, this.showStatusSelector});
 
   @override
   List<Object> get props => [];
+}
+
+class TaskListUpdateStatus extends TaskEvent {
+  final TaskStatus status;
+
+  const TaskListUpdateStatus({required this.status});
+
+  @override
+  List<Object> get props => [status];
 }
 
 class LoadTasksEvent extends TaskEvent {
@@ -68,12 +81,12 @@ class CreateTaskEvent extends TaskEvent {
 }
 
 class UpdateTaskEvent extends TaskEvent {
-  final TaskModel taskModel;
+  final TaskModel? taskModel;
 
-  const UpdateTaskEvent({required this.taskModel});
+  const UpdateTaskEvent({this.taskModel});
 
   @override
-  List<Object> get props => [taskModel];
+  List<Object> get props => [?taskModel];
 }
 
 class DeleteTaskEvent extends TaskEvent {
@@ -99,6 +112,16 @@ class ToggleTaskCompletion extends TaskEvent {
 
   @override
   List<Object> get props => [id];
+}
+
+class ChangeTaskStatusEvent extends TaskEvent {
+  final int id;
+  final TaskStatus status;
+
+  const ChangeTaskStatusEvent({required this.id, required this.status});
+
+  @override
+  List<Object> get props => [id, status];
 }
 
 class SearchTasksEvent extends TaskEvent {

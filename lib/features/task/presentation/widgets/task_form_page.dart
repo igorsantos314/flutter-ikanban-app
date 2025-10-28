@@ -54,7 +54,9 @@ class _TaskFormPageState extends State<TaskFormPage>
             backgroundColor: theme.colorScheme.primary,
             foregroundColor: theme.colorScheme.onPrimary,
             onPressed: () {
-              bloc.add(CreateTaskEvent());
+              bloc.add(
+                widget.isEditMode ? UpdateTaskEvent() : CreateTaskEvent(),
+              );
             },
             child: const Icon(Icons.save),
           ),
@@ -103,6 +105,7 @@ class _TaskFormPageState extends State<TaskFormPage>
                       label: "Descrição",
                     ),
                     const SizedBox(height: 24),
+
                     FormSelectorField(
                       title: 'Status',
                       displayText: state.status.displayName,

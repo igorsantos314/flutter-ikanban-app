@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TaskModel {
 
- int? get id; String get title; String? get description; TaskStatus get status; TaskPriority get priority; DateTime? get dueDate; TaskComplexity get complexity; TaskType get type; bool get isActive;
+ int? get id; String get title; String? get description; TaskStatus get status; TaskPriority get priority; DateTime? get dueDate; TaskComplexity get complexity; TaskType get type; Color? get color; bool get isActive;
 /// Create a copy of TaskModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $TaskModelCopyWith<TaskModel> get copyWith => _$TaskModelCopyWithImpl<TaskModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.complexity, complexity) || other.complexity == complexity)&&(identical(other.type, type) || other.type == type)&&(identical(other.isActive, isActive) || other.isActive == isActive));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.complexity, complexity) || other.complexity == complexity)&&(identical(other.type, type) || other.type == type)&&(identical(other.color, color) || other.color == color)&&(identical(other.isActive, isActive) || other.isActive == isActive));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,title,description,status,priority,dueDate,complexity,type,isActive);
+int get hashCode => Object.hash(runtimeType,id,title,description,status,priority,dueDate,complexity,type,color,isActive);
 
 @override
 String toString() {
-  return 'TaskModel(id: $id, title: $title, description: $description, status: $status, priority: $priority, dueDate: $dueDate, complexity: $complexity, type: $type, isActive: $isActive)';
+  return 'TaskModel(id: $id, title: $title, description: $description, status: $status, priority: $priority, dueDate: $dueDate, complexity: $complexity, type: $type, color: $color, isActive: $isActive)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $TaskModelCopyWith<$Res>  {
   factory $TaskModelCopyWith(TaskModel value, $Res Function(TaskModel) _then) = _$TaskModelCopyWithImpl;
 @useResult
 $Res call({
- int? id, String title, String? description, TaskStatus status, TaskPriority priority, DateTime? dueDate, TaskComplexity complexity, TaskType type, bool isActive
+ int? id, String title, String? description, TaskStatus status, TaskPriority priority, DateTime? dueDate, TaskComplexity complexity, TaskType type, Color? color, bool isActive
 });
 
 
@@ -62,7 +62,7 @@ class _$TaskModelCopyWithImpl<$Res>
 
 /// Create a copy of TaskModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? title = null,Object? description = freezed,Object? status = null,Object? priority = null,Object? dueDate = freezed,Object? complexity = null,Object? type = null,Object? isActive = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? title = null,Object? description = freezed,Object? status = null,Object? priority = null,Object? dueDate = freezed,Object? complexity = null,Object? type = null,Object? color = freezed,Object? isActive = null,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -72,7 +72,8 @@ as TaskStatus,priority: null == priority ? _self.priority : priority // ignore: 
 as TaskPriority,dueDate: freezed == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,complexity: null == complexity ? _self.complexity : complexity // ignore: cast_nullable_to_non_nullable
 as TaskComplexity,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as TaskType,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as TaskType,color: freezed == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
+as Color?,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -158,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String title,  String? description,  TaskStatus status,  TaskPriority priority,  DateTime? dueDate,  TaskComplexity complexity,  TaskType type,  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String title,  String? description,  TaskStatus status,  TaskPriority priority,  DateTime? dueDate,  TaskComplexity complexity,  TaskType type,  Color? color,  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TaskModel() when $default != null:
-return $default(_that.id,_that.title,_that.description,_that.status,_that.priority,_that.dueDate,_that.complexity,_that.type,_that.isActive);case _:
+return $default(_that.id,_that.title,_that.description,_that.status,_that.priority,_that.dueDate,_that.complexity,_that.type,_that.color,_that.isActive);case _:
   return orElse();
 
 }
@@ -179,10 +180,10 @@ return $default(_that.id,_that.title,_that.description,_that.status,_that.priori
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String title,  String? description,  TaskStatus status,  TaskPriority priority,  DateTime? dueDate,  TaskComplexity complexity,  TaskType type,  bool isActive)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String title,  String? description,  TaskStatus status,  TaskPriority priority,  DateTime? dueDate,  TaskComplexity complexity,  TaskType type,  Color? color,  bool isActive)  $default,) {final _that = this;
 switch (_that) {
 case _TaskModel():
-return $default(_that.id,_that.title,_that.description,_that.status,_that.priority,_that.dueDate,_that.complexity,_that.type,_that.isActive);case _:
+return $default(_that.id,_that.title,_that.description,_that.status,_that.priority,_that.dueDate,_that.complexity,_that.type,_that.color,_that.isActive);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +200,10 @@ return $default(_that.id,_that.title,_that.description,_that.status,_that.priori
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String title,  String? description,  TaskStatus status,  TaskPriority priority,  DateTime? dueDate,  TaskComplexity complexity,  TaskType type,  bool isActive)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String title,  String? description,  TaskStatus status,  TaskPriority priority,  DateTime? dueDate,  TaskComplexity complexity,  TaskType type,  Color? color,  bool isActive)?  $default,) {final _that = this;
 switch (_that) {
 case _TaskModel() when $default != null:
-return $default(_that.id,_that.title,_that.description,_that.status,_that.priority,_that.dueDate,_that.complexity,_that.type,_that.isActive);case _:
+return $default(_that.id,_that.title,_that.description,_that.status,_that.priority,_that.dueDate,_that.complexity,_that.type,_that.color,_that.isActive);case _:
   return null;
 
 }
@@ -214,7 +215,7 @@ return $default(_that.id,_that.title,_that.description,_that.status,_that.priori
 
 
 class _TaskModel implements TaskModel {
-  const _TaskModel({this.id, required this.title, this.description, this.status = TaskStatus.backlog, this.priority = TaskPriority.low, this.dueDate, this.complexity = TaskComplexity.easy, this.type = TaskType.personal, this.isActive = true});
+  const _TaskModel({this.id, required this.title, this.description, this.status = TaskStatus.backlog, this.priority = TaskPriority.low, this.dueDate, this.complexity = TaskComplexity.easy, this.type = TaskType.personal, this.color, this.isActive = true});
   
 
 @override final  int? id;
@@ -225,6 +226,7 @@ class _TaskModel implements TaskModel {
 @override final  DateTime? dueDate;
 @override@JsonKey() final  TaskComplexity complexity;
 @override@JsonKey() final  TaskType type;
+@override final  Color? color;
 @override@JsonKey() final  bool isActive;
 
 /// Create a copy of TaskModel
@@ -237,16 +239,16 @@ _$TaskModelCopyWith<_TaskModel> get copyWith => __$TaskModelCopyWithImpl<_TaskMo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.complexity, complexity) || other.complexity == complexity)&&(identical(other.type, type) || other.type == type)&&(identical(other.isActive, isActive) || other.isActive == isActive));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.complexity, complexity) || other.complexity == complexity)&&(identical(other.type, type) || other.type == type)&&(identical(other.color, color) || other.color == color)&&(identical(other.isActive, isActive) || other.isActive == isActive));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,title,description,status,priority,dueDate,complexity,type,isActive);
+int get hashCode => Object.hash(runtimeType,id,title,description,status,priority,dueDate,complexity,type,color,isActive);
 
 @override
 String toString() {
-  return 'TaskModel(id: $id, title: $title, description: $description, status: $status, priority: $priority, dueDate: $dueDate, complexity: $complexity, type: $type, isActive: $isActive)';
+  return 'TaskModel(id: $id, title: $title, description: $description, status: $status, priority: $priority, dueDate: $dueDate, complexity: $complexity, type: $type, color: $color, isActive: $isActive)';
 }
 
 
@@ -257,7 +259,7 @@ abstract mixin class _$TaskModelCopyWith<$Res> implements $TaskModelCopyWith<$Re
   factory _$TaskModelCopyWith(_TaskModel value, $Res Function(_TaskModel) _then) = __$TaskModelCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String title, String? description, TaskStatus status, TaskPriority priority, DateTime? dueDate, TaskComplexity complexity, TaskType type, bool isActive
+ int? id, String title, String? description, TaskStatus status, TaskPriority priority, DateTime? dueDate, TaskComplexity complexity, TaskType type, Color? color, bool isActive
 });
 
 
@@ -274,7 +276,7 @@ class __$TaskModelCopyWithImpl<$Res>
 
 /// Create a copy of TaskModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? title = null,Object? description = freezed,Object? status = null,Object? priority = null,Object? dueDate = freezed,Object? complexity = null,Object? type = null,Object? isActive = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? title = null,Object? description = freezed,Object? status = null,Object? priority = null,Object? dueDate = freezed,Object? complexity = null,Object? type = null,Object? color = freezed,Object? isActive = null,}) {
   return _then(_TaskModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -284,7 +286,8 @@ as TaskStatus,priority: null == priority ? _self.priority : priority // ignore: 
 as TaskPriority,dueDate: freezed == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,complexity: null == complexity ? _self.complexity : complexity // ignore: cast_nullable_to_non_nullable
 as TaskComplexity,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as TaskType,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as TaskType,color: freezed == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
+as Color?,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

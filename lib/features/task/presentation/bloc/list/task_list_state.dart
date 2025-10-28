@@ -7,6 +7,7 @@ part 'task_list_state.freezed.dart';
 @freezed
 abstract class TaskListState with _$TaskListState {
   const factory TaskListState({
+    TaskModel? selectedTask,
     @Default("") String searchQuery,
     @Default([]) List<TaskModel> tasks,
     @Default(false) bool isLoading,
@@ -19,6 +20,8 @@ abstract class TaskListState with _$TaskListState {
     @Default(false) bool showNotification,
     @Default("") String notificationMessage,
     @Default(NotificationType.info) NotificationType notificationType,
+
+    @Default(false) bool showStatusSelector,
   }) = _TaskListState;
 
   factory TaskListState.initial() =>

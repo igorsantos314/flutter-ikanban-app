@@ -11,7 +11,7 @@ class StatusSelectorBottomSheet extends StatelessWidget {
     required this.selectedStatus,
     required this.onStatusSelected,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -33,16 +33,16 @@ class StatusSelectorBottomSheet extends StatelessWidget {
           ),
           Text(
             'Selecione o Status',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             'Status atual: ${selectedStatus.displayName}',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[600],
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
           ),
           const SizedBox(height: 16),
           Flexible(
@@ -73,14 +73,16 @@ class StatusSelectorBottomSheet extends StatelessWidget {
     required BuildContext context,
     required TaskStatus selectedStatus,
     required Function(TaskStatus) onStatusSelected,
+    VoidCallback? onDismissed,
   }) {
+    final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: StatusSelectorBottomSheet(

@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
@@ -24,6 +25,8 @@ abstract class TaskFormState with _$TaskFormState {
 
     @Default(TaskComplexity.easy) TaskComplexity complexity,
     @Default(TaskType.personal) TaskType type,
+
+    Color? color,
 
     @Default(false) bool showNotification,
     @Default(NotificationType.info) NotificationType notificationType,
