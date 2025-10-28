@@ -1,10 +1,10 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 
 abstract class TaskEvent extends Equatable {
   const TaskEvent();
@@ -21,7 +21,7 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
   final DateTime? dueDate;
   final TaskComplexity? complexity;
   final TaskType? type;
-  final Color? color;
+  final TaskColors? color;
 
   const TaskFormUpdateFieldsEvent({
     this.title,

@@ -1,8 +1,8 @@
-import 'package:flutter/rendering.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'task_model.freezed.dart';
@@ -18,7 +18,7 @@ abstract class TaskModel with _$TaskModel {
     DateTime? dueDate,
     @Default(TaskComplexity.easy) TaskComplexity complexity,
     @Default(TaskType.personal) TaskType type,
-    Color? color,
+    @Default(TaskColors.defaultColor) TaskColors color,
     @Default(true) bool isActive,
   }) = _TaskModel;
 }

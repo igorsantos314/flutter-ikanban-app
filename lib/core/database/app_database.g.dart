@@ -85,6 +85,15 @@ class $TaskEntityTable extends TaskEntity
     requiredDuringInsert: true,
   ).withConverter<TaskComplexity>($TaskEntityTable.$convertercomplexity);
   @override
+  late final GeneratedColumnWithTypeConverter<TaskColors, String> color =
+      GeneratedColumn<String>(
+        'color',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<TaskColors>($TaskEntityTable.$convertercolor);
+  @override
   late final GeneratedColumnWithTypeConverter<TaskType, String> type =
       GeneratedColumn<String>(
         'type',
@@ -117,6 +126,7 @@ class $TaskEntityTable extends TaskEntity
     priority,
     dueDate,
     complexity,
+    color,
     type,
     isActive,
   ];
@@ -207,6 +217,12 @@ class $TaskEntityTable extends TaskEntity
           data['${effectivePrefix}complexity'],
         )!,
       ),
+      color: $TaskEntityTable.$convertercolor.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}color'],
+        )!,
+      ),
       type: $TaskEntityTable.$convertertype.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -231,6 +247,8 @@ class $TaskEntityTable extends TaskEntity
       GenericSqlTypeConverter(TaskPriority.values);
   static TypeConverter<TaskComplexity, String> $convertercomplexity =
       GenericSqlTypeConverter(TaskComplexity.values);
+  static TypeConverter<TaskColors, String> $convertercolor =
+      GenericSqlTypeConverter(TaskColors.values);
   static TypeConverter<TaskType, String> $convertertype =
       GenericSqlTypeConverter(TaskType.values);
 }
@@ -243,6 +261,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
   final TaskPriority priority;
   final DateTime? dueDate;
   final TaskComplexity complexity;
+  final TaskColors color;
   final TaskType type;
   final bool isActive;
   const TaskData({
@@ -253,6 +272,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     required this.priority,
     this.dueDate,
     required this.complexity,
+    required this.color,
     required this.type,
     required this.isActive,
   });
@@ -283,6 +303,11 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       );
     }
     {
+      map['color'] = Variable<String>(
+        $TaskEntityTable.$convertercolor.toSql(color),
+      );
+    }
+    {
       map['type'] = Variable<String>(
         $TaskEntityTable.$convertertype.toSql(type),
       );
@@ -304,6 +329,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           ? const Value.absent()
           : Value(dueDate),
       complexity: Value(complexity),
+      color: Value(color),
       type: Value(type),
       isActive: Value(isActive),
     );
@@ -322,6 +348,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       priority: serializer.fromJson<TaskPriority>(json['priority']),
       dueDate: serializer.fromJson<DateTime?>(json['dueDate']),
       complexity: serializer.fromJson<TaskComplexity>(json['complexity']),
+      color: serializer.fromJson<TaskColors>(json['color']),
       type: serializer.fromJson<TaskType>(json['type']),
       isActive: serializer.fromJson<bool>(json['isActive']),
     );
@@ -337,6 +364,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       'priority': serializer.toJson<TaskPriority>(priority),
       'dueDate': serializer.toJson<DateTime?>(dueDate),
       'complexity': serializer.toJson<TaskComplexity>(complexity),
+      'color': serializer.toJson<TaskColors>(color),
       'type': serializer.toJson<TaskType>(type),
       'isActive': serializer.toJson<bool>(isActive),
     };
@@ -350,6 +378,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     TaskPriority? priority,
     Value<DateTime?> dueDate = const Value.absent(),
     TaskComplexity? complexity,
+    TaskColors? color,
     TaskType? type,
     bool? isActive,
   }) => TaskData(
@@ -360,6 +389,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     priority: priority ?? this.priority,
     dueDate: dueDate.present ? dueDate.value : this.dueDate,
     complexity: complexity ?? this.complexity,
+    color: color ?? this.color,
     type: type ?? this.type,
     isActive: isActive ?? this.isActive,
   );
@@ -376,6 +406,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       complexity: data.complexity.present
           ? data.complexity.value
           : this.complexity,
+      color: data.color.present ? data.color.value : this.color,
       type: data.type.present ? data.type.value : this.type,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
     );
@@ -391,6 +422,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           ..write('priority: $priority, ')
           ..write('dueDate: $dueDate, ')
           ..write('complexity: $complexity, ')
+          ..write('color: $color, ')
           ..write('type: $type, ')
           ..write('isActive: $isActive')
           ..write(')'))
@@ -406,6 +438,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     priority,
     dueDate,
     complexity,
+    color,
     type,
     isActive,
   );
@@ -420,6 +453,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           other.priority == this.priority &&
           other.dueDate == this.dueDate &&
           other.complexity == this.complexity &&
+          other.color == this.color &&
           other.type == this.type &&
           other.isActive == this.isActive);
 }
@@ -432,6 +466,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
   final Value<TaskPriority> priority;
   final Value<DateTime?> dueDate;
   final Value<TaskComplexity> complexity;
+  final Value<TaskColors> color;
   final Value<TaskType> type;
   final Value<bool> isActive;
   const TaskEntityCompanion({
@@ -442,6 +477,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     this.priority = const Value.absent(),
     this.dueDate = const Value.absent(),
     this.complexity = const Value.absent(),
+    this.color = const Value.absent(),
     this.type = const Value.absent(),
     this.isActive = const Value.absent(),
   });
@@ -453,12 +489,14 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     required TaskPriority priority,
     this.dueDate = const Value.absent(),
     required TaskComplexity complexity,
+    required TaskColors color,
     required TaskType type,
     this.isActive = const Value.absent(),
   }) : title = Value(title),
        status = Value(status),
        priority = Value(priority),
        complexity = Value(complexity),
+       color = Value(color),
        type = Value(type);
   static Insertable<TaskData> custom({
     Expression<int>? id,
@@ -468,6 +506,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Expression<String>? priority,
     Expression<DateTime>? dueDate,
     Expression<String>? complexity,
+    Expression<String>? color,
     Expression<String>? type,
     Expression<bool>? isActive,
   }) {
@@ -479,6 +518,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       if (priority != null) 'priority': priority,
       if (dueDate != null) 'due_date': dueDate,
       if (complexity != null) 'complexity': complexity,
+      if (color != null) 'color': color,
       if (type != null) 'type': type,
       if (isActive != null) 'is_active': isActive,
     });
@@ -492,6 +532,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Value<TaskPriority>? priority,
     Value<DateTime?>? dueDate,
     Value<TaskComplexity>? complexity,
+    Value<TaskColors>? color,
     Value<TaskType>? type,
     Value<bool>? isActive,
   }) {
@@ -503,6 +544,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       priority: priority ?? this.priority,
       dueDate: dueDate ?? this.dueDate,
       complexity: complexity ?? this.complexity,
+      color: color ?? this.color,
       type: type ?? this.type,
       isActive: isActive ?? this.isActive,
     );
@@ -538,6 +580,11 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
         $TaskEntityTable.$convertercomplexity.toSql(complexity.value),
       );
     }
+    if (color.present) {
+      map['color'] = Variable<String>(
+        $TaskEntityTable.$convertercolor.toSql(color.value),
+      );
+    }
     if (type.present) {
       map['type'] = Variable<String>(
         $TaskEntityTable.$convertertype.toSql(type.value),
@@ -559,6 +606,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
           ..write('priority: $priority, ')
           ..write('dueDate: $dueDate, ')
           ..write('complexity: $complexity, ')
+          ..write('color: $color, ')
           ..write('type: $type, ')
           ..write('isActive: $isActive')
           ..write(')'))
@@ -1049,6 +1097,7 @@ typedef $$TaskEntityTableCreateCompanionBuilder =
       required TaskPriority priority,
       Value<DateTime?> dueDate,
       required TaskComplexity complexity,
+      required TaskColors color,
       required TaskType type,
       Value<bool> isActive,
     });
@@ -1061,6 +1110,7 @@ typedef $$TaskEntityTableUpdateCompanionBuilder =
       Value<TaskPriority> priority,
       Value<DateTime?> dueDate,
       Value<TaskComplexity> complexity,
+      Value<TaskColors> color,
       Value<TaskType> type,
       Value<bool> isActive,
     });
@@ -1111,6 +1161,12 @@ class $$TaskEntityTableFilterComposer
     column: $table.complexity,
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
+
+  ColumnWithTypeConverterFilters<TaskColors, TaskColors, String> get color =>
+      $composableBuilder(
+        column: $table.color,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
 
   ColumnWithTypeConverterFilters<TaskType, TaskType, String> get type =>
       $composableBuilder(
@@ -1168,6 +1224,11 @@ class $$TaskEntityTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get type => $composableBuilder(
     column: $table.type,
     builder: (column) => ColumnOrderings(column),
@@ -1214,6 +1275,9 @@ class $$TaskEntityTableAnnotationComposer
         builder: (column) => column,
       );
 
+  GeneratedColumnWithTypeConverter<TaskColors, String> get color =>
+      $composableBuilder(column: $table.color, builder: (column) => column);
+
   GeneratedColumnWithTypeConverter<TaskType, String> get type =>
       $composableBuilder(column: $table.type, builder: (column) => column);
 
@@ -1256,6 +1320,7 @@ class $$TaskEntityTableTableManager
                 Value<TaskPriority> priority = const Value.absent(),
                 Value<DateTime?> dueDate = const Value.absent(),
                 Value<TaskComplexity> complexity = const Value.absent(),
+                Value<TaskColors> color = const Value.absent(),
                 Value<TaskType> type = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
               }) => TaskEntityCompanion(
@@ -1266,6 +1331,7 @@ class $$TaskEntityTableTableManager
                 priority: priority,
                 dueDate: dueDate,
                 complexity: complexity,
+                color: color,
                 type: type,
                 isActive: isActive,
               ),
@@ -1278,6 +1344,7 @@ class $$TaskEntityTableTableManager
                 required TaskPriority priority,
                 Value<DateTime?> dueDate = const Value.absent(),
                 required TaskComplexity complexity,
+                required TaskColors color,
                 required TaskType type,
                 Value<bool> isActive = const Value.absent(),
               }) => TaskEntityCompanion.insert(
@@ -1288,6 +1355,7 @@ class $$TaskEntityTableTableManager
                 priority: priority,
                 dueDate: dueDate,
                 complexity: complexity,
+                color: color,
                 type: type,
                 isActive: isActive,
               ),

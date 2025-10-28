@@ -5,6 +5,8 @@ import 'package:flutter_ikanban_app/core/ui/widgets/multi_line_bloc_text_field.d
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_bloc.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_state.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/widgets/color_selector.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/form_selector_field.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/date_selector_field.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_form_selectors_mixin.dart';
@@ -27,7 +29,7 @@ class TaskFormPage extends StatefulWidget {
   State<TaskFormPage> createState() => _TaskFormPageState();
 }
 
-class _TaskFormPageState extends State<TaskFormPage> 
+class _TaskFormPageState extends State<TaskFormPage>
     with TaskFormSelectorsMixin {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -75,9 +77,7 @@ class _TaskFormPageState extends State<TaskFormPage>
         ],
       ),
       body: BlocListener<TaskFormBloc, TaskFormState>(
-        listener: (context, state) {
-
-        },
+        listener: (context, state) {},
         child: BlocBuilder<TaskFormBloc, TaskFormState>(
           builder: (context, state) {
             return Padding(
@@ -106,6 +106,14 @@ class _TaskFormPageState extends State<TaskFormPage>
                     ),
                     const SizedBox(height: 24),
 
+                    ColorSelector(
+                      selectedColor: state.color,
+                      onColorSelected: (color) {
+                        bloc.add(TaskFormUpdateFieldsEvent(color: color));
+                      },
+                      availableColors: TaskColors.values,
+                    ),
+                    const SizedBox(height: 16),
                     FormSelectorField(
                       title: 'Status',
                       displayText: state.status.displayName,
@@ -137,7 +145,9 @@ class _TaskFormPageState extends State<TaskFormPage>
                     FormSelectorField(
                       title: 'Tipo',
                       displayText: state.type.displayName,
-                      description: state.type.description.isNotEmpty ? state.type.description : null,
+                      description: state.type.description.isNotEmpty
+                          ? state.type.description
+                          : null,
                       icon: state.type.icon,
                       iconColor: state.type.color,
                       onTap: () => showTypeSelector(context, state),

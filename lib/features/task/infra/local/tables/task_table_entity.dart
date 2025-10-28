@@ -4,6 +4,7 @@ import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 
 @DataClassName('TaskData')
 class TaskEntity extends Table {
@@ -14,6 +15,9 @@ class TaskEntity extends Table {
   TextColumn get priority => text().map(GenericSqlTypeConverter(TaskPriority.values))();
   DateTimeColumn get dueDate => dateTime().named('due_date').nullable()();
   TextColumn get complexity => text().map(GenericSqlTypeConverter(TaskComplexity.values))();
+
+  TextColumn get color => text().map(GenericSqlTypeConverter(TaskColors.values))();
+
   TextColumn get type => text().map(GenericSqlTypeConverter(TaskType.values))();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }

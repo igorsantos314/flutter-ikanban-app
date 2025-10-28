@@ -4,6 +4,7 @@ import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'task_form_state.freezed.dart';
@@ -26,7 +27,7 @@ abstract class TaskFormState with _$TaskFormState {
     @Default(TaskComplexity.easy) TaskComplexity complexity,
     @Default(TaskType.personal) TaskType type,
 
-    Color? color,
+    @Default(TaskColors.defaultColor) TaskColors color,
 
     @Default(false) bool showNotification,
     @Default(NotificationType.info) NotificationType notificationType,

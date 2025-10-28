@@ -13,6 +13,7 @@ class TaskMapper {
       dueDate: model.dueDate != null ? Value(model.dueDate!) : const Value.absent(),
       complexity: Value(model.complexity),
       type: Value(model.type),
+      color: Value(model.color),
       isActive: Value(model.isActive),
     );
   }
@@ -27,6 +28,7 @@ class TaskMapper {
       dueDate: entity.dueDate,
       complexity: entity.complexity,
       type: entity.type,
+      color: entity.color,
       isActive: entity.isActive,
     );
   }
