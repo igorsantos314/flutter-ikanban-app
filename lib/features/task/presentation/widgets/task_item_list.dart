@@ -30,12 +30,34 @@ class TaskItemList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    Color borderColor;
+    Color cardColor;
+    Color priorityColor;
+    bool showAllDetails = true;
+
+    if (task.status == TaskStatus.done) {
+      priorityColor = TaskColors.green.color;
+      borderColor = TaskColors.green.color;
+      cardColor = TaskColors.green.color;
+      showAllDetails = false;
+    } 
+    else if(task.status == TaskStatus.cancelled) {
+      priorityColor = Colors.grey;
+      borderColor = Colors.grey;
+      cardColor = Colors.grey;
+      showAllDetails = false;
+    } else {
+      priorityColor = task.priority.color;
+      borderColor = task.color.color;
+      cardColor = theme.colorScheme.surface;
+    }
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      //color: task.color == TaskColors.defaultColor ? theme.colorScheme.surface : task.color.color,
+      color: cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: task.color.color, width: 2)
+        side: BorderSide(color: borderColor, width: 2),
       ),
       elevation: 2,
       child: InkWell(
@@ -48,7 +70,7 @@ class TaskItemList extends StatelessWidget {
               height: 35,
               child: Container(
                 decoration: BoxDecoration(
-                  color: task.priority.color.withAlpha(150),
+                  color: priorityColor.withAlpha(150),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(12),
                     topRight: Radius.circular(12),
@@ -62,11 +84,9 @@ class TaskItemList extends StatelessWidget {
                       SizedBox(width: 4),
                       Text(
                         task.priority.displayName,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.w600),
                       ),
-                    ]
+                    ],
                   ),
                 ),
               ),
@@ -115,7 +135,8 @@ class TaskItemList extends StatelessWidget {
 
                         // Descrição
                         if (task.description != null &&
-                            task.description!.isNotEmpty) ...[
+                            task.description!.isNotEmpty &&
+                            showAllDetails) ...[
                           const SizedBox(height: 8),
                           Text(
                             task.description!,
@@ -143,68 +164,72 @@ class TaskItemList extends StatelessWidget {
                                       ),
                               ),
                               const SizedBox(width: 4),
-                              Text(
-                                'Vence em ${task.dueDate!.day}/${task.dueDate!.month}/${task.dueDate!.year}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: task.dueDate!.isBefore(DateTime.now())
-                                      ? theme.colorScheme.error
-                                      : theme.colorScheme.onSurface.withAlpha(
-                                          150,
-                                        ),
-                                  fontWeight:
-                                      task.dueDate!.isBefore(DateTime.now())
-                                      ? FontWeight.w600
-                                      : FontWeight.normal,
+                              if (showAllDetails)
+                                Text(
+                                  'Vence em ${task.dueDate!.day}/${task.dueDate!.month}/${task.dueDate!.year}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color:
+                                        task.dueDate!.isBefore(DateTime.now())
+                                        ? theme.colorScheme.error
+                                        : theme.colorScheme.onSurface.withAlpha(
+                                            150,
+                                          ),
+                                    fontWeight:
+                                        task.dueDate!.isBefore(DateTime.now())
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ],
 
                         const SizedBox(height: 12),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surface.withAlpha(100),
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: [
-                              BoxShadow(
-                                color: theme.colorScheme.onSurface.withAlpha(
-                                  20,
+                        // Tipo e Complexidade
+                        if (showAllDetails)
+                          Container(
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface.withAlpha(100),
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: theme.colorScheme.onSurface.withAlpha(
+                                    20,
+                                  ),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
                                 ),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          child: Wrap(
-                            spacing: 12,
-                            runSpacing: 4,
-                            children: [
-                              Icon(
-                                task.type.icon,
-                                size: 24,
-                                color: task.type.color,
-                              ),
-                              Icon(
-                                task.complexity.icon,
-                                size: 24,
-                                color: task.complexity.color,
-                              ),
-                              Text(
-                                '${task.complexity.index + 1} pts',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                              ],
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: Wrap(
+                              spacing: 12,
+                              runSpacing: 4,
+                              children: [
+                                Icon(
+                                  task.type.icon,
+                                  size: 24,
+                                  color: task.type.color,
                                 ),
-                              ),
-                            ],
+                                Icon(
+                                  task.complexity.icon,
+                                  size: 24,
+                                  color: task.complexity.color,
+                                ),
+                                Text(
+                                  '${task.complexity.index + 1} pts',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),

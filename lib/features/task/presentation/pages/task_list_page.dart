@@ -10,6 +10,7 @@ import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.d
 import 'package:flutter_ikanban_app/features/task/presentation/modals/status_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/task_form_selectors_mixin.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_item_list.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_status_filter.dart';
 
 class TaskListPage extends StatelessWidget {
   const TaskListPage({super.key});
@@ -121,6 +122,16 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         ),
         body: Column(
           children: [
+            // Filter Bar
+            Padding(padding:  EdgeInsets.all(8.0), child: TaskStatusFilter(
+              selectedStatuses: [],
+              
+              onChanged: (newSelection) {
+                
+              },
+              showSelectAll: true,
+            )),
+            
             // Task List
             Expanded(
               child: BlocBuilder<TaskListBloc, TaskListState>(

@@ -26,6 +26,7 @@ dependencies:
   go_router: ^16.1.0
   intl: ^0.20.2
   provider: ^6.1.5+1
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -40,3 +41,14 @@ flutter:
 
   assets:
   - assets/images/
+
+flutter_launcher_icons:
+    android: "launcher_icon" # or true, or a custom name like "my_app_icon"
+    ios: true
+    image_path: "assets/icons/logo.png"
+
+    # For adaptive icons (Android):
+    adaptive_icon_foreground: "assets/icons/logo.png"
+    adaptive_icon_background: "#FFFFFF"
+
+    remove_alpha_ios: true
