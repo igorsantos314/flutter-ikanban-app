@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 
 class TaskItemList extends StatelessWidget {
   final TaskModel task;
@@ -26,11 +29,10 @@ class TaskItemList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final effectiveCardColor = cardColor ?? theme.cardColor;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      color: effectiveCardColor,
+      color: task.color.color,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: borderColor != null
@@ -52,13 +54,36 @@ class TaskItemList extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Título
-                    Text(
-                      task.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
+                    Row(
+                      children: [
+                        if (onToggleCompletion != null) ...[
+                          const SizedBox(height: 8),
+                          IconButton(
+                            onPressed: onToggleCompletion,
+                            icon: Icon(
+                              task.status == TaskStatus.done
+                                  ? Icons.check_circle
+                                  : Icons.radio_button_unchecked,
+                              color: task.status == TaskStatus.done
+                                  ? Colors.green
+                                  : theme.colorScheme.onSurface,
+                            ),
+                            visualDensity: VisualDensity.compact,
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                          ),
+                        ],
+                        // Título
+                        Text(
+                          task.title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ),
 
                     // Descrição
@@ -85,7 +110,7 @@ class TaskItemList extends StatelessWidget {
                             Icons.schedule,
                             size: 14,
                             color: task.dueDate!.isBefore(DateTime.now())
-                                ? Colors.red
+                                ? theme.colorScheme.error
                                 : theme.colorScheme.onSurface.withAlpha(150),
                           ),
                           const SizedBox(width: 4),
@@ -94,7 +119,7 @@ class TaskItemList extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               color: task.dueDate!.isBefore(DateTime.now())
-                                  ? Colors.red
+                                  ? theme.colorScheme.error
                                   : theme.colorScheme.onSurface.withAlpha(150),
                               fontWeight: task.dueDate!.isBefore(DateTime.now())
                                   ? FontWeight.w600
@@ -104,6 +129,46 @@ class TaskItemList extends StatelessWidget {
                         ],
                       ),
                     ],
+
+                    const SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface.withAlpha(100),
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: theme.colorScheme.onSurface.withAlpha(20),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      child: Wrap(
+                        spacing: 12,
+                        runSpacing: 4,
+                        children: [
+                          Icon(
+                            task.priority.icon,
+                            size: 24,
+                            color: task.priority.color,
+                          ),
+                          Icon(
+                            task.complexity.icon,
+                            size: 24,
+                            color: task.complexity.color,
+                          ),
+                          Icon(
+                            task.type.icon,
+                            size: 24,
+                            color: task.type.color,
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -115,94 +180,40 @@ class TaskItemList extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // Status Chip (clicável)
-                  GestureDetector(
-                    onTap: onStatusTap,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: onStatusTap != null
-                            ? Border.all(
-                                color: task.status.color.withValues(alpha: 0.3),
-                              )
-                            : null,
-                      ),
-                      child: Chip(
-                        label: Text(
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface.withAlpha(100),
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.colorScheme.onSurface.withAlpha(20),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          task.status.icon,
+                          size: 18,
+                          color: task.status.color,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
                           task.status.displayName,
                           style: const TextStyle(
-                            fontSize: 11,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        backgroundColor: task.status.color.withAlpha(50),
-                        avatar: Icon(
-                          task.status.icon,
-                          size: 14,
-                          color: task.status.color,
-                        ),
-                        visualDensity: VisualDensity.compact,
-                      ),
+                      ],
                     ),
                   ),
-
-                  // Indicador de Prioridade
-                  if (task.priority.name != 'low') ...[
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: task.priority.color.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: task.priority.color.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.priority_high,
-                            size: 12,
-                            color: task.priority.color,
-                          ),
-                          const SizedBox(width: 2),
-                          Text(
-                            task.priority.displayName,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: task.priority.color.withValues(alpha: 0.7),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-
-                  // Botão de toggle completion (se fornecido)
-                  if (onToggleCompletion != null) ...[
-                    const SizedBox(height: 8),
-                    IconButton(
-                      onPressed: onToggleCompletion,
-                      icon: Icon(
-                        task.status == TaskStatus.done
-                            ? Icons.check_circle
-                            : Icons.radio_button_unchecked,
-                        color: task.status == TaskStatus.done
-                            ? Colors.green
-                            : theme.colorScheme.onSurface,
-                      ),
-                      visualDensity: VisualDensity.compact,
-                      constraints: const BoxConstraints(
-                        minWidth: 32,
-                        minHeight: 32,
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ],

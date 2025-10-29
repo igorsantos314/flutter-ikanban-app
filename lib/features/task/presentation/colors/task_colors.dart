@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum TaskColors {  
+enum TaskColors {
   defaultColor, // Gray
   red,
   green,
@@ -17,25 +17,25 @@ extension TaskColorsExtension on TaskColors {
   Color get color {
     switch (this) {
       case TaskColors.defaultColor:
-        return const Color(0xFF9E9E9E); // Gray
+        return const Color.fromARGB(255, 158, 158, 158); // Gray
       case TaskColors.red:
-        return const Color(0xFFF44336);
+        return const Color.fromARGB(255, 255, 179, 186);
       case TaskColors.green:
-        return const Color(0xFF4CAF50);
+        return const Color.fromARGB(255, 186, 255, 201);
       case TaskColors.blue:
-        return const Color(0xFF2196F3);
+        return const Color.fromARGB(255, 186, 225, 255);
       case TaskColors.yellow:
-        return const Color(0xFFFFEB3B);
+        return const Color.fromARGB(255, 255, 255, 186);
       case TaskColors.purple:
-        return const Color(0xFF9C27B0);
+        return const Color.fromARGB(255, 186, 147, 255);
       case TaskColors.orange:
-        return const Color(0xFFFF9800);
+        return const Color.fromARGB(255, 255, 223, 186);
       case TaskColors.teal:
-        return const Color(0xFF009688);
+        return const Color.fromARGB(255, 141, 255, 244);
       case TaskColors.lavender:
-        return const Color(0xFFE1BEE7);
+        return const Color.fromARGB(255, 230, 190, 255);
       case TaskColors.blueGrey:
-        return const Color(0xFF607D8B);
+        return const Color.fromARGB(255, 96, 125, 139);
     }
   }
 

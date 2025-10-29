@@ -7,7 +7,7 @@ import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_li
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_list_state.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/status_selector_bottom_sheet.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_form_selectors_mixin.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/task_form_selectors_mixin.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_item_list.dart';
 
 class TaskListPage extends StatelessWidget {
@@ -89,7 +89,33 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         ),
       ],
       child: Scaffold(
-        appBar: AppBar(title: const Text('iKanban - Tarefas')),
+        appBar: AppBar(
+          leading: Icon(
+            size: 32,
+            Icons.checklist
+          ),
+          title: const Text('OnMyBox - Tarefas'),
+          actions: [
+            IconButton(
+              iconSize: 32,
+              icon: const Icon(Icons.search),
+              onPressed: () {
+                context.read<TaskListBloc>().add(
+                      const RefreshTasksEvent(),
+                    );
+              },
+            ),
+            IconButton(
+              iconSize: 32,
+              icon: const Icon(Icons.filter_list),
+              onPressed: () {
+                context.read<TaskListBloc>().add(
+                      const RefreshTasksEvent(),
+                    );
+              },
+            ),
+          ],
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             AppNavigation.navigateToTask(context);
@@ -98,23 +124,6 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         ),
         body: Column(
           children: [
-            // Search Bar
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                decoration: const InputDecoration(
-                  hintText: 'Buscar tarefas...',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) {},
-                onSubmitted: (value) {
-                  context.read<TaskListBloc>().add(
-                    SearchTasksEvent(query: value),
-                  );
-                },
-              ),
-            ),
             // Task List
             Expanded(
               child: BlocBuilder<TaskListBloc, TaskListState>(

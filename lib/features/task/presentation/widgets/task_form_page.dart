@@ -6,10 +6,10 @@ import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_fo
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_state.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/widgets/color_selector.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/widgets/form_selector_field.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/widgets/date_selector_field.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_form_selectors_mixin.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/color_selector.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/form_selector_field.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/date_selector_field.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/task_form_selectors_mixin.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
@@ -114,6 +114,7 @@ class _TaskFormPageState extends State<TaskFormPage>
                       availableColors: TaskColors.values,
                     ),
                     const SizedBox(height: 16),
+
                     FormSelectorField(
                       title: 'Status',
                       displayText: state.status.displayName,
