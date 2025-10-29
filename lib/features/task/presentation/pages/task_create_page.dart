@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
-import 'package:flutter_ikanban_app/core/ui/modals/loading_modal.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/snackbars.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_bloc.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_state.dart';
@@ -53,13 +52,6 @@ class TaskCreatePageContent extends StatelessWidget {
                 TaskFormResetEvent(closeScreen: false),
               );
             }
-          },
-        ),
-        BlocListener<TaskFormBloc, TaskFormState>(
-          listenWhen: (previous, current) =>
-              previous.isLoading != current.isLoading,
-          listener: (context, state) {
-            LoadingModal.displayLoading(context, isShow: state.isLoading);
           },
         ),
       ],

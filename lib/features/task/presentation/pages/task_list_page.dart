@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
+import 'package:flutter_ikanban_app/core/ui/widgets/appbar/logo_with_title_widget.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/snackbars.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_list_bloc.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_list_state.dart';
@@ -90,11 +91,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
       ],
       child: Scaffold(
         appBar: AppBar(
-          leading: Icon(
-            size: 32,
-            Icons.checklist
-          ),
-          title: const Text('OnMyBox - Tarefas'),
+          title: LogoWithTitleWidget(),
           actions: [
             IconButton(
               iconSize: 32,
@@ -162,22 +159,13 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                           Text(
                             state.searchQuery.isNotEmpty
                                 ? 'Nenhuma tarefa encontrada para "${state.searchQuery}"'
-                                : 'Nenhuma tarefa encontrada',
+                                : 'Você ainda não registrou nenhuma tarefa',
                             style: TextStyle(
                               fontSize: 16,
                               color: theme.colorScheme.onSurface,
                             ),
+                            maxLines: 2,
                             textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 16),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              context.read<TaskListBloc>().add(
-                                const RefreshTasksEvent(),
-                              );
-                            },
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('Atualizar'),
                           ),
                         ],
                       ),

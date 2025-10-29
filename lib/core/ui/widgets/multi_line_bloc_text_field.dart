@@ -91,7 +91,6 @@ class MultilineBlocTextField<C extends StateStreamable<S>, S> extends StatelessW
                 onEditingComplete: onEditingComplete,
                 decoration: InputDecoration(
                   labelText: label,
-                  border: const OutlineInputBorder(),
                   errorText: errorText,
                   alignLabelWithHint: true,
                 ),

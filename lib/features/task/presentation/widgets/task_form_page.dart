@@ -80,6 +80,12 @@ class _TaskFormPageState extends State<TaskFormPage>
         listener: (context, state) {},
         child: BlocBuilder<TaskFormBloc, TaskFormState>(
           builder: (context, state) {
+            if (state.isLoading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(

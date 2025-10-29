@@ -85,7 +85,6 @@ class BlocTextField<C extends StateStreamable<S>, S> extends StatelessWidget {
                 onEditingComplete: onEditingComplete,
                 decoration: InputDecoration(
                   labelText: label,
-                  border: const OutlineInputBorder(),
                   errorText: errorText,
                 ),
                 onChanged: onChanged,
