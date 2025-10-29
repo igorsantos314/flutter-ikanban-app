@@ -45,7 +45,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         priority: event.priority ?? state.priority,
         complexity: event.complexity ?? state.complexity,
         type: event.type ?? state.type,
-        dueDate: event.dueDate,
+        dueDate: event.dueDate ?? state.dueDate,
         color: event.color ?? state.color,
       ),
     );

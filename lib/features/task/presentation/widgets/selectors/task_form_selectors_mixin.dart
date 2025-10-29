@@ -68,6 +68,7 @@ mixin TaskFormSelectorsMixin {
 
   /// Abre o seletor de data de vencimento
   void showDueDateSelector(BuildContext context, TaskFormState state) {
+    final theme = Theme.of(context).colorScheme;
     final bloc = context.read<TaskFormBloc>();
 
     showModalBottomSheet<void>(
@@ -78,8 +79,8 @@ mixin TaskFormSelectorsMixin {
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: theme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: DueDateSelectorBottomSheet(

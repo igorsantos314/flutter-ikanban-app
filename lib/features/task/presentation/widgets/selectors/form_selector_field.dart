@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// 
 /// Este widget padroniza a aparência e comportamento dos seletores,
 /// eliminando duplicação de código entre os diferentes tipos de seletores.
-class FormSelectorField extends StatelessWidget {
+class FormSelectorField<T> extends StatelessWidget {
   final String title;
   final String displayText;
   final String? description;

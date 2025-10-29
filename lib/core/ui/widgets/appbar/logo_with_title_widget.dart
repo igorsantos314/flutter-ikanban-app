@@ -9,13 +9,8 @@ class LogoWithTitleWidget extends StatelessWidget {
     return Row(
       children: [
         const Image(
-          width: 64,
-          height: 64,
-          image: AssetImage('assets/images/logo.png')),
-        Text(
-          "iKanban",
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
+          width: 180,
+          image: AssetImage('assets/images/name_logo_right.png')),
       ],
     );
   }
