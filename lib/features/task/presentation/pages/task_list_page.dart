@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
-import 'package:flutter_ikanban_app/core/ui/widgets/appbar/logo_with_title_widget.dart';
+import 'package:flutter_ikanban_app/core/ui/widgets/appbar/custom_app_bar.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/snackbars.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_list_bloc.dart';
@@ -92,17 +92,17 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         ),
       ],
       child: Scaffold(
-        appBar: AppBar(
-          title: LogoWithTitleWidget(),
-          actions: [
-            IconButton(
-              iconSize: 32,
-              icon: const Icon(Icons.search),
-              onPressed: () {
-                context.read<TaskListBloc>().add(const RefreshTasksEvent());
-              },
-            ),
-          ],
+        appBar: CustomAppBar(
+          onClose: () {
+            context.read<TaskListBloc>().add(
+              const SearchTasksEvent(query: ''),
+            );
+          },
+          onSubmit: (query) {
+            context.read<TaskListBloc>().add(
+              SearchTasksEvent(query: query),
+            );
+          },
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {

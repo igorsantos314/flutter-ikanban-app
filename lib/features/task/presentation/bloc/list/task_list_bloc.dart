@@ -201,7 +201,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     emit(state.copyWith(searchQuery: event.query));
 
     // Reinicia busca com novo filtro
-    add(const RefreshTasksEvent());
+    add(const LoadTasksEvent());
   }
 
   /// Processa dados do stream (primeira página + mudanças em tempo real)

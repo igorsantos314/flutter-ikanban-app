@@ -4,13 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// [MultilineBlocTextField] integrado ao BLoC.
 ///
-/// Essa versão usa [BlocBuilder] com `buildWhen`:
-/// - O campo só rebuilda quando o valor ou o erro mudarem.
-/// - Mais flexível que o [BlocSelector], pois você acessa o estado inteiro
-///   e pode aplicar condições de comparação personalizadas.
-///
-/// Deve ser utilizado para quando o campo depender de **mais de um pedaço do estado**
-/// ou se a lógica para decidir rebuild for mais complexa.
+/// Agora não fixa altura; cresce com o conteúdo até `maxLines`.
 class MultilineBlocTextField<C extends StateStreamable<S>, S> extends StatelessWidget {
   /// Como pegar o valor atual do estado (ex: `(s) => s.email`)
   final String Function(S state) valueSelector;
@@ -27,9 +21,14 @@ class MultilineBlocTextField<C extends StateStreamable<S>, S> extends StatelessW
   /// Label do campo
   final String label;
 
-  /// Configurações extras
-  final double textFieldWith;
-  final double textFieldHeight;
+  /// Largura máxima do campo; se null, ocupa o espaço do pai
+  final double? maxWidth;
+
+  /// Linhas mínima e máxima do TextField — controla o redimensionamento.
+  final int minLines;
+  final int maxLines;
+
+  /// Espaçamentos e demais configs
   final double paddingTop;
   final double paddingBottom;
   final bool enabled;
@@ -45,8 +44,9 @@ class MultilineBlocTextField<C extends StateStreamable<S>, S> extends StatelessW
     required this.controller,
     required this.label,
     this.errorSelector,
-    this.textFieldWith = 400,
-    this.textFieldHeight = 240,
+    this.maxWidth,
+    this.minLines = 1,
+    this.maxLines = 6,
     this.paddingTop = 8.0,
     this.paddingBottom = 8.0,
     this.enabled = true,
@@ -63,19 +63,18 @@ class MultilineBlocTextField<C extends StateStreamable<S>, S> extends StatelessW
       listener: (context, state) {
         final value = valueSelector(state);
         if (controller.text != value) {
+          // Preserva a seleção para o final do texto atual
           controller.text = value;
           controller.selection = TextSelection.collapsed(offset: value.length);
         }
       },
       child: Padding(
         padding: EdgeInsets.only(top: paddingTop, bottom: paddingBottom),
-        child: SizedBox(
-          width: textFieldWith,
-          height: textFieldHeight,
-          /// Observa apenas o erro para rebuilder o widget,
-          /// em caso de problemas, trocar por BlocBuilder com listenerWhen, para observar o erro.
-          /// 
-          /// OBS.: não precisa observar a mudança de texto por os BlocListener já atualiza o controller altomaticamente
+        child: ConstrainedBox(
+          // Se maxWidth for null, não impõe limite (ocupa o espaço do pai)
+          constraints: BoxConstraints(
+            maxWidth: maxWidth ?? double.infinity,
+          ),
           child: BlocSelector<C, S, String?>(
             selector: (state) => errorSelector?.call(state),
             builder: (context, errorText) {
@@ -85,8 +84,9 @@ class MultilineBlocTextField<C extends StateStreamable<S>, S> extends StatelessW
                 keyboardType: keyboardType,
                 inputFormatters: inputFormatters,
                 maxLength: maxLength,
-                maxLines: null,
-                expands: true,
+                minLines: minLines,
+                maxLines: maxLines,
+                // não usar expands quando queremos altura dinâmica baseada nas linhas
                 textAlignVertical: TextAlignVertical.top,
                 onEditingComplete: onEditingComplete,
                 decoration: InputDecoration(

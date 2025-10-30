@@ -81,11 +81,9 @@ class _TaskFormPageState extends State<TaskFormPage>
         child: BlocBuilder<TaskFormBloc, TaskFormState>(
           builder: (context, state) {
             if (state.isLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const Center(child: CircularProgressIndicator());
             }
-            
+
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(
@@ -127,7 +125,10 @@ class _TaskFormPageState extends State<TaskFormPage>
                       description: state.status.description,
                       icon: state.status.icon,
                       iconColor: state.status.color,
-                      onTap: () => showStatusSelector(context, state),
+                      onTap: () {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                        showStatusSelector(context, state);
+                      },
                     ),
                     const SizedBox(height: 16),
                     FormSelectorField(
@@ -163,7 +164,10 @@ class _TaskFormPageState extends State<TaskFormPage>
                     DateSelectorField<TaskFormBloc, TaskFormState>(
                       title: 'Data de Vencimento',
                       selectedDate: state.dueDate,
-                      onTap: () => showDueDateSelector(context, state),
+                      onTap: () {
+                        _removeFocus();
+                        showDueDateSelector(context, state);
+                      },
                     ),
                     const SizedBox(height: 32),
                   ],
@@ -174,5 +178,9 @@ class _TaskFormPageState extends State<TaskFormPage>
         ),
       ),
     );
+  }
+
+  void _removeFocus() {
+    FocusScope.of(context).requestFocus(FocusNode());
   }
 }
