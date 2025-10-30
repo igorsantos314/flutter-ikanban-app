@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
-import 'package:go_router/go_router.dart';
 
 class ScaffoldWithNavBar extends StatefulWidget {
   final Widget child;

@@ -36,7 +36,15 @@ class AppNavigation {
       ),
       GoRoute(
         path: editTask,
-        builder: (context, state) => const TaskEditPage(),
+        builder: (context, state) {
+          final taskId = state.pathParameters['id'];
+
+          if (taskId == null) {
+            throw Exception('Task ID is required to edit a task.');
+          }
+
+          return TaskEditPage(taskId: int.parse(taskId) );
+        },
       ),
     ],
   );
@@ -45,9 +53,9 @@ class AppNavigation {
     context.go(home);
   }
 
-  static void navigateToTask(BuildContext context, {String? taskId}) {
+  static void navigateToTask(BuildContext context, {int? taskId}) {
     context.push(
-      taskId == null ? createTask : editTask.replaceFirst(':id', taskId),
+      taskId == null ? createTask : editTask.replaceFirst(':id', taskId.toString()),
     );
   }
 

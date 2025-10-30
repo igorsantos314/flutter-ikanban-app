@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   freezed: ^3.2.0
   json_serializable: ^6.10.0
@@ -22,6 +24,9 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.39
   freezed_annotation: ^3.1.0
   go_router: ^16.1.0
+  intl: ^0.20.2
+  provider: ^6.1.5+1
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -33,3 +38,17 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+  - assets/images/
+
+flutter_launcher_icons:
+    android: "launcher_icon" # or true, or a custom name like "my_app_icon"
+    ios: true
+    image_path: "assets/icons/logo.png"
+
+    # For adaptive icons (Android):
+    adaptive_icon_foreground: "assets/icons/logo.png"
+    adaptive_icon_background: "#FFFFFF"
+
+    remove_alpha_ios: true
