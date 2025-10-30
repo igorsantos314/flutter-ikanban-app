@@ -2,21 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 
 class TaskStatusFilter extends StatelessWidget {
-  final List<TaskStatus> selectedStatuses;
+  final List<TaskStatus> selectedStatus;
   final Function(List<TaskStatus>) onChanged;
   final bool showSelectAll;
 
   const TaskStatusFilter({
     super.key,
-    required this.selectedStatuses,
+    required this.selectedStatus,
     required this.onChanged,
     this.showSelectAll = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bool isAllSelected = selectedStatuses.length == TaskStatus.values.length;
-    
+    final theme = Theme.of(context);
+    final bool isAllSelected =
+        selectedStatus.length == TaskStatus.values.length;
+
     return SizedBox(
       height: 40,
       child: ListView(
@@ -27,7 +29,18 @@ class TaskStatusFilter extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: FilterChip(
-                label: const Text('Todos'),
+                label: Row(
+                  children: [
+                    Icon(
+                      isAllSelected
+                          ? Icons.check_box
+                          : Icons.check_box_outline_blank,
+                      size: 18,
+                      color: isAllSelected ? theme.primaryColor : null,
+                    ),
+                    Text('Todos'),
+                  ],
+                ),
                 selected: isAllSelected,
                 onSelected: (selected) {
                   if (selected) {
@@ -38,28 +51,32 @@ class TaskStatusFilter extends StatelessWidget {
                     onChanged([]);
                   }
                 },
-                selectedColor: Theme.of(context).primaryColor.withValues(alpha: 0.3),
+                selectedColor: theme.primaryColor.withValues(alpha: 0.3),
                 checkmarkColor: Theme.of(context).primaryColor,
-                avatar: Icon(
-                  isAllSelected ? Icons.check_box : Icons.check_box_outline_blank,
-                  size: 18,
-                  color: isAllSelected ? Theme.of(context).primaryColor : null,
-                ),
               ),
             ),
-          
+
           // Chips dos status
           ...TaskStatus.values.map((status) {
-            final bool isSelected = selectedStatuses.contains(status);
-            
+            final bool isSelected = selectedStatus.contains(status);
+
             return Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: FilterChip(
-                label: Text(status.displayName),
+                label: Row(
+                  children: [
+                    Icon(
+                      status.icon,
+                      size: 16,
+                      color: isSelected ? status.color : theme.disabledColor,
+                    ),
+                    Text(status.displayName),
+                  ],
+                ),
                 selected: isSelected,
                 onSelected: (selected) {
-                  List<TaskStatus> newSelection = List.from(selectedStatuses);
-                  
+                  List<TaskStatus> newSelection = List.from(selectedStatus);
+
                   if (selected) {
                     // Adicionar status
                     if (!newSelection.contains(status)) {
@@ -69,16 +86,11 @@ class TaskStatusFilter extends StatelessWidget {
                     // Remover status
                     newSelection.remove(status);
                   }
-                  
+
                   onChanged(newSelection);
                 },
                 selectedColor: status.color.withValues(alpha: 0.3),
                 checkmarkColor: status.color,
-                avatar: Icon(
-                  status.icon,
-                  size: 16,
-                  color: isSelected ? status.color : Colors.grey[600],
-                ),
               ),
             );
           }),

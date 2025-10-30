@@ -22,6 +22,7 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
   final TaskComplexity? complexity;
   final TaskType? type;
   final TaskColors? color;
+  final List<TaskStatus>? statusFilter;
 
   const TaskFormUpdateFieldsEvent({
     this.title,
@@ -32,10 +33,20 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
     this.complexity,
     this.type,
     this.color,
+    this.statusFilter,
   });
 
   @override
-  List<Object> get props => [?title, ?description, ?status, ?priority, ?dueDate, ?complexity, ?type, ?color];
+  List<Object> get props => [?title, ?description, ?status, ?priority, ?dueDate, ?complexity, ?type, ?color, ?statusFilter];
+}
+
+class TaskListUpdateStatusFilter extends TaskEvent {
+  final List<TaskStatus> statusFilter;
+
+  const TaskListUpdateStatusFilter({required this.statusFilter});
+
+  @override
+  List<Object> get props => [statusFilter];
 }
 
 class LoadTaskFormEvent extends TaskEvent {

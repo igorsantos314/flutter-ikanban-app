@@ -4,6 +4,7 @@ import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/appbar/logo_with_title_widget.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/snackbars.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_list_bloc.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_list_state.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.dart';
@@ -98,18 +99,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
               iconSize: 32,
               icon: const Icon(Icons.search),
               onPressed: () {
-                context.read<TaskListBloc>().add(
-                      const RefreshTasksEvent(),
-                    );
-              },
-            ),
-            IconButton(
-              iconSize: 32,
-              icon: const Icon(Icons.filter_list),
-              onPressed: () {
-                context.read<TaskListBloc>().add(
-                      const RefreshTasksEvent(),
-                    );
+                context.read<TaskListBloc>().add(const RefreshTasksEvent());
               },
             ),
           ],
@@ -123,15 +113,24 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         body: Column(
           children: [
             // Filter Bar
-            Padding(padding:  EdgeInsets.all(8.0), child: TaskStatusFilter(
-              selectedStatuses: [],
-              
-              onChanged: (newSelection) {
-                
+            BlocSelector<TaskListBloc, TaskListState, List<TaskStatus>>(
+              selector: (state) => state.statusFilter,
+              builder: (context, selectedStatuses) {
+                return Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TaskStatusFilter(
+                    selectedStatus: selectedStatuses,
+                    onChanged: (newSelection) {
+                      context.read<TaskListBloc>().add(
+                        TaskListUpdateStatusFilter(statusFilter: newSelection),
+                      );
+                    },
+                    showSelectAll: true,
+                  ),
+                );
               },
-              showSelectAll: true,
-            )),
-            
+            ),
+
             // Task List
             Expanded(
               child: BlocBuilder<TaskListBloc, TaskListState>(

@@ -46,6 +46,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     // UI events
     on<TaskFormResetEvent>(_onTaskFormReset);
     on<TaskListUpdateStatus>(_onTaskListUpdateStatus);
+    on<TaskListUpdateStatusFilter>(_onTaskListUpdateStatusFilter);
   }
 
   @override
@@ -341,7 +342,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     emit(
       state.copyWith(
         showNotification: event.showNotification ?? state.showNotification,
-        showStatusSelector: event.showStatusSelector ?? state.showStatusSelector,
+        showStatusSelector:
+            event.showStatusSelector ?? state.showStatusSelector,
       ),
     );
   }
@@ -443,5 +445,12 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         },
       );
     });
+  }
+
+  FutureOr<void> _onTaskListUpdateStatusFilter(
+    TaskListUpdateStatusFilter event,
+    Emitter<TaskListState> emit,
+  ) {
+    emit(state.copyWith(statusFilter: event.statusFilter));
   }
 }
