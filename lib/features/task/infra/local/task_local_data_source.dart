@@ -44,7 +44,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
     DateTime? startDate,
     DateTime? endDate,
     String? orderBy,
-    TaskStatus? status,
+    List<TaskStatus>? status,
     TaskPriority? priority,
     TaskComplexity? complexity,
     TaskType? type,
@@ -70,7 +70,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
     }
 
     if (status != null) {
-      query.where((tbl) => tbl.status.equals(status.name));
+      query.where((tbl) => tbl.status.isIn(status.map((e) => e.name)));
     }
 
     if (priority != null) {
@@ -126,7 +126,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
 
       if (status != null) {
         totalItemsQuery.where(
-          db.taskEntity.status.equals(status.name),
+          db.taskEntity.status.isIn(status.map((e) => e.name)),
         );
       }
       if (priority != null) {

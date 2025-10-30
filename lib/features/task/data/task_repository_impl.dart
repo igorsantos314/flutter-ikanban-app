@@ -66,7 +66,7 @@ class TaskRepositoryImpl implements TaskRepository {
     DateTime? startDate,
     DateTime? endDate,
     String? orderBy,
-    TaskStatus? status,
+    List<TaskStatus>? status,
     TaskPriority? priority,
     TaskComplexity? complexity,
     TaskType? type,
@@ -74,7 +74,20 @@ class TaskRepositoryImpl implements TaskRepository {
     bool ascending = true,
   }) {
     return _localDataSource
-        .watchTasks(page: page, limitPerPage: limitPerPage)
+        .watchTasks(
+          page: page,
+          limitPerPage: limitPerPage,
+          search: search,
+          startDate: startDate,
+          endDate: endDate,
+          orderBy: orderBy,
+          status: status,
+          priority: priority,
+          complexity: complexity,
+          type: type,
+          onlyActive: onlyActive,
+          ascending: ascending,
+        )
         .map<ResultPage<TaskModel>>((event) {
           final result = event.items
               .map((data) => TaskMapper.fromEntity(data))

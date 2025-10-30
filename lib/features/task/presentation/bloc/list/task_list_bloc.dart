@@ -84,6 +84,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
           page: 1,
           limitPerPage: _pageSize,
           search: _currentSearch,
+          status: state.statusFilter,
           onlyActive: true,
           ascending: false, // Mais recentes primeiro
         )
@@ -146,6 +147,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         page: nextPage,
         limitPerPage: _pageSize,
         search: _currentSearch,
+        status: state.statusFilter,
         onlyActive: true,
         ascending: false,
       );
@@ -452,5 +454,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     Emitter<TaskListState> emit,
   ) {
     emit(state.copyWith(statusFilter: event.statusFilter));
+    add(const LoadTasksEvent());
   }
 }

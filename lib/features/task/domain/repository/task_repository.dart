@@ -15,7 +15,7 @@ abstract class TaskRepository {
     DateTime? startDate,
     DateTime? endDate,
     String? orderBy,
-    TaskStatus? status,
+    List<TaskStatus>? status,
     TaskPriority? priority,
     TaskComplexity? complexity,
     TaskType? type,
