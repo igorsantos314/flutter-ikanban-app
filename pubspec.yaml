@@ -27,6 +27,7 @@ dependencies:
   intl: ^0.20.2
   provider: ^6.1.5+1
   flutter_launcher_icons: ^0.14.4
+  share_plus: ^10.0.3
 
 dev_dependencies:
   flutter_test:
