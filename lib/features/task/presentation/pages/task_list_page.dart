@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
+import 'package:flutter_ikanban_app/core/ui/enums/layout_mode.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/appbar/custom_app_bar.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/snackbars.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_list_bloc.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_list_state.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_list_bloc.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/enums/task_layout.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/events/list/task_list_events.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/states/list/task_list_state.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/status_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/task_form_selectors_mixin.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_item_list.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_list_layout_mode.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_status_filter.dart';
 
 class TaskListPage extends StatelessWidget {
@@ -94,14 +98,10 @@ class _TaskListPageContentState extends State<TaskListPageContent>
       child: Scaffold(
         appBar: CustomAppBar(
           onClose: () {
-            context.read<TaskListBloc>().add(
-              const SearchTasksEvent(query: ''),
-            );
+            context.read<TaskListBloc>().add(const SearchTasksEvent(query: ''));
           },
           onSubmit: (query) {
-            context.read<TaskListBloc>().add(
-              SearchTasksEvent(query: query),
-            );
+            context.read<TaskListBloc>().add(SearchTasksEvent(query: query));
           },
         ),
         floatingActionButton: FloatingActionButton(
@@ -138,7 +138,8 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                     previous.tasks != current.tasks ||
                     previous.isLoading != current.isLoading ||
                     previous.isLoadingMore != current.isLoadingMore ||
-                    previous.hasError != current.hasError,
+                    previous.hasError != current.hasError ||
+                    previous.layoutMode != current.layoutMode,
                 builder: (context, state) {
                   // Loading inicial
                   if (state.isLoading && state.tasks.isEmpty) {
@@ -189,62 +190,42 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                         const RefreshTasksEvent(),
                       );
                     },
-                    child: ListView.builder(
-                      itemCount:
-                          state.tasks.length + (state.hasMorePages ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        // Item de loading no final (scroll infinito)
-                        if (index == state.tasks.length) {
-                          if (state.isLoadingMore) {
-                            return const Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Center(
-                                child: Column(
-                                  children: [
-                                    CircularProgressIndicator(),
-                                    SizedBox(height: 8),
-                                    Text('Carregando mais tarefas...'),
-                                  ],
+                    child: Column(
+                      children: [
+                        TaskListLayoutMode(
+                          taskLayout: state.layoutMode,
+                          onToggle: () {
+                            context.read<TaskListBloc>().add(
+                              const ToggleLayoutModeEvent(),
+                            );
+                          },
+                        ),
+                        Expanded(
+                          child: state.layoutMode == TaskLayout.grid
+                              ? GridView.builder(
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount:
+                                            state.layoutMode == TaskLayout.list
+                                            ? 1
+                                            : 2,
+                                        childAspectRatio: 1.0,
+                                      ),
+                                  itemCount:
+                                      state.tasks.length +
+                                      (state.hasMorePages ? 1 : 0),
+                                  itemBuilder: (context, index) =>
+                                      _taskItemBuilder(context, state, index),
+                                )
+                              : ListView.builder(
+                                  itemCount:
+                                      state.tasks.length +
+                                      (state.hasMorePages ? 1 : 0),
+                                  itemBuilder: (context, index) =>
+                                      _taskItemBuilder(context, state, index),
                                 ),
-                              ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        }
-
-                        // Trigger para load more (quando chegar perto do fim)
-                        if (index == state.tasks.length - 3 &&
-                            state.hasMorePages &&
-                            !state.isLoadingMore) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            context.read<TaskListBloc>().add(
-                              const LoadMoreTasksEvent(),
-                            );
-                          });
-                        }
-
-                        // Item da tarefa
-                        final task = state.tasks[index];
-                        return TaskItemList(
-                          task: task,
-                          onTap: () {
-                            AppNavigation.navigateToTask(
-                              context,
-                              taskId: task.id,
-                            );
-                          },
-                          onLongPress: () {
-                            context.read<TaskListBloc>().add(
-                              TaskSelectedEvent(task: task),
-                            );
-                          },
-                          onToggleCompletion: () {
-                            context.read<TaskListBloc>().add(
-                              ToggleTaskCompletion(id: task.id!),
-                            );
-                          },
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   );
                 },
@@ -254,5 +235,58 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         ),
       ),
     );
+  }
+
+  Widget _taskItemBuilder(
+    BuildContext context,
+    TaskListState state,
+    int index,
+  ) {
+    {
+      // Item de loading no final (scroll infinito)
+      if (index == state.tasks.length) {
+        if (state.isLoadingMore) {
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Center(
+              child: Column(
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 8),
+                  Text('Carregando mais tarefas...'),
+                ],
+              ),
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      }
+
+      // Trigger para load more (quando chegar perto do fim)
+      if (index == state.tasks.length - 3 &&
+          state.hasMorePages &&
+          !state.isLoadingMore) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.read<TaskListBloc>().add(const LoadMoreTasksEvent());
+        });
+      }
+
+      final task = state.tasks[index];
+      return TaskItemList(
+        task: task,
+        layoutMode: state.layoutMode == TaskLayout.list
+            ? LayoutMode.fullWidth
+            : LayoutMode.compact,
+        onTap: () {
+          AppNavigation.navigateToTask(context, taskId: task.id);
+        },
+        onLongPress: () {
+          context.read<TaskListBloc>().add(TaskSelectedEvent(task: task));
+        },
+        onToggleCompletion: () {
+          context.read<TaskListBloc>().add(ToggleTaskCompletion(id: task.id!));
+        },
+      );
+    }
   }
 }

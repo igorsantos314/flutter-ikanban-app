@@ -7,8 +7,11 @@ import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/list/task_list_state.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/enums/task_layout.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/events/list/task_list_events.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/events/shared/task_shared_events.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/states/list/task_list_state.dart';
 
 /// TaskListBloc com implementação senior:
 /// - Stream para mudanças em tempo real (primeira página)
@@ -47,6 +50,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     on<TaskFormResetEvent>(_onTaskFormReset);
     on<TaskListUpdateStatus>(_onTaskListUpdateStatus);
     on<TaskListUpdateStatusFilter>(_onTaskListUpdateStatusFilter);
+    on<ToggleLayoutModeEvent>(_onToggleLayoutMode);
   }
 
   @override
@@ -455,5 +459,18 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   ) {
     emit(state.copyWith(statusFilter: event.statusFilter));
     add(const LoadTasksEvent());
+  }
+
+  FutureOr<void> _onToggleLayoutMode(
+    ToggleLayoutModeEvent event,
+    Emitter<TaskListState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        layoutMode: state.layoutMode == TaskLayout.list
+            ? TaskLayout.grid
+            : TaskLayout.list,
+      ),
+    );
   }
 }

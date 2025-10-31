@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TaskListState {
 
- TaskModel? get selectedTask; String get searchQuery; List<TaskModel> get tasks; bool get isLoading; bool get isLoadingMore; bool get hasMorePages; int get currentPage; bool get hasError; String get errorMessage; bool get showNotification; String get notificationMessage; NotificationType get notificationType; List<TaskStatus> get statusFilter; bool get showStatusSelector;
+ TaskModel? get selectedTask; String get searchQuery; List<TaskModel> get tasks; bool get isLoading; bool get isLoadingMore; bool get hasMorePages; int get currentPage; bool get hasError; String get errorMessage; bool get showNotification; String get notificationMessage; NotificationType get notificationType; List<TaskStatus> get statusFilter; bool get showStatusSelector; TaskLayout get layoutMode;
 /// Create a copy of TaskListState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $TaskListStateCopyWith<TaskListState> get copyWith => _$TaskListStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskListState&&(identical(other.selectedTask, selectedTask) || other.selectedTask == selectedTask)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&const DeepCollectionEquality().equals(other.tasks, tasks)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.hasMorePages, hasMorePages) || other.hasMorePages == hasMorePages)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.hasError, hasError) || other.hasError == hasError)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&const DeepCollectionEquality().equals(other.statusFilter, statusFilter)&&(identical(other.showStatusSelector, showStatusSelector) || other.showStatusSelector == showStatusSelector));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskListState&&(identical(other.selectedTask, selectedTask) || other.selectedTask == selectedTask)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&const DeepCollectionEquality().equals(other.tasks, tasks)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.hasMorePages, hasMorePages) || other.hasMorePages == hasMorePages)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.hasError, hasError) || other.hasError == hasError)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&const DeepCollectionEquality().equals(other.statusFilter, statusFilter)&&(identical(other.showStatusSelector, showStatusSelector) || other.showStatusSelector == showStatusSelector)&&(identical(other.layoutMode, layoutMode) || other.layoutMode == layoutMode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,selectedTask,searchQuery,const DeepCollectionEquality().hash(tasks),isLoading,isLoadingMore,hasMorePages,currentPage,hasError,errorMessage,showNotification,notificationMessage,notificationType,const DeepCollectionEquality().hash(statusFilter),showStatusSelector);
+int get hashCode => Object.hash(runtimeType,selectedTask,searchQuery,const DeepCollectionEquality().hash(tasks),isLoading,isLoadingMore,hasMorePages,currentPage,hasError,errorMessage,showNotification,notificationMessage,notificationType,const DeepCollectionEquality().hash(statusFilter),showStatusSelector,layoutMode);
 
 @override
 String toString() {
-  return 'TaskListState(selectedTask: $selectedTask, searchQuery: $searchQuery, tasks: $tasks, isLoading: $isLoading, isLoadingMore: $isLoadingMore, hasMorePages: $hasMorePages, currentPage: $currentPage, hasError: $hasError, errorMessage: $errorMessage, showNotification: $showNotification, notificationMessage: $notificationMessage, notificationType: $notificationType, statusFilter: $statusFilter, showStatusSelector: $showStatusSelector)';
+  return 'TaskListState(selectedTask: $selectedTask, searchQuery: $searchQuery, tasks: $tasks, isLoading: $isLoading, isLoadingMore: $isLoadingMore, hasMorePages: $hasMorePages, currentPage: $currentPage, hasError: $hasError, errorMessage: $errorMessage, showNotification: $showNotification, notificationMessage: $notificationMessage, notificationType: $notificationType, statusFilter: $statusFilter, showStatusSelector: $showStatusSelector, layoutMode: $layoutMode)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $TaskListStateCopyWith<$Res>  {
   factory $TaskListStateCopyWith(TaskListState value, $Res Function(TaskListState) _then) = _$TaskListStateCopyWithImpl;
 @useResult
 $Res call({
- TaskModel? selectedTask, String searchQuery, List<TaskModel> tasks, bool isLoading, bool isLoadingMore, bool hasMorePages, int currentPage, bool hasError, String errorMessage, bool showNotification, String notificationMessage, NotificationType notificationType, List<TaskStatus> statusFilter, bool showStatusSelector
+ TaskModel? selectedTask, String searchQuery, List<TaskModel> tasks, bool isLoading, bool isLoadingMore, bool hasMorePages, int currentPage, bool hasError, String errorMessage, bool showNotification, String notificationMessage, NotificationType notificationType, List<TaskStatus> statusFilter, bool showStatusSelector, TaskLayout layoutMode
 });
 
 
@@ -62,7 +62,7 @@ class _$TaskListStateCopyWithImpl<$Res>
 
 /// Create a copy of TaskListState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? selectedTask = freezed,Object? searchQuery = null,Object? tasks = null,Object? isLoading = null,Object? isLoadingMore = null,Object? hasMorePages = null,Object? currentPage = null,Object? hasError = null,Object? errorMessage = null,Object? showNotification = null,Object? notificationMessage = null,Object? notificationType = null,Object? statusFilter = null,Object? showStatusSelector = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? selectedTask = freezed,Object? searchQuery = null,Object? tasks = null,Object? isLoading = null,Object? isLoadingMore = null,Object? hasMorePages = null,Object? currentPage = null,Object? hasError = null,Object? errorMessage = null,Object? showNotification = null,Object? notificationMessage = null,Object? notificationType = null,Object? statusFilter = null,Object? showStatusSelector = null,Object? layoutMode = null,}) {
   return _then(_self.copyWith(
 selectedTask: freezed == selectedTask ? _self.selectedTask : selectedTask // ignore: cast_nullable_to_non_nullable
 as TaskModel?,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
@@ -78,7 +78,8 @@ as bool,notificationMessage: null == notificationMessage ? _self.notificationMes
 as String,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
 as NotificationType,statusFilter: null == statusFilter ? _self.statusFilter : statusFilter // ignore: cast_nullable_to_non_nullable
 as List<TaskStatus>,showStatusSelector: null == showStatusSelector ? _self.showStatusSelector : showStatusSelector // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,layoutMode: null == layoutMode ? _self.layoutMode : layoutMode // ignore: cast_nullable_to_non_nullable
+as TaskLayout,
   ));
 }
 /// Create a copy of TaskListState
@@ -175,10 +176,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( TaskModel? selectedTask,  String searchQuery,  List<TaskModel> tasks,  bool isLoading,  bool isLoadingMore,  bool hasMorePages,  int currentPage,  bool hasError,  String errorMessage,  bool showNotification,  String notificationMessage,  NotificationType notificationType,  List<TaskStatus> statusFilter,  bool showStatusSelector)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( TaskModel? selectedTask,  String searchQuery,  List<TaskModel> tasks,  bool isLoading,  bool isLoadingMore,  bool hasMorePages,  int currentPage,  bool hasError,  String errorMessage,  bool showNotification,  String notificationMessage,  NotificationType notificationType,  List<TaskStatus> statusFilter,  bool showStatusSelector,  TaskLayout layoutMode)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TaskListState() when $default != null:
-return $default(_that.selectedTask,_that.searchQuery,_that.tasks,_that.isLoading,_that.isLoadingMore,_that.hasMorePages,_that.currentPage,_that.hasError,_that.errorMessage,_that.showNotification,_that.notificationMessage,_that.notificationType,_that.statusFilter,_that.showStatusSelector);case _:
+return $default(_that.selectedTask,_that.searchQuery,_that.tasks,_that.isLoading,_that.isLoadingMore,_that.hasMorePages,_that.currentPage,_that.hasError,_that.errorMessage,_that.showNotification,_that.notificationMessage,_that.notificationType,_that.statusFilter,_that.showStatusSelector,_that.layoutMode);case _:
   return orElse();
 
 }
@@ -196,10 +197,10 @@ return $default(_that.selectedTask,_that.searchQuery,_that.tasks,_that.isLoading
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( TaskModel? selectedTask,  String searchQuery,  List<TaskModel> tasks,  bool isLoading,  bool isLoadingMore,  bool hasMorePages,  int currentPage,  bool hasError,  String errorMessage,  bool showNotification,  String notificationMessage,  NotificationType notificationType,  List<TaskStatus> statusFilter,  bool showStatusSelector)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( TaskModel? selectedTask,  String searchQuery,  List<TaskModel> tasks,  bool isLoading,  bool isLoadingMore,  bool hasMorePages,  int currentPage,  bool hasError,  String errorMessage,  bool showNotification,  String notificationMessage,  NotificationType notificationType,  List<TaskStatus> statusFilter,  bool showStatusSelector,  TaskLayout layoutMode)  $default,) {final _that = this;
 switch (_that) {
 case _TaskListState():
-return $default(_that.selectedTask,_that.searchQuery,_that.tasks,_that.isLoading,_that.isLoadingMore,_that.hasMorePages,_that.currentPage,_that.hasError,_that.errorMessage,_that.showNotification,_that.notificationMessage,_that.notificationType,_that.statusFilter,_that.showStatusSelector);case _:
+return $default(_that.selectedTask,_that.searchQuery,_that.tasks,_that.isLoading,_that.isLoadingMore,_that.hasMorePages,_that.currentPage,_that.hasError,_that.errorMessage,_that.showNotification,_that.notificationMessage,_that.notificationType,_that.statusFilter,_that.showStatusSelector,_that.layoutMode);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -216,10 +217,10 @@ return $default(_that.selectedTask,_that.searchQuery,_that.tasks,_that.isLoading
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( TaskModel? selectedTask,  String searchQuery,  List<TaskModel> tasks,  bool isLoading,  bool isLoadingMore,  bool hasMorePages,  int currentPage,  bool hasError,  String errorMessage,  bool showNotification,  String notificationMessage,  NotificationType notificationType,  List<TaskStatus> statusFilter,  bool showStatusSelector)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( TaskModel? selectedTask,  String searchQuery,  List<TaskModel> tasks,  bool isLoading,  bool isLoadingMore,  bool hasMorePages,  int currentPage,  bool hasError,  String errorMessage,  bool showNotification,  String notificationMessage,  NotificationType notificationType,  List<TaskStatus> statusFilter,  bool showStatusSelector,  TaskLayout layoutMode)?  $default,) {final _that = this;
 switch (_that) {
 case _TaskListState() when $default != null:
-return $default(_that.selectedTask,_that.searchQuery,_that.tasks,_that.isLoading,_that.isLoadingMore,_that.hasMorePages,_that.currentPage,_that.hasError,_that.errorMessage,_that.showNotification,_that.notificationMessage,_that.notificationType,_that.statusFilter,_that.showStatusSelector);case _:
+return $default(_that.selectedTask,_that.searchQuery,_that.tasks,_that.isLoading,_that.isLoadingMore,_that.hasMorePages,_that.currentPage,_that.hasError,_that.errorMessage,_that.showNotification,_that.notificationMessage,_that.notificationType,_that.statusFilter,_that.showStatusSelector,_that.layoutMode);case _:
   return null;
 
 }
@@ -231,7 +232,7 @@ return $default(_that.selectedTask,_that.searchQuery,_that.tasks,_that.isLoading
 
 
 class _TaskListState implements TaskListState {
-  const _TaskListState({this.selectedTask, this.searchQuery = "", final  List<TaskModel> tasks = const [], this.isLoading = false, this.isLoadingMore = false, this.hasMorePages = true, this.currentPage = 1, this.hasError = false, this.errorMessage = "", this.showNotification = false, this.notificationMessage = "", this.notificationType = NotificationType.info, final  List<TaskStatus> statusFilter = TaskStatus.values, this.showStatusSelector = false}): _tasks = tasks,_statusFilter = statusFilter;
+  const _TaskListState({this.selectedTask, this.searchQuery = "", final  List<TaskModel> tasks = const [], this.isLoading = false, this.isLoadingMore = false, this.hasMorePages = true, this.currentPage = 1, this.hasError = false, this.errorMessage = "", this.showNotification = false, this.notificationMessage = "", this.notificationType = NotificationType.info, final  List<TaskStatus> statusFilter = TaskStatus.values, this.showStatusSelector = false, this.layoutMode = TaskLayout.list}): _tasks = tasks,_statusFilter = statusFilter;
   
 
 @override final  TaskModel? selectedTask;
@@ -260,6 +261,7 @@ class _TaskListState implements TaskListState {
 }
 
 @override@JsonKey() final  bool showStatusSelector;
+@override@JsonKey() final  TaskLayout layoutMode;
 
 /// Create a copy of TaskListState
 /// with the given fields replaced by the non-null parameter values.
@@ -271,16 +273,16 @@ _$TaskListStateCopyWith<_TaskListState> get copyWith => __$TaskListStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskListState&&(identical(other.selectedTask, selectedTask) || other.selectedTask == selectedTask)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&const DeepCollectionEquality().equals(other._tasks, _tasks)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.hasMorePages, hasMorePages) || other.hasMorePages == hasMorePages)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.hasError, hasError) || other.hasError == hasError)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&const DeepCollectionEquality().equals(other._statusFilter, _statusFilter)&&(identical(other.showStatusSelector, showStatusSelector) || other.showStatusSelector == showStatusSelector));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskListState&&(identical(other.selectedTask, selectedTask) || other.selectedTask == selectedTask)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&const DeepCollectionEquality().equals(other._tasks, _tasks)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.hasMorePages, hasMorePages) || other.hasMorePages == hasMorePages)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.hasError, hasError) || other.hasError == hasError)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&const DeepCollectionEquality().equals(other._statusFilter, _statusFilter)&&(identical(other.showStatusSelector, showStatusSelector) || other.showStatusSelector == showStatusSelector)&&(identical(other.layoutMode, layoutMode) || other.layoutMode == layoutMode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,selectedTask,searchQuery,const DeepCollectionEquality().hash(_tasks),isLoading,isLoadingMore,hasMorePages,currentPage,hasError,errorMessage,showNotification,notificationMessage,notificationType,const DeepCollectionEquality().hash(_statusFilter),showStatusSelector);
+int get hashCode => Object.hash(runtimeType,selectedTask,searchQuery,const DeepCollectionEquality().hash(_tasks),isLoading,isLoadingMore,hasMorePages,currentPage,hasError,errorMessage,showNotification,notificationMessage,notificationType,const DeepCollectionEquality().hash(_statusFilter),showStatusSelector,layoutMode);
 
 @override
 String toString() {
-  return 'TaskListState(selectedTask: $selectedTask, searchQuery: $searchQuery, tasks: $tasks, isLoading: $isLoading, isLoadingMore: $isLoadingMore, hasMorePages: $hasMorePages, currentPage: $currentPage, hasError: $hasError, errorMessage: $errorMessage, showNotification: $showNotification, notificationMessage: $notificationMessage, notificationType: $notificationType, statusFilter: $statusFilter, showStatusSelector: $showStatusSelector)';
+  return 'TaskListState(selectedTask: $selectedTask, searchQuery: $searchQuery, tasks: $tasks, isLoading: $isLoading, isLoadingMore: $isLoadingMore, hasMorePages: $hasMorePages, currentPage: $currentPage, hasError: $hasError, errorMessage: $errorMessage, showNotification: $showNotification, notificationMessage: $notificationMessage, notificationType: $notificationType, statusFilter: $statusFilter, showStatusSelector: $showStatusSelector, layoutMode: $layoutMode)';
 }
 
 
@@ -291,7 +293,7 @@ abstract mixin class _$TaskListStateCopyWith<$Res> implements $TaskListStateCopy
   factory _$TaskListStateCopyWith(_TaskListState value, $Res Function(_TaskListState) _then) = __$TaskListStateCopyWithImpl;
 @override @useResult
 $Res call({
- TaskModel? selectedTask, String searchQuery, List<TaskModel> tasks, bool isLoading, bool isLoadingMore, bool hasMorePages, int currentPage, bool hasError, String errorMessage, bool showNotification, String notificationMessage, NotificationType notificationType, List<TaskStatus> statusFilter, bool showStatusSelector
+ TaskModel? selectedTask, String searchQuery, List<TaskModel> tasks, bool isLoading, bool isLoadingMore, bool hasMorePages, int currentPage, bool hasError, String errorMessage, bool showNotification, String notificationMessage, NotificationType notificationType, List<TaskStatus> statusFilter, bool showStatusSelector, TaskLayout layoutMode
 });
 
 
@@ -308,7 +310,7 @@ class __$TaskListStateCopyWithImpl<$Res>
 
 /// Create a copy of TaskListState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? selectedTask = freezed,Object? searchQuery = null,Object? tasks = null,Object? isLoading = null,Object? isLoadingMore = null,Object? hasMorePages = null,Object? currentPage = null,Object? hasError = null,Object? errorMessage = null,Object? showNotification = null,Object? notificationMessage = null,Object? notificationType = null,Object? statusFilter = null,Object? showStatusSelector = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? selectedTask = freezed,Object? searchQuery = null,Object? tasks = null,Object? isLoading = null,Object? isLoadingMore = null,Object? hasMorePages = null,Object? currentPage = null,Object? hasError = null,Object? errorMessage = null,Object? showNotification = null,Object? notificationMessage = null,Object? notificationType = null,Object? statusFilter = null,Object? showStatusSelector = null,Object? layoutMode = null,}) {
   return _then(_TaskListState(
 selectedTask: freezed == selectedTask ? _self.selectedTask : selectedTask // ignore: cast_nullable_to_non_nullable
 as TaskModel?,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
@@ -324,7 +326,8 @@ as bool,notificationMessage: null == notificationMessage ? _self.notificationMes
 as String,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
 as NotificationType,statusFilter: null == statusFilter ? _self._statusFilter : statusFilter // ignore: cast_nullable_to_non_nullable
 as List<TaskStatus>,showStatusSelector: null == showStatusSelector ? _self.showStatusSelector : showStatusSelector // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,layoutMode: null == layoutMode ? _self.layoutMode : layoutMode // ignore: cast_nullable_to_non_nullable
+as TaskLayout,
   ));
 }
 

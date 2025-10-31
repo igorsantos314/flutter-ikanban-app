@@ -1,0 +1,4 @@
+enum TaskLayout {
+  grid,
+  list,
+}

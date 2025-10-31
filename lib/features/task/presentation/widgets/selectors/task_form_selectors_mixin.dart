@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_bloc.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_state.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_form_bloc.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/states/form/task_form_state.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/status_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/complexity_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/priority_selector_bottom_sheet.dart';

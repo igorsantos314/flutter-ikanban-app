@@ -7,8 +7,9 @@ import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/errors/task_repository_errors.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_state.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/events/shared/task_shared_events.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/states/form/task_form_state.dart';
 
 class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
   final TaskRepository taskRepository;
