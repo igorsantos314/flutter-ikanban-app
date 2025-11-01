@@ -5,6 +5,9 @@ import 'package:flutter_ikanban_app/features/settings/infra/settings_data_source
 import 'package:flutter_ikanban_app/features/task/data/task_repository_impl.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/features/task/infra/local/task_local_data_source.dart';
+import 'package:flutter_ikanban_app/shared/theme/data/theme_repository_impl.dart';
+import 'package:flutter_ikanban_app/shared/theme/infra/theme_data_source.dart';
+import 'package:flutter_ikanban_app/shared/theme/repository/theme_repository.dart';
 import 'package:get_it/get_it.dart';
 
 // Dependency Injection
@@ -12,8 +15,21 @@ final getIt = GetIt.instance;
 
 void setupLocator() {
   getIt.registerLazySingleton<AppDatabase>(() => AppDatabase());
+
+  _setupThemeModule();
+
   _setupTaskModule();
   _setupSettingsModule();
+}
+
+void _setupThemeModule() {
+  getIt.registerLazySingleton<ThemeDataSource>(
+    () => ThemeDataSource(),
+  );
+
+  getIt.registerLazySingleton<ThemeRepository>(
+    () => ThemeRepositoryImpl(getIt()),
+  );
 }
 
 void _setupTaskModule() {
@@ -29,6 +45,9 @@ void _setupTaskModule() {
 void _setupSettingsModule() {
   getIt.registerLazySingleton<SettingsDataSource>(() => SettingsDataSource());
   getIt.registerLazySingleton<SettingsRepository>(
-    () => SettingsRepositoryImpl(dataSource: getIt()),
+    () => SettingsRepositoryImpl(
+      themeRepository: getIt(),
+      dataSource: getIt(),
+    ),
   );
 }
