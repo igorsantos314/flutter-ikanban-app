@@ -1,3 +1,5 @@
+import 'package:flutter_ikanban_app/core/di/app_locator.dart';
+import 'package:flutter_ikanban_app/core/theme/theme_enum.dart';
 import 'package:flutter_ikanban_app/shared/theme/infra/theme_data_source.dart';
 import 'package:flutter_ikanban_app/shared/theme/repository/theme_repository.dart';
 
@@ -6,13 +8,19 @@ class ThemeRepositoryImpl implements ThemeRepository {
 
   ThemeRepositoryImpl(this.dataSource);
 
-  @override
-  Future<bool> isDarkModeEnabled() {
-    return dataSource.isDarkModeEnabled();
+  static Future<AppTheme> getThemePrefs() async {
+    return await ThemeRepositoryImpl(
+      getIt<ThemeDataSource>(),
+    ).getTheme();
   }
 
   @override
-  Future<void> setDarkModeEnabled(bool isEnabled) {
-    return dataSource.setDarkModeEnabled(isEnabled);
+  Future<AppTheme> getTheme() {
+    return dataSource.getTheme();
+  }
+
+  @override
+  Future<void> setTheme(AppTheme theme) {
+    return dataSource.setTheme(theme);
   }
 }

@@ -14,30 +14,79 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SettingsState {
 
-
+ SettingsModel? get settingsModel; AppTheme get appTheme; String get language; String get appVersion; bool get showNotification; NotificationType get notificationType; String get notificationMessage;
+/// Create a copy of SettingsState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SettingsStateCopyWith<SettingsState> get copyWith => _$SettingsStateCopyWithImpl<SettingsState>(this as SettingsState, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsState);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsState&&(identical(other.settingsModel, settingsModel) || other.settingsModel == settingsModel)&&(identical(other.appTheme, appTheme) || other.appTheme == appTheme)&&(identical(other.language, language) || other.language == language)&&(identical(other.appVersion, appVersion) || other.appVersion == appVersion)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,settingsModel,appTheme,language,appVersion,showNotification,notificationType,notificationMessage);
 
 @override
 String toString() {
-  return 'SettingsState()';
+  return 'SettingsState(settingsModel: $settingsModel, appTheme: $appTheme, language: $language, appVersion: $appVersion, showNotification: $showNotification, notificationType: $notificationType, notificationMessage: $notificationMessage)';
 }
 
 
 }
 
 /// @nodoc
-class $SettingsStateCopyWith<$Res>  {
-$SettingsStateCopyWith(SettingsState _, $Res Function(SettingsState) __);
+abstract mixin class $SettingsStateCopyWith<$Res>  {
+  factory $SettingsStateCopyWith(SettingsState value, $Res Function(SettingsState) _then) = _$SettingsStateCopyWithImpl;
+@useResult
+$Res call({
+ SettingsModel? settingsModel, AppTheme appTheme, String language, String appVersion, bool showNotification, NotificationType notificationType, String notificationMessage
+});
+
+
+$SettingsModelCopyWith<$Res>? get settingsModel;
+
+}
+/// @nodoc
+class _$SettingsStateCopyWithImpl<$Res>
+    implements $SettingsStateCopyWith<$Res> {
+  _$SettingsStateCopyWithImpl(this._self, this._then);
+
+  final SettingsState _self;
+  final $Res Function(SettingsState) _then;
+
+/// Create a copy of SettingsState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? settingsModel = freezed,Object? appTheme = null,Object? language = null,Object? appVersion = null,Object? showNotification = null,Object? notificationType = null,Object? notificationMessage = null,}) {
+  return _then(_self.copyWith(
+settingsModel: freezed == settingsModel ? _self.settingsModel : settingsModel // ignore: cast_nullable_to_non_nullable
+as SettingsModel?,appTheme: null == appTheme ? _self.appTheme : appTheme // ignore: cast_nullable_to_non_nullable
+as AppTheme,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+as String,appVersion: null == appVersion ? _self.appVersion : appVersion // ignore: cast_nullable_to_non_nullable
+as String,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
+as bool,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
+as NotificationType,notificationMessage: null == notificationMessage ? _self.notificationMessage : notificationMessage // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+/// Create a copy of SettingsState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SettingsModelCopyWith<$Res>? get settingsModel {
+    if (_self.settingsModel == null) {
+    return null;
+  }
+
+  return $SettingsModelCopyWith<$Res>(_self.settingsModel!, (value) {
+    return _then(_self.copyWith(settingsModel: value));
+  });
+}
 }
 
 
@@ -55,12 +104,11 @@ extension SettingsStatePatterns on SettingsState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SettingsState value)?  $default,{TResult Function( _Initial value)?  initial,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SettingsState value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _SettingsState() when $default != null:
-return $default(_that);case _Initial() when initial != null:
-return initial(_that);case _:
+return $default(_that);case _:
   return orElse();
 
 }
@@ -78,12 +126,11 @@ return initial(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SettingsState value)  $default,{required TResult Function( _Initial value)  initial,}){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SettingsState value)  $default,){
 final _that = this;
 switch (_that) {
 case _SettingsState():
-return $default(_that);case _Initial():
-return initial(_that);case _:
+return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -100,12 +147,11 @@ return initial(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SettingsState value)?  $default,{TResult? Function( _Initial value)?  initial,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SettingsState value)?  $default,){
 final _that = this;
 switch (_that) {
 case _SettingsState() when $default != null:
-return $default(_that);case _Initial() when initial != null:
-return initial(_that);case _:
+return $default(_that);case _:
   return null;
 
 }
@@ -122,11 +168,10 @@ return initial(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isDarkMode,  String language)?  $default,{TResult Function()?  initial,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SettingsModel? settingsModel,  AppTheme appTheme,  String language,  String appVersion,  bool showNotification,  NotificationType notificationType,  String notificationMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SettingsState() when $default != null:
-return $default(_that.isDarkMode,_that.language);case _Initial() when initial != null:
-return initial();case _:
+return $default(_that.settingsModel,_that.appTheme,_that.language,_that.appVersion,_that.showNotification,_that.notificationType,_that.notificationMessage);case _:
   return orElse();
 
 }
@@ -144,11 +189,10 @@ return initial();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isDarkMode,  String language)  $default,{required TResult Function()  initial,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SettingsModel? settingsModel,  AppTheme appTheme,  String language,  String appVersion,  bool showNotification,  NotificationType notificationType,  String notificationMessage)  $default,) {final _that = this;
 switch (_that) {
 case _SettingsState():
-return $default(_that.isDarkMode,_that.language);case _Initial():
-return initial();case _:
+return $default(_that.settingsModel,_that.appTheme,_that.language,_that.appVersion,_that.showNotification,_that.notificationType,_that.notificationMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -165,11 +209,10 @@ return initial();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isDarkMode,  String language)?  $default,{TResult? Function()?  initial,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SettingsModel? settingsModel,  AppTheme appTheme,  String language,  String appVersion,  bool showNotification,  NotificationType notificationType,  String notificationMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _SettingsState() when $default != null:
-return $default(_that.isDarkMode,_that.language);case _Initial() when initial != null:
-return initial();case _:
+return $default(_that.settingsModel,_that.appTheme,_that.language,_that.appVersion,_that.showNotification,_that.notificationType,_that.notificationMessage);case _:
   return null;
 
 }
@@ -181,15 +224,20 @@ return initial();case _:
 
 
 class _SettingsState implements SettingsState {
-  const _SettingsState({required this.isDarkMode, required this.language});
+  const _SettingsState({this.settingsModel, this.appTheme = AppTheme.system, this.language = 'pt', this.appVersion = '0.0.1', this.showNotification = false, this.notificationType = NotificationType.info, this.notificationMessage = ""});
   
 
- final  bool isDarkMode;
- final  String language;
+@override final  SettingsModel? settingsModel;
+@override@JsonKey() final  AppTheme appTheme;
+@override@JsonKey() final  String language;
+@override@JsonKey() final  String appVersion;
+@override@JsonKey() final  bool showNotification;
+@override@JsonKey() final  NotificationType notificationType;
+@override@JsonKey() final  String notificationMessage;
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
+@override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 _$SettingsStateCopyWith<_SettingsState> get copyWith => __$SettingsStateCopyWithImpl<_SettingsState>(this, _$identity);
 
@@ -197,16 +245,16 @@ _$SettingsStateCopyWith<_SettingsState> get copyWith => __$SettingsStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsState&&(identical(other.isDarkMode, isDarkMode) || other.isDarkMode == isDarkMode)&&(identical(other.language, language) || other.language == language));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsState&&(identical(other.settingsModel, settingsModel) || other.settingsModel == settingsModel)&&(identical(other.appTheme, appTheme) || other.appTheme == appTheme)&&(identical(other.language, language) || other.language == language)&&(identical(other.appVersion, appVersion) || other.appVersion == appVersion)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isDarkMode,language);
+int get hashCode => Object.hash(runtimeType,settingsModel,appTheme,language,appVersion,showNotification,notificationType,notificationMessage);
 
 @override
 String toString() {
-  return 'SettingsState(isDarkMode: $isDarkMode, language: $language)';
+  return 'SettingsState(settingsModel: $settingsModel, appTheme: $appTheme, language: $language, appVersion: $appVersion, showNotification: $showNotification, notificationType: $notificationType, notificationMessage: $notificationMessage)';
 }
 
 
@@ -215,13 +263,13 @@ String toString() {
 /// @nodoc
 abstract mixin class _$SettingsStateCopyWith<$Res> implements $SettingsStateCopyWith<$Res> {
   factory _$SettingsStateCopyWith(_SettingsState value, $Res Function(_SettingsState) _then) = __$SettingsStateCopyWithImpl;
-@useResult
+@override @useResult
 $Res call({
- bool isDarkMode, String language
+ SettingsModel? settingsModel, AppTheme appTheme, String language, String appVersion, bool showNotification, NotificationType notificationType, String notificationMessage
 });
 
 
-
+@override $SettingsModelCopyWith<$Res>? get settingsModel;
 
 }
 /// @nodoc
@@ -234,47 +282,32 @@ class __$SettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? isDarkMode = null,Object? language = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? settingsModel = freezed,Object? appTheme = null,Object? language = null,Object? appVersion = null,Object? showNotification = null,Object? notificationType = null,Object? notificationMessage = null,}) {
   return _then(_SettingsState(
-isDarkMode: null == isDarkMode ? _self.isDarkMode : isDarkMode // ignore: cast_nullable_to_non_nullable
-as bool,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+settingsModel: freezed == settingsModel ? _self.settingsModel : settingsModel // ignore: cast_nullable_to_non_nullable
+as SettingsModel?,appTheme: null == appTheme ? _self.appTheme : appTheme // ignore: cast_nullable_to_non_nullable
+as AppTheme,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+as String,appVersion: null == appVersion ? _self.appVersion : appVersion // ignore: cast_nullable_to_non_nullable
+as String,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
+as bool,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
+as NotificationType,notificationMessage: null == notificationMessage ? _self.notificationMessage : notificationMessage // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
 
-
-}
-
-/// @nodoc
-
-
-class _Initial implements SettingsState {
-  const _Initial();
-  
-
-
-
-
-
-
+/// Create a copy of SettingsState
+/// with the given fields replaced by the non-null parameter values.
 @override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Initial);
+@pragma('vm:prefer-inline')
+$SettingsModelCopyWith<$Res>? get settingsModel {
+    if (_self.settingsModel == null) {
+    return null;
+  }
+
+  return $SettingsModelCopyWith<$Res>(_self.settingsModel!, (value) {
+    return _then(_self.copyWith(settingsModel: value));
+  });
 }
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'SettingsState.initial()';
 }
-
-
-}
-
-
-
 
 // dart format on

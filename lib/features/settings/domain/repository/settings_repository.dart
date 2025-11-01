@@ -1,10 +1,8 @@
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/errors/settings_repository_errors.dart';
+import 'package:flutter_ikanban_app/features/settings/domain/model/settings_model.dart';
 
 abstract class SettingsRepository {
-  Future<Outcome<bool, SettingsRepositoryErrors>> getIsDarkMode();
-  Future<Outcome<void, SettingsRepositoryErrors>> setIsDarkMode(bool isDarkMode);
-  
-  Future<Outcome<String, SettingsRepositoryErrors>> getLanguage();
-  Future<Outcome<void, SettingsRepositoryErrors>> setLanguage(String language);
+  Future<Outcome<SettingsModel, SettingsRepositoryErrors>> loadSettings();
+  Future<Outcome<void, SettingsRepositoryErrors>> saveSettings(SettingsModel settings);
 }

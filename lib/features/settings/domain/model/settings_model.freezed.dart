@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SettingsModel {
 
- bool get isDarkMode; String get language;
+ AppTheme get appTheme; String get language; String get appVersion;
 /// Create a copy of SettingsModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $SettingsModelCopyWith<SettingsModel> get copyWith => _$SettingsModelCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsModel&&(identical(other.isDarkMode, isDarkMode) || other.isDarkMode == isDarkMode)&&(identical(other.language, language) || other.language == language));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsModel&&(identical(other.appTheme, appTheme) || other.appTheme == appTheme)&&(identical(other.language, language) || other.language == language)&&(identical(other.appVersion, appVersion) || other.appVersion == appVersion));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isDarkMode,language);
+int get hashCode => Object.hash(runtimeType,appTheme,language,appVersion);
 
 @override
 String toString() {
-  return 'SettingsModel(isDarkMode: $isDarkMode, language: $language)';
+  return 'SettingsModel(appTheme: $appTheme, language: $language, appVersion: $appVersion)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $SettingsModelCopyWith<$Res>  {
   factory $SettingsModelCopyWith(SettingsModel value, $Res Function(SettingsModel) _then) = _$SettingsModelCopyWithImpl;
 @useResult
 $Res call({
- bool isDarkMode, String language
+ AppTheme appTheme, String language, String appVersion
 });
 
 
@@ -62,10 +62,11 @@ class _$SettingsModelCopyWithImpl<$Res>
 
 /// Create a copy of SettingsModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? isDarkMode = null,Object? language = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? appTheme = null,Object? language = null,Object? appVersion = null,}) {
   return _then(_self.copyWith(
-isDarkMode: null == isDarkMode ? _self.isDarkMode : isDarkMode // ignore: cast_nullable_to_non_nullable
-as bool,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+appTheme: null == appTheme ? _self.appTheme : appTheme // ignore: cast_nullable_to_non_nullable
+as AppTheme,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+as String,appVersion: null == appVersion ? _self.appVersion : appVersion // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -151,10 +152,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isDarkMode,  String language)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AppTheme appTheme,  String language,  String appVersion)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SettingsModel() when $default != null:
-return $default(_that.isDarkMode,_that.language);case _:
+return $default(_that.appTheme,_that.language,_that.appVersion);case _:
   return orElse();
 
 }
@@ -172,10 +173,10 @@ return $default(_that.isDarkMode,_that.language);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isDarkMode,  String language)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AppTheme appTheme,  String language,  String appVersion)  $default,) {final _that = this;
 switch (_that) {
 case _SettingsModel():
-return $default(_that.isDarkMode,_that.language);case _:
+return $default(_that.appTheme,_that.language,_that.appVersion);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -192,10 +193,10 @@ return $default(_that.isDarkMode,_that.language);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isDarkMode,  String language)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AppTheme appTheme,  String language,  String appVersion)?  $default,) {final _that = this;
 switch (_that) {
 case _SettingsModel() when $default != null:
-return $default(_that.isDarkMode,_that.language);case _:
+return $default(_that.appTheme,_that.language,_that.appVersion);case _:
   return null;
 
 }
@@ -207,11 +208,12 @@ return $default(_that.isDarkMode,_that.language);case _:
 
 
 class _SettingsModel implements SettingsModel {
-  const _SettingsModel({required this.isDarkMode, required this.language});
+  const _SettingsModel({this.appTheme = AppTheme.system, required this.language, required this.appVersion});
   
 
-@override final  bool isDarkMode;
+@override@JsonKey() final  AppTheme appTheme;
 @override final  String language;
+@override final  String appVersion;
 
 /// Create a copy of SettingsModel
 /// with the given fields replaced by the non-null parameter values.
@@ -223,16 +225,16 @@ _$SettingsModelCopyWith<_SettingsModel> get copyWith => __$SettingsModelCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsModel&&(identical(other.isDarkMode, isDarkMode) || other.isDarkMode == isDarkMode)&&(identical(other.language, language) || other.language == language));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsModel&&(identical(other.appTheme, appTheme) || other.appTheme == appTheme)&&(identical(other.language, language) || other.language == language)&&(identical(other.appVersion, appVersion) || other.appVersion == appVersion));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isDarkMode,language);
+int get hashCode => Object.hash(runtimeType,appTheme,language,appVersion);
 
 @override
 String toString() {
-  return 'SettingsModel(isDarkMode: $isDarkMode, language: $language)';
+  return 'SettingsModel(appTheme: $appTheme, language: $language, appVersion: $appVersion)';
 }
 
 
@@ -243,7 +245,7 @@ abstract mixin class _$SettingsModelCopyWith<$Res> implements $SettingsModelCopy
   factory _$SettingsModelCopyWith(_SettingsModel value, $Res Function(_SettingsModel) _then) = __$SettingsModelCopyWithImpl;
 @override @useResult
 $Res call({
- bool isDarkMode, String language
+ AppTheme appTheme, String language, String appVersion
 });
 
 
@@ -260,10 +262,11 @@ class __$SettingsModelCopyWithImpl<$Res>
 
 /// Create a copy of SettingsModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? isDarkMode = null,Object? language = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? appTheme = null,Object? language = null,Object? appVersion = null,}) {
   return _then(_SettingsModel(
-isDarkMode: null == isDarkMode ? _self.isDarkMode : isDarkMode // ignore: cast_nullable_to_non_nullable
-as bool,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+appTheme: null == appTheme ? _self.appTheme : appTheme // ignore: cast_nullable_to_non_nullable
+as AppTheme,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+as String,appVersion: null == appVersion ? _self.appVersion : appVersion // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
