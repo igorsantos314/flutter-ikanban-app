@@ -138,4 +138,19 @@ class TaskRepositoryImpl implements TaskRepository {
       );
     }
   }
+  
+  @override
+  Future<Outcome<void, TaskRepositoryErrors>> createTasks(List<TaskModel> tasks) async{
+    try {
+      final entities = tasks.map((task) => TaskMapper.toEntity(task)).toList();
+      await _localDataSource.insertTasks(entities);
+      return const Outcome.success();
+    } catch (e) {
+      return Outcome.failure(
+        error: GenericError(),
+        message: 'Failed to create tasks',
+        throwable: e,
+      );
+    }
+  }
 }

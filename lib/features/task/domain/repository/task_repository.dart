@@ -23,6 +23,7 @@ abstract class TaskRepository {
     bool ascending = true,
   });
   Future<Outcome<void, TaskRepositoryErrors>> createTask(TaskModel task);
+  Future<Outcome<void, TaskRepositoryErrors>> createTasks(List<TaskModel> tasks);
   Future<Outcome<void, TaskRepositoryErrors>> updateTask(TaskModel task);
   Future<Outcome<void, TaskRepositoryErrors>> deleteTask(int id);
   Future<Outcome<TaskModel, TaskRepositoryErrors>> getTaskById(int taskId);

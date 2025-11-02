@@ -40,3 +40,9 @@ class ResetSettingsEvent extends SettingsEvent {
   const ResetSettingsEvent();
 }
 
+class SettingsResetNotification extends SettingsEvent {
+  const SettingsResetNotification();
+
+  @override
+  List<Object> get props => [];
+}

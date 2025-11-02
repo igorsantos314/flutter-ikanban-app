@@ -77,7 +77,6 @@ class ExportDataUseCase {
               'type': task.type.name,
               'dueDate': task.dueDate?.toIso8601String(),
               'isActive': task.isActive,
-              'createdAt': DateTime.now().toIso8601String(),
             }).toList();
             totalTasks = resultPage.totalItems;
           }

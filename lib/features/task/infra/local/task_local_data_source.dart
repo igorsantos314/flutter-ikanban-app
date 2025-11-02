@@ -167,4 +167,12 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
       );
     }
   }
+
+  Future<void> insertTasks(List<TaskEntityCompanion> entities) async {
+    await db.transaction(() async {
+      for (final entity in entities) {
+        await into(db.taskEntity).insert(entity);
+      }
+    });
+  }
 }

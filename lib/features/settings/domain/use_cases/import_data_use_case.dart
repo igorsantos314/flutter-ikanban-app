@@ -4,6 +4,11 @@ import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/repository/settings_repository.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/model/settings_model.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
 
@@ -158,12 +163,33 @@ class ImportDataUseCase {
               final tasksData = data['tasks'] as List<dynamic>;
               
               // Processar cada tarefa
-              // TODO: Implementar Task.fromJson e _taskRepository.createTask
-              // for (final taskJson in tasksData) {
-              //   final taskData = taskJson as Map<String, dynamic>;
-              //   final task = Task.fromJson(taskData);
-              //   await _taskRepository.createTask(task);
-              // }
+              _taskRepository.createTasks(
+                tasksData.map((taskJson) {
+                  final taskMap = taskJson as Map<String, dynamic>;
+                  return TaskModel(
+                    id: taskMap['id'] as int?,
+                    title: taskMap['title'] as String,
+                    description: taskMap['description'] as String?,
+                    status: TaskStatus.values.firstWhere(
+                      (e) => e.toString() == 'TaskStatus.${taskMap['status']}',
+                      orElse: () => TaskStatus.backlog,
+                    ),
+                    priority: TaskPriority.values.firstWhere(
+                      (e) => e.toString() == 'TaskPriority.${taskMap['priority']}',
+                      orElse: () => TaskPriority.medium,
+                    ),
+                    complexity: TaskComplexity.values.firstWhere(
+                      (e) => e.toString() == 'TaskComplexity.${taskMap['complexity']}',
+                      orElse: () => TaskComplexity.medium,
+                    ),
+                    type: TaskType.values.firstWhere(
+                      (e) => e.toString() == 'TaskType.${taskMap['type']}',
+                      orElse: () => TaskType.feature,
+                    ),
+                    isActive: taskMap['isActive'] as bool? ?? true,
+                  );
+                }).toList(),
+              );
               
               // Por enquanto, apenas contamos as tarefas
               tasksImported = tasksData.length;
