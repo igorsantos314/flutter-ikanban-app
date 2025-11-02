@@ -51,8 +51,8 @@ class TaskStatusFilter extends StatelessWidget {
                     onChanged([]);
                   }
                 },
-                selectedColor: theme.primaryColor.withValues(alpha: 0.3),
-                checkmarkColor: Theme.of(context).primaryColor,
+                selectedColor: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                checkmarkColor: theme.colorScheme.onSurface,
               ),
             ),
 

@@ -192,6 +192,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                     },
                     child: Column(
                       children: [
+                        // Layout Toggle
                         TaskListLayoutMode(
                           taskLayout: state.layoutMode,
                           onToggle: () {
@@ -200,6 +201,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                             );
                           },
                         ),
+                        const SizedBox(height: 8),
                         Expanded(
                           child: state.layoutMode == TaskLayout.grid
                               ? GridView.builder(
