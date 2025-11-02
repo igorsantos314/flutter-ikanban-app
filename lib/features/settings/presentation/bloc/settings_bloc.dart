@@ -37,7 +37,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     Emitter<SettingsState> emit,
   ) async {
     log("Loading settings...");
-    await Future.delayed(const Duration(milliseconds: 5000));
+    emit(state.copyWith(isLoading: true));
+    
     final outcome = await loadSettingsUseCase.execute();
 
     outcome.when(

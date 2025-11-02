@@ -23,8 +23,8 @@ class SettingsPage extends StatelessWidget {
         loadSettingsUseCase: getIt(),
         exportDataUseCase: getIt(),
         importDataUseCase: getIt(),
-      ),
-      child: SettingsPageContent(),
+      )..add(LoadSettingsEvent()),
+      child: const SettingsPageContent(),
     );
   }
 }
@@ -37,13 +37,6 @@ class SettingsPageContent extends StatefulWidget {
 }
 
 class _SettingsPageContentState extends State<SettingsPageContent> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SettingsBloc>().add(LoadSettingsEvent());
-    });
-  }
 
   Widget _buildThemeOption(
     BuildContext context,
@@ -59,8 +52,15 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
 
     return InkWell(
       onTap: () {
+        // Evita múltiplos taps
+        if (isSelected) return;
+        
+        // Atualiza o provider imediatamente para feedback visual
         themeProvider.setTheme(themeOption);
+        
+        // Salva no BLoC (que persiste no repository)
         context.read<SettingsBloc>().add(UpdateThemeEvent(themeOption));
+        
         HapticFeedback.lightImpact();
       },
       borderRadius: BorderRadius.circular(8),
