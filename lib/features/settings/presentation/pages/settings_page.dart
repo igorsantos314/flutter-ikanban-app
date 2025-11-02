@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
-import 'package:flutter_ikanban_app/core/theme/theme_mapper.dart';
-import 'package:flutter_ikanban_app/core/theme/theme_provider.dart';
-import 'package:flutter_ikanban_app/core/theme/theme_enum.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_mapper.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_provider.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
 import 'package:flutter_ikanban_app/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:flutter_ikanban_app/features/settings/presentation/events/settings_events.dart';
 import 'package:flutter_ikanban_app/features/settings/presentation/modals/about_developer_modal.dart';
@@ -17,7 +17,10 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SettingsBloc(settingsRepository: getIt()),
+      create: (context) => SettingsBloc(
+        settingsRepository: getIt(),
+        dataBackupService: getIt(),
+      ),
       child: SettingsPageContent(),
     );
   }
@@ -271,48 +274,53 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                     ),
 
                     const SizedBox(height: 32),
-                  ],
-                ),
-              ),
 
-              // Rodapé com informações
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  border: Border(
-                    top: BorderSide(color: theme.dividerColor, width: 0.5),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    // Informações da versão
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          size: 16,
-                          color: theme.colorScheme.onSurface.withValues(
-                            alpha: 0.6,
+                    // Sobre o Desenvolvedor
+
+                    // Rodapé com informações
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        border: Border(
+                          top: BorderSide(
+                            color: theme.dividerColor,
+                            width: 0.5,
                           ),
                         ),
-                        const SizedBox(width: 6),
-                        Text(
-                          state.appVersion,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(
-                              alpha: 0.6,
-                            ),
+                      ),
+                      child: Column(
+                        children: [
+                          // Informações da versão
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                size: 16,
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.6,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                state.appVersion,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 8),
+
+                          // Informações do desenvolvedor
+                          _aboutDeveloperInfo(context, theme),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 8),
-
-                    // Informações do desenvolvedor
-                    _aboutDeveloperInfo(context, theme),
                   ],
                 ),
               ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ikanban_app/core/theme/theme_enum.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
 
 class ThemeProvider with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.light; // Usa o tema do sistema por padrão

@@ -1,5 +1,5 @@
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
-import 'package:flutter_ikanban_app/core/theme/theme_enum.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
 import 'package:flutter_ikanban_app/shared/theme/infra/theme_data_source.dart';
 import 'package:flutter_ikanban_app/shared/theme/repository/theme_repository.dart';
 

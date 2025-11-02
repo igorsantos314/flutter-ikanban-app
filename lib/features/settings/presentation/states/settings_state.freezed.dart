@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SettingsState {
 
- SettingsModel? get settingsModel; AppTheme get appTheme; String get language; String get appVersion; bool get showNotification; NotificationType get notificationType; String get notificationMessage;
+ SettingsModel? get settingsModel; AppTheme get appTheme; String get language; String get appVersion; bool get isLoading; bool get showNotification; NotificationType get notificationType; String get notificationMessage;
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $SettingsStateCopyWith<SettingsState> get copyWith => _$SettingsStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsState&&(identical(other.settingsModel, settingsModel) || other.settingsModel == settingsModel)&&(identical(other.appTheme, appTheme) || other.appTheme == appTheme)&&(identical(other.language, language) || other.language == language)&&(identical(other.appVersion, appVersion) || other.appVersion == appVersion)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsState&&(identical(other.settingsModel, settingsModel) || other.settingsModel == settingsModel)&&(identical(other.appTheme, appTheme) || other.appTheme == appTheme)&&(identical(other.language, language) || other.language == language)&&(identical(other.appVersion, appVersion) || other.appVersion == appVersion)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,settingsModel,appTheme,language,appVersion,showNotification,notificationType,notificationMessage);
+int get hashCode => Object.hash(runtimeType,settingsModel,appTheme,language,appVersion,isLoading,showNotification,notificationType,notificationMessage);
 
 @override
 String toString() {
-  return 'SettingsState(settingsModel: $settingsModel, appTheme: $appTheme, language: $language, appVersion: $appVersion, showNotification: $showNotification, notificationType: $notificationType, notificationMessage: $notificationMessage)';
+  return 'SettingsState(settingsModel: $settingsModel, appTheme: $appTheme, language: $language, appVersion: $appVersion, isLoading: $isLoading, showNotification: $showNotification, notificationType: $notificationType, notificationMessage: $notificationMessage)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $SettingsStateCopyWith<$Res>  {
   factory $SettingsStateCopyWith(SettingsState value, $Res Function(SettingsState) _then) = _$SettingsStateCopyWithImpl;
 @useResult
 $Res call({
- SettingsModel? settingsModel, AppTheme appTheme, String language, String appVersion, bool showNotification, NotificationType notificationType, String notificationMessage
+ SettingsModel? settingsModel, AppTheme appTheme, String language, String appVersion, bool isLoading, bool showNotification, NotificationType notificationType, String notificationMessage
 });
 
 
@@ -62,13 +62,14 @@ class _$SettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? settingsModel = freezed,Object? appTheme = null,Object? language = null,Object? appVersion = null,Object? showNotification = null,Object? notificationType = null,Object? notificationMessage = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? settingsModel = freezed,Object? appTheme = null,Object? language = null,Object? appVersion = null,Object? isLoading = null,Object? showNotification = null,Object? notificationType = null,Object? notificationMessage = null,}) {
   return _then(_self.copyWith(
 settingsModel: freezed == settingsModel ? _self.settingsModel : settingsModel // ignore: cast_nullable_to_non_nullable
 as SettingsModel?,appTheme: null == appTheme ? _self.appTheme : appTheme // ignore: cast_nullable_to_non_nullable
 as AppTheme,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
 as String,appVersion: null == appVersion ? _self.appVersion : appVersion // ignore: cast_nullable_to_non_nullable
-as String,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
+as String,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
 as bool,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
 as NotificationType,notificationMessage: null == notificationMessage ? _self.notificationMessage : notificationMessage // ignore: cast_nullable_to_non_nullable
 as String,
@@ -168,10 +169,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SettingsModel? settingsModel,  AppTheme appTheme,  String language,  String appVersion,  bool showNotification,  NotificationType notificationType,  String notificationMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SettingsModel? settingsModel,  AppTheme appTheme,  String language,  String appVersion,  bool isLoading,  bool showNotification,  NotificationType notificationType,  String notificationMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SettingsState() when $default != null:
-return $default(_that.settingsModel,_that.appTheme,_that.language,_that.appVersion,_that.showNotification,_that.notificationType,_that.notificationMessage);case _:
+return $default(_that.settingsModel,_that.appTheme,_that.language,_that.appVersion,_that.isLoading,_that.showNotification,_that.notificationType,_that.notificationMessage);case _:
   return orElse();
 
 }
@@ -189,10 +190,10 @@ return $default(_that.settingsModel,_that.appTheme,_that.language,_that.appVersi
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SettingsModel? settingsModel,  AppTheme appTheme,  String language,  String appVersion,  bool showNotification,  NotificationType notificationType,  String notificationMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SettingsModel? settingsModel,  AppTheme appTheme,  String language,  String appVersion,  bool isLoading,  bool showNotification,  NotificationType notificationType,  String notificationMessage)  $default,) {final _that = this;
 switch (_that) {
 case _SettingsState():
-return $default(_that.settingsModel,_that.appTheme,_that.language,_that.appVersion,_that.showNotification,_that.notificationType,_that.notificationMessage);case _:
+return $default(_that.settingsModel,_that.appTheme,_that.language,_that.appVersion,_that.isLoading,_that.showNotification,_that.notificationType,_that.notificationMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -209,10 +210,10 @@ return $default(_that.settingsModel,_that.appTheme,_that.language,_that.appVersi
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SettingsModel? settingsModel,  AppTheme appTheme,  String language,  String appVersion,  bool showNotification,  NotificationType notificationType,  String notificationMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SettingsModel? settingsModel,  AppTheme appTheme,  String language,  String appVersion,  bool isLoading,  bool showNotification,  NotificationType notificationType,  String notificationMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _SettingsState() when $default != null:
-return $default(_that.settingsModel,_that.appTheme,_that.language,_that.appVersion,_that.showNotification,_that.notificationType,_that.notificationMessage);case _:
+return $default(_that.settingsModel,_that.appTheme,_that.language,_that.appVersion,_that.isLoading,_that.showNotification,_that.notificationType,_that.notificationMessage);case _:
   return null;
 
 }
@@ -224,13 +225,14 @@ return $default(_that.settingsModel,_that.appTheme,_that.language,_that.appVersi
 
 
 class _SettingsState implements SettingsState {
-  const _SettingsState({this.settingsModel, this.appTheme = AppTheme.system, this.language = 'pt', this.appVersion = '0.0.1', this.showNotification = false, this.notificationType = NotificationType.info, this.notificationMessage = ""});
+  const _SettingsState({this.settingsModel, this.appTheme = AppTheme.system, this.language = 'pt', this.appVersion = '0.0.1', this.isLoading = false, this.showNotification = false, this.notificationType = NotificationType.info, this.notificationMessage = ""});
   
 
 @override final  SettingsModel? settingsModel;
 @override@JsonKey() final  AppTheme appTheme;
 @override@JsonKey() final  String language;
 @override@JsonKey() final  String appVersion;
+@override@JsonKey() final  bool isLoading;
 @override@JsonKey() final  bool showNotification;
 @override@JsonKey() final  NotificationType notificationType;
 @override@JsonKey() final  String notificationMessage;
@@ -245,16 +247,16 @@ _$SettingsStateCopyWith<_SettingsState> get copyWith => __$SettingsStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsState&&(identical(other.settingsModel, settingsModel) || other.settingsModel == settingsModel)&&(identical(other.appTheme, appTheme) || other.appTheme == appTheme)&&(identical(other.language, language) || other.language == language)&&(identical(other.appVersion, appVersion) || other.appVersion == appVersion)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsState&&(identical(other.settingsModel, settingsModel) || other.settingsModel == settingsModel)&&(identical(other.appTheme, appTheme) || other.appTheme == appTheme)&&(identical(other.language, language) || other.language == language)&&(identical(other.appVersion, appVersion) || other.appVersion == appVersion)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,settingsModel,appTheme,language,appVersion,showNotification,notificationType,notificationMessage);
+int get hashCode => Object.hash(runtimeType,settingsModel,appTheme,language,appVersion,isLoading,showNotification,notificationType,notificationMessage);
 
 @override
 String toString() {
-  return 'SettingsState(settingsModel: $settingsModel, appTheme: $appTheme, language: $language, appVersion: $appVersion, showNotification: $showNotification, notificationType: $notificationType, notificationMessage: $notificationMessage)';
+  return 'SettingsState(settingsModel: $settingsModel, appTheme: $appTheme, language: $language, appVersion: $appVersion, isLoading: $isLoading, showNotification: $showNotification, notificationType: $notificationType, notificationMessage: $notificationMessage)';
 }
 
 
@@ -265,7 +267,7 @@ abstract mixin class _$SettingsStateCopyWith<$Res> implements $SettingsStateCopy
   factory _$SettingsStateCopyWith(_SettingsState value, $Res Function(_SettingsState) _then) = __$SettingsStateCopyWithImpl;
 @override @useResult
 $Res call({
- SettingsModel? settingsModel, AppTheme appTheme, String language, String appVersion, bool showNotification, NotificationType notificationType, String notificationMessage
+ SettingsModel? settingsModel, AppTheme appTheme, String language, String appVersion, bool isLoading, bool showNotification, NotificationType notificationType, String notificationMessage
 });
 
 
@@ -282,13 +284,14 @@ class __$SettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? settingsModel = freezed,Object? appTheme = null,Object? language = null,Object? appVersion = null,Object? showNotification = null,Object? notificationType = null,Object? notificationMessage = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? settingsModel = freezed,Object? appTheme = null,Object? language = null,Object? appVersion = null,Object? isLoading = null,Object? showNotification = null,Object? notificationType = null,Object? notificationMessage = null,}) {
   return _then(_SettingsState(
 settingsModel: freezed == settingsModel ? _self.settingsModel : settingsModel // ignore: cast_nullable_to_non_nullable
 as SettingsModel?,appTheme: null == appTheme ? _self.appTheme : appTheme // ignore: cast_nullable_to_non_nullable
 as AppTheme,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
 as String,appVersion: null == appVersion ? _self.appVersion : appVersion // ignore: cast_nullable_to_non_nullable
-as String,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
+as String,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
 as bool,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
 as NotificationType,notificationMessage: null == notificationMessage ? _self.notificationMessage : notificationMessage // ignore: cast_nullable_to_non_nullable
 as String,

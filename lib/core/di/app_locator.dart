@@ -1,4 +1,10 @@
 import 'package:flutter_ikanban_app/core/database/app_database.dart';
+import 'package:flutter_ikanban_app/core/services/data_backup_service.dart';
+import 'package:flutter_ikanban_app/core/use_cases/theme/get_theme_use_case.dart';
+import 'package:flutter_ikanban_app/core/use_cases/theme/set_theme_use_case.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_provider.dart';
+import 'package:flutter_ikanban_app/core/use_cases/export_data_use_case.dart';
+import 'package:flutter_ikanban_app/core/use_cases/import_data_use_case.dart';
 import 'package:flutter_ikanban_app/features/settings/data/settings_repository_impl.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/repository/settings_repository.dart';
 import 'package:flutter_ikanban_app/features/settings/infra/settings_data_source.dart';
@@ -17,9 +23,9 @@ void setupLocator() {
   getIt.registerLazySingleton<AppDatabase>(() => AppDatabase());
 
   _setupThemeModule();
-
   _setupTaskModule();
   _setupSettingsModule();
+  _setupCoreServices();
 }
 
 void _setupThemeModule() {
@@ -49,5 +55,44 @@ void _setupSettingsModule() {
       themeRepository: getIt(),
       dataSource: getIt(),
     ),
+  );
+}
+
+void _setupCoreServices() {
+  // Theme Use Cases
+  getIt.registerLazySingleton<SetThemeUseCase>(
+    () => SetThemeUseCase(getIt()),
+  );
+
+  getIt.registerLazySingleton<GetThemeUseCase>(
+    () => GetThemeUseCase(getIt()),
+  );
+
+  // Data Use Cases
+  getIt.registerLazySingleton<ExportDataUseCase>(
+    () => ExportDataUseCase(
+      settingsRepository: getIt(),
+      taskRepository: getIt(),
+    ),
+  );
+
+  getIt.registerLazySingleton<ImportDataUseCase>(
+    () => ImportDataUseCase(
+      settingsRepository: getIt(),
+      taskRepository: getIt(),
+    ),
+  );
+
+  // Services
+  getIt.registerLazySingleton<DataBackupService>(
+    () => DataBackupService(
+      exportDataUseCase: getIt(),
+      importDataUseCase: getIt(),
+    ),
+  );
+
+  // Theme Provider (agora usando use cases)
+  getIt.registerLazySingleton<ThemeProvider>(
+    () => ThemeProvider(),
   );
 }

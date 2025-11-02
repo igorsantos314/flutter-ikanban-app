@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_ikanban_app/core/theme/theme_enum.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
 
 abstract class SettingsEvent extends Equatable {
   const SettingsEvent();
@@ -24,7 +24,12 @@ class ExportDataEvent extends SettingsEvent {
 }
 
 class ImportDataEvent extends SettingsEvent {
-  const ImportDataEvent();
+  final String filePath;
+  
+  const ImportDataEvent({required this.filePath});
+  
+  @override
+  List<Object> get props => [filePath];
 }
 
 class ClearDataEvent extends SettingsEvent {

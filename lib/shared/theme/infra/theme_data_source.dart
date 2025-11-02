@@ -1,5 +1,5 @@
-import 'package:flutter_ikanban_app/core/theme/theme_enum.dart';
-import 'package:flutter_ikanban_app/shared/shared_preferences/shared_prefs_service.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
+import 'package:flutter_ikanban_app/core/services/shared_prefs_service.dart';
 
 class ThemeDataSource {
   static const String darkModeKey = 'dark_mode';

@@ -1,4 +1,4 @@
-import 'package:flutter_ikanban_app/core/theme/theme_enum.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'settings_model.freezed.dart';

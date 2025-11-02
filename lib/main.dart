@@ -1,10 +1,10 @@
 // ignore_for_file: camel_case_types
 
 import 'package:flutter/material.dart';
-import 'package:flutter_ikanban_app/core/theme/ikanban_theme.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/ikanban_theme.dart';
 import 'package:flutter_ikanban_app/shared/theme/data/theme_repository_impl.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_ikanban_app/core/theme/theme_provider.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';

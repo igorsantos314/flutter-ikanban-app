@@ -1,4 +1,4 @@
-import 'package:flutter_ikanban_app/core/theme/theme_enum.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/model/settings_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -13,6 +13,7 @@ abstract class SettingsState with _$SettingsState {
     @Default(AppTheme.system) AppTheme appTheme,
     @Default('pt') String language,
     @Default('0.0.1') String appVersion,
+    @Default(false) bool isLoading,
 
     @Default(false) bool showNotification,
     @Default(NotificationType.info) NotificationType notificationType,
