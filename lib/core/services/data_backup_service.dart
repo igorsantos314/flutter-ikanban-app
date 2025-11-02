@@ -11,17 +11,32 @@ class DataBackupService {
   const DataBackupService({
     required ExportDataUseCase exportDataUseCase,
     required ImportDataUseCase importDataUseCase,
-  })  : _exportDataUseCase = exportDataUseCase,
-        _importDataUseCase = importDataUseCase;
+  }) : _exportDataUseCase = exportDataUseCase,
+       _importDataUseCase = importDataUseCase;
 
   /// Exporta todos os dados do aplicativo
-  Future<Outcome<String, ExportDataError>> exportAllData() {
-    return _exportDataUseCase.execute();
+  Future<Outcome<String, ExportDataError>> exportAllData() async {
+    final result = await _exportDataUseCase.execute();
+    return result.when(
+      success: (exportResult) {
+        if (exportResult == null) {
+          return Outcome.failure(
+            error: ExportDataError.fileSaveFailed,
+            message: 'Caminho do arquivo de exportação é nulo',
+          );
+        }
+        return Outcome.success(value: exportResult.filePath);
+      },
+      failure: (error, message, throwable) =>
+          Outcome.failure(error: error, message: message, throwable: throwable),
+    );
   }
 
   /// Importa dados de um arquivo
-  Future<Outcome<ImportResult, ImportDataError>> importDataFromFile(String filePath) {
-    return _importDataUseCase.execute(filePath);
+  Future<Outcome<ImportResult, ImportDataError>> importDataFromFile(
+    String filePath,
+  ) {
+    return _importDataUseCase.executeFromFile(filePath);
   }
 
   /// Limpa todos os dados do aplicativo
@@ -36,16 +51,15 @@ class DataBackupService {
   }
 
   /// Valida se um arquivo é um backup válido
-  Future<Outcome<bool, ImportDataError>> validateBackupFile(String filePath) async {
+  Future<Outcome<bool, ImportDataError>> validateBackupFile(
+    String filePath,
+  ) async {
     // Reutiliza a lógica de importação apenas para validar
-    final result = await _importDataUseCase.execute(filePath);
+    final result = await _importDataUseCase.executeFromFile(filePath);
     return result.when(
       success: (importResult) => Outcome.success(value: true),
-      failure: (error, message, throwable) => Outcome.failure(
-        error: error,
-        message: message,
-        throwable: throwable,
-      ),
+      failure: (error, message, throwable) =>
+          Outcome.failure(error: error, message: message, throwable: throwable),
     );
   }
 }

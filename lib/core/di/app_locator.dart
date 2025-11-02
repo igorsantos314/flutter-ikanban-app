@@ -1,5 +1,7 @@
 import 'package:flutter_ikanban_app/core/database/app_database.dart';
 import 'package:flutter_ikanban_app/core/services/data_backup_service.dart';
+import 'package:flutter_ikanban_app/core/services/file/file_service.dart';
+import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
 import 'package:flutter_ikanban_app/core/use_cases/theme/get_theme_use_case.dart';
 import 'package:flutter_ikanban_app/core/use_cases/theme/set_theme_use_case.dart';
 import 'package:flutter_ikanban_app/shared/theme/presentation/theme_provider.dart';
@@ -29,9 +31,7 @@ void setupLocator() {
 }
 
 void _setupThemeModule() {
-  getIt.registerLazySingleton<ThemeDataSource>(
-    () => ThemeDataSource(),
-  );
+  getIt.registerLazySingleton<ThemeDataSource>(() => ThemeDataSource());
 
   getIt.registerLazySingleton<ThemeRepository>(
     () => ThemeRepositoryImpl(getIt()),
@@ -51,26 +51,26 @@ void _setupTaskModule() {
 void _setupSettingsModule() {
   getIt.registerLazySingleton<SettingsDataSource>(() => SettingsDataSource());
   getIt.registerLazySingleton<SettingsRepository>(
-    () => SettingsRepositoryImpl(
-      themeRepository: getIt(),
-      dataSource: getIt(),
-    ),
+    () => SettingsRepositoryImpl(themeRepository: getIt(), dataSource: getIt()),
   );
 }
 
 void _setupCoreServices() {
-  // Theme Use Cases
-  getIt.registerLazySingleton<SetThemeUseCase>(
-    () => SetThemeUseCase(getIt()),
-  );
+  // Backup/Restore Service
+  getIt.registerLazySingleton<FileService>(() => FileService());
 
-  getIt.registerLazySingleton<GetThemeUseCase>(
-    () => GetThemeUseCase(getIt()),
-  );
+  getIt.registerLazySingleton<FileShareService>(() => FileShareService());
+
+  // Theme Use Cases
+  getIt.registerLazySingleton<SetThemeUseCase>(() => SetThemeUseCase(getIt()));
+
+  getIt.registerLazySingleton<GetThemeUseCase>(() => GetThemeUseCase(getIt()));
 
   // Data Use Cases
   getIt.registerLazySingleton<ExportDataUseCase>(
     () => ExportDataUseCase(
+      fileService: getIt(),
+      fileShareService: getIt(),
       settingsRepository: getIt(),
       taskRepository: getIt(),
     ),
@@ -80,6 +80,8 @@ void _setupCoreServices() {
     () => ImportDataUseCase(
       settingsRepository: getIt(),
       taskRepository: getIt(),
+      fileService: getIt(),
+      fileShareService: getIt(),
     ),
   );
 
@@ -92,7 +94,5 @@ void _setupCoreServices() {
   );
 
   // Theme Provider (agora usando use cases)
-  getIt.registerLazySingleton<ThemeProvider>(
-    () => ThemeProvider(),
-  );
+  getIt.registerLazySingleton<ThemeProvider>(() => ThemeProvider());
 }
