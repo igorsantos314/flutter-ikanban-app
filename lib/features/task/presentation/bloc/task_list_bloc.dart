@@ -49,7 +49,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     // UI events
     on<TaskFormResetEvent>(_onTaskFormReset);
     on<TaskListUpdateStatus>(_onTaskListUpdateStatus);
-    on<TaskListUpdateStatusFilter>(_onTaskListUpdateStatusFilter);
+    on<TaskListUpdateStatusFilterEvent>(_onTaskListUpdateStatusFilter);
     on<ToggleLayoutModeEvent>(_onToggleLayoutMode);
   }
 
@@ -88,7 +88,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
           page: 1,
           limitPerPage: _pageSize,
           search: _currentSearch,
-          status: state.statusFilter,
+          status: state.statusFilter == TaskStatus.all ? null : state.statusFilter,
           onlyActive: true,
           ascending: false, // Mais recentes primeiro
         )
@@ -454,10 +454,10 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   }
 
   FutureOr<void> _onTaskListUpdateStatusFilter(
-    TaskListUpdateStatusFilter event,
+    TaskListUpdateStatusFilterEvent event,
     Emitter<TaskListState> emit,
   ) {
-    emit(state.copyWith(statusFilter: event.statusFilter));
+    emit(state.copyWith(statusFilter: event.status));
     add(const LoadTasksEvent());
   }
 

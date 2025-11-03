@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 enum TaskStatus {
+  all,          // Todos os status
   backlog,      // Backlog (ideias/futuro)
   todo,         // A Fazer
   inProgress,   // Em Progresso
@@ -15,6 +16,8 @@ extension TaskStatusExtension on TaskStatus {
   // Nome em português
   String get displayName {
     switch (this) {
+      case TaskStatus.all:
+        return 'Todos';
       case TaskStatus.backlog:
         return 'Backlog';
       case TaskStatus.todo:
@@ -37,6 +40,8 @@ extension TaskStatusExtension on TaskStatus {
   // Cor
   Color get color {
     switch (this) {
+      case TaskStatus.all:
+        return Colors.grey;
       case TaskStatus.backlog:
         return Colors.grey;
       case TaskStatus.todo:
@@ -59,6 +64,8 @@ extension TaskStatusExtension on TaskStatus {
   // Ícone
   IconData get icon {
     switch (this) {
+      case TaskStatus.all:
+        return Icons.list;
       case TaskStatus.backlog:
         return Icons.inventory_2;
       case TaskStatus.todo:
@@ -114,12 +121,16 @@ extension TaskStatusExtension on TaskStatus {
         return 1.0;
       case TaskStatus.cancelled:
         return 0.0;
+      default:
+        return 0.0;
     }
   }
 
   // Descrição
   String get description {
     switch (this) {
+      case TaskStatus.all:
+        return 'Todos os status';
       case TaskStatus.backlog:
         return 'Ideias e tarefas futuras';
       case TaskStatus.todo:
@@ -158,6 +169,8 @@ extension TaskStatusExtension on TaskStatus {
         return null;
       case TaskStatus.cancelled:
         return null;
+      default:
+        return null;
     }
   }
 
@@ -179,6 +192,8 @@ extension TaskStatusExtension on TaskStatus {
       case TaskStatus.done:
         return TaskStatus.review;
       case TaskStatus.cancelled:
+        return null;
+      default:
         return null;
     }
   }

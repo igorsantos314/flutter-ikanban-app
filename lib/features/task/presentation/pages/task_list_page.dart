@@ -113,16 +113,18 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         body: Column(
           children: [
             // Filter Bar
-            BlocSelector<TaskListBloc, TaskListState, List<TaskStatus>>(
+            BlocSelector<TaskListBloc, TaskListState, TaskStatus>(
               selector: (state) => state.statusFilter,
-              builder: (context, selectedStatuses) {
+              builder: (context, selectedStatus) {
                 return Padding(
                   padding: EdgeInsets.all(8.0),
                   child: TaskStatusFilter(
-                    selectedStatus: selectedStatuses,
+                    selectedStatus: selectedStatus,
                     onChanged: (newSelection) {
                       context.read<TaskListBloc>().add(
-                        TaskListUpdateStatusFilter(statusFilter: newSelection),
+                        TaskListUpdateStatusFilterEvent(
+                          status: newSelection
+                        ),
                       );
                     },
                     showSelectAll: true,

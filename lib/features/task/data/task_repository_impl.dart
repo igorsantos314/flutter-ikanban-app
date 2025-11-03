@@ -66,7 +66,7 @@ class TaskRepositoryImpl implements TaskRepository {
     DateTime? startDate,
     DateTime? endDate,
     String? orderBy,
-    List<TaskStatus>? status,
+    TaskStatus? status,
     TaskPriority? priority,
     TaskComplexity? complexity,
     TaskType? type,
