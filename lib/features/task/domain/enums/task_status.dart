@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 enum TaskStatus {
+  all,          // Todos os status
   backlog,      // Backlog (ideias/futuro)
   todo,         // A Fazer
   inProgress,   // Em Progresso
@@ -9,12 +10,15 @@ enum TaskStatus {
   testing,      // Em Teste
   done,         // Concluído
   cancelled,    // Cancelado
+  archived,    // Arquivado (não usado atualmente)
 }
 
 extension TaskStatusExtension on TaskStatus {
   // Nome em português
   String get displayName {
     switch (this) {
+      case TaskStatus.all:
+        return 'Todos';
       case TaskStatus.backlog:
         return 'Backlog';
       case TaskStatus.todo:
@@ -31,12 +35,16 @@ extension TaskStatusExtension on TaskStatus {
         return 'Concluído';
       case TaskStatus.cancelled:
         return 'Cancelado';
+      case TaskStatus.archived:
+        return 'Arquivado';
     }
   }
 
   // Cor
   Color get color {
     switch (this) {
+      case TaskStatus.all:
+        return Colors.grey;
       case TaskStatus.backlog:
         return Colors.grey;
       case TaskStatus.todo:
@@ -53,12 +61,16 @@ extension TaskStatusExtension on TaskStatus {
         return Colors.green;
       case TaskStatus.cancelled:
         return Colors.grey[700]!;
+      case TaskStatus.archived:
+        return Colors.brown;
     }
   }
 
   // Ícone
   IconData get icon {
     switch (this) {
+      case TaskStatus.all:
+        return Icons.list;
       case TaskStatus.backlog:
         return Icons.inventory_2;
       case TaskStatus.todo:
@@ -75,6 +87,8 @@ extension TaskStatusExtension on TaskStatus {
         return Icons.check_circle;
       case TaskStatus.cancelled:
         return Icons.cancel;
+      case TaskStatus.archived:
+        return Icons.archive;
     }
   }
 
@@ -114,12 +128,18 @@ extension TaskStatusExtension on TaskStatus {
         return 1.0;
       case TaskStatus.cancelled:
         return 0.0;
+      case TaskStatus.archived:
+        return 0.0;
+      default:
+        return 0.0;
     }
   }
 
   // Descrição
   String get description {
     switch (this) {
+      case TaskStatus.all:
+        return 'Todos os status';
       case TaskStatus.backlog:
         return 'Ideias e tarefas futuras';
       case TaskStatus.todo:
@@ -136,6 +156,8 @@ extension TaskStatusExtension on TaskStatus {
         return 'Tarefa finalizada';
       case TaskStatus.cancelled:
         return 'Tarefa cancelada';
+      case TaskStatus.archived:
+        return 'Tarefa arquivada';
     }
   }
 
@@ -158,6 +180,10 @@ extension TaskStatusExtension on TaskStatus {
         return null;
       case TaskStatus.cancelled:
         return null;
+      case TaskStatus.archived:
+        return null;
+      default:
+        return null;
     }
   }
 
@@ -179,6 +205,10 @@ extension TaskStatusExtension on TaskStatus {
       case TaskStatus.done:
         return TaskStatus.review;
       case TaskStatus.cancelled:
+        return null;
+      case TaskStatus.archived:
+        return null;
+      default:
         return null;
     }
   }

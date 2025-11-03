@@ -13,6 +13,8 @@ class ComplexitySelectorBottomSheet extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: const BoxDecoration(
@@ -26,21 +28,22 @@ class ComplexitySelectorBottomSheet extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: theme.colorScheme.surface.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           Text(
             'Selecione a Complexidade',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Complexidade atual: ${selectedComplexity.displayName}',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[600],
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: 16),
@@ -62,10 +65,10 @@ class ComplexitySelectorBottomSheet extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isSelected 
                               ? complexity.color.withValues(alpha: 0.1)
-                              : Colors.grey[100],
+                              : theme.colorScheme.onSurface.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: isSelected ? complexity.color : Colors.grey[300]!,
+                            color: isSelected ? complexity.color : theme.colorScheme.onSurface.withValues(alpha: 0.3),
                             width: isSelected ? 2 : 1,
                           ),
                         ),
@@ -117,7 +120,7 @@ class ComplexitySelectorBottomSheet extends StatelessWidget {
                                     complexity.description,
                                     style: TextStyle(
                                       fontSize: 11,
-                                      color: Colors.grey[600],
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                                     ),
                                   ),
                                 ],
@@ -155,13 +158,14 @@ class ComplexitySelectorBottomSheet extends StatelessWidget {
     required TaskComplexity selectedComplexity,
     required Function(TaskComplexity) onComplexitySelected,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: ComplexitySelectorBottomSheet(

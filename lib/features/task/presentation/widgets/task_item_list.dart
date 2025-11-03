@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_ikanban_app/core/ui/enums/layout_mode.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
@@ -14,6 +15,7 @@ class TaskItemList extends StatelessWidget {
   final VoidCallback? onStatusTap;
   final Color? cardColor;
   final Color? borderColor;
+  final LayoutMode layoutMode;
 
   const TaskItemList({
     super.key,
@@ -24,6 +26,7 @@ class TaskItemList extends StatelessWidget {
     this.onStatusTap,
     this.cardColor,
     this.borderColor,
+    this.layoutMode = LayoutMode.fullWidth,
   });
 
   @override
@@ -40,8 +43,7 @@ class TaskItemList extends StatelessWidget {
       borderColor = TaskColors.green.color;
       cardColor = TaskColors.green.color;
       showAllDetails = false;
-    } 
-    else if(task.status == TaskStatus.cancelled) {
+    } else if (task.status == TaskStatus.cancelled) {
       priorityColor = Colors.grey;
       borderColor = Colors.grey;
       cardColor = Colors.grey;
@@ -50,6 +52,10 @@ class TaskItemList extends StatelessWidget {
       priorityColor = task.priority.color;
       borderColor = task.color.color;
       cardColor = theme.colorScheme.surface;
+    }
+
+    if (layoutMode == LayoutMode.compact) {
+      showAllDetails = false;
     }
 
     return Card(
@@ -93,196 +99,249 @@ class TaskItemList extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Conteúdo principal
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            if (onToggleCompletion != null) ...[
-                              const SizedBox(height: 8),
-                              IconButton(
-                                onPressed: onToggleCompletion,
-                                icon: Icon(
-                                  task.status == TaskStatus.done
-                                      ? Icons.check_circle
-                                      : Icons.radio_button_unchecked,
-                                  color: task.status == TaskStatus.done
-                                      ? Colors.green
-                                      : theme.colorScheme.onSurface,
-                                ),
-                                visualDensity: VisualDensity.compact,
-                                constraints: const BoxConstraints(
-                                  minWidth: 32,
-                                  minHeight: 32,
-                                ),
-                              ),
-                            ],
-                            // Título
-                            Text(
-                              task.title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        // Descrição
-                        if (task.description != null &&
-                            task.description!.isNotEmpty &&
-                            showAllDetails) ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            task.description!,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: theme.colorScheme.onSurface.withAlpha(150),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-
-                        // Data de vencimento
-                        if (task.dueDate != null) ...[
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.schedule,
-                                size: 14,
-                                color: task.dueDate!.isBefore(DateTime.now())
-                                    ? theme.colorScheme.error
-                                    : theme.colorScheme.onSurface.withAlpha(
-                                        150,
-                                      ),
-                              ),
-                              const SizedBox(width: 4),
-                              if (showAllDetails)
-                                Text(
-                                  'Vence em ${task.dueDate!.day}/${task.dueDate!.month}/${task.dueDate!.year}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color:
-                                        task.dueDate!.isBefore(DateTime.now())
-                                        ? theme.colorScheme.error
-                                        : theme.colorScheme.onSurface.withAlpha(
-                                            150,
-                                          ),
-                                    fontWeight:
-                                        task.dueDate!.isBefore(DateTime.now())
-                                        ? FontWeight.w600
-                                        : FontWeight.normal,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ],
-
-                        const SizedBox(height: 12),
-                        // Tipo e Complexidade
-                        if (showAllDetails)
-                          Container(
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.surface.withAlpha(100),
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: theme.colorScheme.onSurface.withAlpha(
-                                    20,
-                                  ),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            child: Wrap(
-                              spacing: 12,
-                              runSpacing: 4,
-                              children: [
-                                Icon(
-                                  task.type.icon,
-                                  size: 24,
-                                  color: task.type.color,
-                                ),
-                                Icon(
-                                  task.complexity.icon,
-                                  size: 24,
-                                  color: task.complexity.color,
-                                ),
-                                Text(
-                                  '${task.complexity.index + 1} pts',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(width: 12),
-
-                  // Status e Prioridade
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surface.withAlpha(100),
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: theme.colorScheme.onSurface.withAlpha(20),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              task.status.icon,
-                              size: 18,
-                              color: task.status.color,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              task.status.displayName,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+              child: layoutMode == LayoutMode.compact
+                  ? _buildCompactContent(theme, showAllDetails)
+                  : _buildFullWidgetContent(theme, showAllDetails),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFullWidgetContent(ThemeData theme, bool showAllDetails) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Conteúdo principal
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Título e botão de conclusão
+              _buildTitleRow(theme),
+
+              // Descrição
+              _buildDescription(theme, showAllDetails),
+
+              // Data de vencimento
+              _buildDueDate(theme, showAllDetails),
+
+              const SizedBox(height: 12),
+
+              // Tipo e Complexidade
+              _buildTypeAndComplexity(theme, showAllDetails),
+            ],
+          ),
+        ),
+
+        const SizedBox(width: 12),
+
+        // Status e Prioridade
+        _buildStatusAndPriority(theme, showAllDetails),
+      ],
+    );
+  }
+
+  Widget _buildCompactContent(ThemeData theme, bool showAllDetails) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        // Conteúdo principal
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Título e botão de conclusão
+            _buildTitleRow(theme),
+
+            // Descrição
+            _buildDescription(theme, showAllDetails),
+
+            // Data de vencimento
+            _buildDueDate(theme, showAllDetails),
+
+            const SizedBox(height: 12),
+
+            // Tipo e Complexidade
+            _buildTypeAndComplexity(theme, showAllDetails),
+          ],
+        ),
+
+        const SizedBox(width: 12),
+
+        // Status e Prioridade
+        _buildStatusAndPriority(theme, showAllDetails),
+      ],
+    );
+  }
+
+  Widget _buildTitleRow(ThemeData theme) {
+    return Row(
+      children: [
+        // Marcar como concluído
+        if (onToggleCompletion != null) ...[
+          const SizedBox(height: 8),
+          IconButton(
+            onPressed: onToggleCompletion,
+            icon: Icon(
+              task.status == TaskStatus.done
+                  ? Icons.check_circle
+                  : Icons.radio_button_unchecked,
+              color: task.status == TaskStatus.done
+                  ? Colors.green
+                  : theme.colorScheme.onSurface,
+            ),
+            visualDensity: VisualDensity.compact,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+          ),
+        ],
+
+        // Título
+        Expanded(
+          child: Text(
+            task.title,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: layoutMode == LayoutMode.compact ? 14 : 16,
+              overflow: TextOverflow.ellipsis
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDescription(ThemeData theme, bool showAllDetails) {
+    return Column(
+      children: [
+        if (task.description != null &&
+            task.description!.isNotEmpty &&
+            showAllDetails) ...[
+          const SizedBox(height: 8),
+          Text(
+            task.description!,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: theme.colorScheme.onSurface.withAlpha(150),
+              fontSize: layoutMode == LayoutMode.compact ? 12 : 14,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildDueDate(ThemeData theme, bool showAllDetails) {
+    return Column(
+      children: [
+        if (task.dueDate != null) ...[
+          const SizedBox(height: 8),
+          if (showAllDetails)
+            Row(
+              children: [
+                Icon(
+                  Icons.schedule,
+                  size: 14,
+                  color: task.dueDate!.isBefore(DateTime.now())
+                      ? theme.colorScheme.error
+                      : theme.colorScheme.onSurface.withAlpha(150),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Vence em ${task.dueDate!.day}/${task.dueDate!.month}/${task.dueDate!.year}',
+                  style: TextStyle(
+                    fontSize: layoutMode == LayoutMode.compact ? 10 : 12,
+                    color: task.dueDate!.isBefore(DateTime.now())
+                        ? theme.colorScheme.error
+                        : theme.colorScheme.onSurface.withAlpha(150),
+                    fontWeight: task.dueDate!.isBefore(DateTime.now())
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildStatusAndPriority(ThemeData theme, bool showAllDetails) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withAlpha(100),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: theme.colorScheme.onSurface.withAlpha(20),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(task.status.icon, size: 18, color: task.status.color),
+              const SizedBox(width: 4),
+              Text(
+                task.status.displayName,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTypeAndComplexity(ThemeData theme, bool showAllDetails) {
+    return Column(
+      children: [
+        // Tipo e Complexidade
+        if (showAllDetails)
+          Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface.withAlpha(100),
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.onSurface.withAlpha(20),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 4,
+              children: [
+                Icon(task.type.icon, size: 24, color: task.type.color),
+                Icon(
+                  task.complexity.icon,
+                  size: 24,
+                  color: task.complexity.color,
+                ),
+                Text(
+                  '${task.complexity.index + 1} pts',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

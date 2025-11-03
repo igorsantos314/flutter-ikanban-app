@@ -12,10 +12,12 @@ class DueDateSelectorBottomSheet extends StatefulWidget {
   });
 
   @override
-  State<DueDateSelectorBottomSheet> createState() => _DueDateSelectorBottomSheetState();
+  State<DueDateSelectorBottomSheet> createState() =>
+      _DueDateSelectorBottomSheetState();
 }
 
-class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet> {
+class _DueDateSelectorBottomSheetState
+    extends State<DueDateSelectorBottomSheet> {
   DateTime? _selectedDate;
   final DateFormat _dateFormat = DateFormat('dd/MM/yyyy');
 
@@ -65,7 +67,7 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: const BoxDecoration(
@@ -79,7 +81,7 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
             height: 4,
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: theme.colorScheme.surface.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -94,14 +96,14 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
             Text(
               'Data selecionada: ${_dateFormat.format(_selectedDate!)}',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[600],
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             )
           else
             Text(
               'Nenhuma data selecionada',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[600],
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           const SizedBox(height: 16),
@@ -113,26 +115,26 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
                   // Opção para remover data
                   _buildRemoveDateOption(theme),
                   const SizedBox(height: 16),
-                  
+
                   // Opções rápidas
                   Text(
                     'Opções Rápidas',
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[700],
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                   const SizedBox(height: 8),
                   ..._quickOptions.map((option) => _buildQuickOption(option)),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Seleção personalizada
                   Text(
                     'Data Personalizada',
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[700],
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -177,10 +179,14 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.grey[100] : Colors.white,
+            color: isSelected
+                ? theme.colorScheme.surface.withValues(alpha: 0.1)
+                : theme.colorScheme.onSurface.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected ? Colors.grey[400]! : Colors.grey[300]!,
+              color: isSelected
+                  ? theme.colorScheme.onSurface.withValues(alpha: 0.3)
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.1),
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -188,7 +194,7 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
             children: [
               Icon(
                 Icons.clear,
-                color: Colors.grey[600],
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 size: 24,
               ),
               const SizedBox(width: 12),
@@ -196,15 +202,17 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
                 child: Text(
                   'Sem data de vencimento',
                   style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    color: Colors.grey[700],
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ),
               if (isSelected)
                 Icon(
                   Icons.check_circle,
-                  color: Colors.grey[600],
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
             ],
           ),
@@ -214,9 +222,10 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
   }
 
   Widget _buildQuickOption(DateOption option) {
-    final isSelected = _selectedDate != null && 
-        _isSameDay(_selectedDate!, option.date);
-    
+    final theme = Theme.of(context);
+    final isSelected =
+        _selectedDate != null && _isSameDay(_selectedDate!, option.date);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
@@ -225,22 +234,20 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isSelected 
+            color: isSelected
                 ? option.color.withValues(alpha: 0.1)
-                : Colors.grey[100],
+                : theme.colorScheme.surface.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected ? option.color : Colors.grey[300]!,
+              color: isSelected
+                  ? option.color
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.1),
               width: isSelected ? 2 : 1,
             ),
           ),
           child: Row(
             children: [
-              Icon(
-                option.icon,
-                color: option.color,
-                size: 24,
-              ),
+              Icon(option.icon, color: option.color, size: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -249,8 +256,8 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
                     Text(
                       option.label,
                       style: TextStyle(
-                        fontWeight: isSelected 
-                            ? FontWeight.bold 
+                        fontWeight: isSelected
+                            ? FontWeight.bold
                             : FontWeight.normal,
                         color: option.color,
                       ),
@@ -259,17 +266,15 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
                       _dateFormat.format(option.date),
                       style: TextStyle(
                         fontSize: 11,
-                        color: Colors.grey[600],
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              if (isSelected)
-                Icon(
-                  Icons.check_circle,
-                  color: option.color,
-                ),
+              if (isSelected) Icon(Icons.check_circle, color: option.color),
             ],
           ),
         ),
@@ -278,21 +283,24 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
   }
 
   Widget _buildCustomDateOption(ThemeData theme) {
+    final theme = Theme.of(context);
     return InkWell(
       onTap: _showDatePicker,
       borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.blue[50],
+          color: theme.colorScheme.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.blue[200]!),
+          border: Border.all(
+            color: theme.colorScheme.primary.withValues(alpha: 0.2),
+          ),
         ),
         child: Row(
           children: [
             Icon(
               Icons.calendar_today,
-              color: Colors.blue[700],
+              color: theme.colorScheme.primary,
               size: 24,
             ),
             const SizedBox(width: 12),
@@ -301,13 +309,13 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
                 'Escolher data específica',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w500,
-                  color: Colors.blue[700],
+                  color: theme.colorScheme.primary.withValues(alpha: 0.9),
                 ),
               ),
             ),
             Icon(
               Icons.keyboard_arrow_right,
-              color: Colors.blue[700],
+              color: theme.colorScheme.primary.withValues(alpha: 0.9),
             ),
           ],
         ),
@@ -318,15 +326,16 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
   Future<void> _showDatePicker() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    
+
     // Garante que a data inicial não seja anterior ao dia de hoje
     DateTime initialDate;
-    if (_selectedDate != null && _selectedDate!.isAfter(today.subtract(const Duration(days: 1)))) {
+    if (_selectedDate != null &&
+        _selectedDate!.isAfter(today.subtract(const Duration(days: 1)))) {
       initialDate = _selectedDate!;
     } else {
       initialDate = today;
     }
-    
+
     try {
       final picked = await showDatePicker(
         context: context,
@@ -349,8 +358,8 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
 
   bool _isSameDay(DateTime date1, DateTime date2) {
     return date1.year == date2.year &&
-           date1.month == date2.month &&
-           date1.day == date2.day;
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 
   DateTime _getEndOfWeek(DateTime date) {
@@ -370,6 +379,7 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
     required DateTime? selectedDueDate,
     required Function(DateTime?) onDueDateSelected,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -378,8 +388,8 @@ class _DueDateSelectorBottomSheetState extends State<DueDateSelectorBottomSheet>
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: DueDateSelectorBottomSheet(

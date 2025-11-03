@@ -15,13 +15,11 @@ class ColorSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Cores',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        Text('Cores', style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -29,27 +27,29 @@ class ColorSelector extends StatelessWidget {
             children: availableColors.map((color) {
               final isSelected = color == selectedColor;
               return GestureDetector(
-              onTap: () => onColorSelected(color),
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: color.color,
-                    shape: BoxShape.circle,
-                    border: isSelected
-                        ? Border.all(color: Colors.black, width: 3)
-                        : null,
+                onTap: () => onColorSelected(color),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: color.color,
+                      shape: BoxShape.circle,
+                      border: isSelected
+                          ? Border.all(
+                              color: theme.colorScheme.onSurface,
+                              width: 3,
+                            )
+                          : null,
+                    ),
                   ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
           ),
         ),
       ],
     );
   }
 }
-  

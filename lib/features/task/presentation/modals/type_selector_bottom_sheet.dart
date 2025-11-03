@@ -10,9 +10,11 @@ class TypeSelectorBottomSheet extends StatelessWidget {
     required this.selectedType,
     required this.onTypeSelected,
   });
-  
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     // Organiza os tipos em categorias
     final technicalTypes = [
       TaskType.feature,
@@ -20,7 +22,7 @@ class TypeSelectorBottomSheet extends StatelessWidget {
       TaskType.improvement,
       TaskType.documentation,
     ];
-    
+
     final domesticTypes = [
       TaskType.housework,
       TaskType.shopping,
@@ -29,7 +31,7 @@ class TypeSelectorBottomSheet extends StatelessWidget {
       TaskType.finance,
       TaskType.cooking,
     ];
-    
+
     final personalTypes = [
       TaskType.study,
       TaskType.personal,
@@ -38,12 +40,14 @@ class TypeSelectorBottomSheet extends StatelessWidget {
       TaskType.hobby,
       TaskType.social,
     ];
-    
+
     final otherTypes = TaskType.values
-        .where((type) => 
-            !technicalTypes.contains(type) && 
-            !domesticTypes.contains(type) && 
-            !personalTypes.contains(type))
+        .where(
+          (type) =>
+              !technicalTypes.contains(type) &&
+              !domesticTypes.contains(type) &&
+              !personalTypes.contains(type),
+        )
         .toList();
 
     return Container(
@@ -59,21 +63,21 @@ class TypeSelectorBottomSheet extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: theme.colorScheme.surface.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           Text(
             'Selecione o Tipo',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             'Tipo atual: ${selectedType.displayName}',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[600],
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: 16),
@@ -106,15 +110,21 @@ class TypeSelectorBottomSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildCategory(BuildContext context, String categoryName, List<TaskType> types) {
+  Widget _buildCategory(
+    BuildContext context,
+    String categoryName,
+    List<TaskType> types,
+  ) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           categoryName,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+          style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
           ),
         ),
         const SizedBox(height: 8),
@@ -131,22 +141,20 @@ class TypeSelectorBottomSheet extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isSelected 
+                  color: isSelected
                       ? type.color.withValues(alpha: 0.1)
-                      : Colors.grey[100],
+                      : theme.colorScheme.surface.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: isSelected ? type.color : Colors.grey[300]!,
+                    color: isSelected
+                        ? type.color
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.3),
                     width: isSelected ? 2 : 1,
                   ),
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      type.icon,
-                      color: type.color,
-                      size: 24,
-                    ),
+                    Icon(type.icon, color: type.color, size: 24),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -155,8 +163,8 @@ class TypeSelectorBottomSheet extends StatelessWidget {
                           Text(
                             type.displayName,
                             style: TextStyle(
-                              fontWeight: isSelected 
-                                  ? FontWeight.bold 
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
                                   : FontWeight.normal,
                               color: type.color,
                             ),
@@ -166,17 +174,15 @@ class TypeSelectorBottomSheet extends StatelessWidget {
                               type.description,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey[600],
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.6,
+                                ),
                               ),
                             ),
                         ],
                       ),
                     ),
-                    if (isSelected)
-                      Icon(
-                        Icons.check_circle,
-                        color: type.color,
-                      ),
+                    if (isSelected) Icon(Icons.check_circle, color: type.color),
                   ],
                 ),
               ),
@@ -192,6 +198,8 @@ class TypeSelectorBottomSheet extends StatelessWidget {
     required TaskType selectedType,
     required Function(TaskType) onTypeSelected,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -200,8 +208,8 @@ class TypeSelectorBottomSheet extends StatelessWidget {
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: TypeSelectorBottomSheet(

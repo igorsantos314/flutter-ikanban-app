@@ -74,16 +74,20 @@ class _CustomAppBarState extends State<CustomAppBar>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return AppBar(
       title: !_isSearchExpanded ? const Image(
         width: 180,
         image: AssetImage('assets/images/name_logo_right.png'),
       ) : null,
+      backgroundColor: theme.colorScheme.surface,
       actions: [
         if (_isSearchExpanded) ...[
           // Botão de voltar
           IconButton(
             icon: const Icon(Icons.arrow_back),
+            color: theme.colorScheme.onSurface,
             onPressed: _collapseSearch,
           ),
           
@@ -130,6 +134,7 @@ class _CustomAppBarState extends State<CustomAppBar>
           // Ícone de busca
           IconButton(
             icon: const Icon(Icons.search),
+            color: theme.colorScheme.onSurface,
             onPressed: _expandSearch,
           ),
         ],

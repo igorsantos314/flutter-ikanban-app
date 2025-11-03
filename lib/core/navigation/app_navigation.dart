@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/ui/scaffold_with_nav_bar.dart';
 import 'package:flutter_ikanban_app/features/settings/presentation/pages/settings_page.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/pages/task_create_page.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/pages/task_edit_page.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/pages/task_list_page.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class AppNavigation {
@@ -12,8 +14,19 @@ class AppNavigation {
   static const String editTask = '/edit-task/:id';
   static const String settings = '/settings';
 
-  static GoRouter get router => GoRouter(
+  static final ThemeProvider _themeProvider = getIt<ThemeProvider>();
+  static late final GoRouter router;
+
+  static void initRouter() {
+    router = getRouter();
+  }
+
+  static GoRouter getRouter() {
+    print('AppNavigation created - themeProvider hash: ${identityHashCode(getIt<ThemeProvider>())}');
+
+    return GoRouter(
     initialLocation: home,
+    refreshListenable: _themeProvider,
     routes: [
       // Default route to mantain unique Scaffold structure
       ShellRoute(
@@ -47,7 +60,7 @@ class AppNavigation {
         },
       ),
     ],
-  );
+  );}
 
   static void navigateToHome(BuildContext context) {
     context.go(home);

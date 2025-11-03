@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/bloc_text_field.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/multi_line_bloc_text_field.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_bloc.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/form/task_form_state.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_event.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_form_bloc.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/states/form/task_form_state.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/color_selector.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/form_selector_field.dart';
@@ -41,6 +41,38 @@ class _TaskFormPageState extends State<TaskFormPage>
     super.dispose();
   }
 
+  void _onRequestDeleteTask({required VoidCallback onDeleteEvent}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Excluir Tarefa'),
+        content: const Text(
+          'Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.onSurface,
+            ),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+              onDeleteEvent();
+            },
+            child: const Text('Excluir'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TaskFormBloc>();
@@ -69,7 +101,9 @@ class _TaskFormPageState extends State<TaskFormPage>
               backgroundColor: theme.colorScheme.error,
               foregroundColor: theme.colorScheme.onError,
               onPressed: () {
-                bloc.add(DeleteTaskEvent());
+                _onRequestDeleteTask(
+                  onDeleteEvent: () => bloc.add(DeleteTaskEvent()),
+                );
               },
               child: const Icon(Icons.delete),
             ),

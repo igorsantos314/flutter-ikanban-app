@@ -1,21 +1,29 @@
 // ignore_for_file: camel_case_types
 
 import 'package:flutter/material.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/ikanban_theme.dart';
+import 'package:flutter_ikanban_app/shared/theme/data/theme_repository_impl.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_ikanban_app/core/theme/theme_provider.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Setup dependecy Injection
   setupLocator();
 
+  final theme = await ThemeRepositoryImpl.getThemePrefs();
+  getIt<ThemeProvider>().setTheme(theme);
+
+  // Initialize App Navigation to ensure have just one Route instance
+  AppNavigation.initRouter();
+
   runApp(
     ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
+      create: (context) => getIt<ThemeProvider>(),
       child: const iKanbanApp(),
     ),
   );
@@ -32,9 +40,8 @@ class iKanbanApp extends StatelessWidget {
       title: 'iKanban',
       routerConfig: AppNavigation.router,
       themeMode: themeProvider.themeMode,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-      ),
+      theme: ikanbanLightTheme,
+      darkTheme: ikanbanDarkTheme,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

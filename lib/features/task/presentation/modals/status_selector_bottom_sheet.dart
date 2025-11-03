@@ -5,15 +5,18 @@ import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors
 class StatusSelectorBottomSheet extends StatelessWidget {
   final TaskStatus selectedStatus;
   final Function(TaskStatus) onStatusSelected;
+  final bool isShowArchived;
 
   const StatusSelectorBottomSheet({
     super.key,
     required this.selectedStatus,
     required this.onStatusSelected,
+    this.isShowArchived = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: const BoxDecoration(
@@ -27,28 +30,25 @@ class StatusSelectorBottomSheet extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: theme.colorScheme.surface.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           Text(
             'Selecione o Status',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             'Status atual: ${selectedStatus.displayName}',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+            style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
           ),
           const SizedBox(height: 16),
           Flexible(
             child: SingleChildScrollView(
               child: StatusSelector(
                 selectedStatus: selectedStatus,
+                isShowArchived: isShowArchived,
                 onStatusSelected: (status) {
                   onStatusSelected(status);
                   Navigator.of(context).pop();
@@ -73,21 +73,24 @@ class StatusSelectorBottomSheet extends StatelessWidget {
     required BuildContext context,
     required TaskStatus selectedStatus,
     required Function(TaskStatus) onStatusSelected,
+    bool isShowArchived = false,
     VoidCallback? onDismissed,
   }) {
-    final theme = Theme.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: StatusSelectorBottomSheet(
           selectedStatus: selectedStatus,
           onStatusSelected: onStatusSelected,
+          isShowArchived: isShowArchived,
         ),
       ),
     );

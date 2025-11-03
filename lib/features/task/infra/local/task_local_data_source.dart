@@ -44,7 +44,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
     DateTime? startDate,
     DateTime? endDate,
     String? orderBy,
-    List<TaskStatus>? status,
+    TaskStatus? status,
     TaskPriority? priority,
     TaskComplexity? complexity,
     TaskType? type,
@@ -70,7 +70,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
     }
 
     if (status != null) {
-      query.where((tbl) => tbl.status.isIn(status.map((e) => e.name)));
+      query.where((tbl) => tbl.status.equals(status.name));
     }
 
     if (priority != null) {
@@ -126,7 +126,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
 
       if (status != null) {
         totalItemsQuery.where(
-          db.taskEntity.status.isIn(status.map((e) => e.name)),
+          db.taskEntity.status.equals(status.name),
         );
       }
       if (priority != null) {
@@ -166,5 +166,13 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
         limitPerPage: limitPerPage,
       );
     }
+  }
+
+  Future<void> insertTasks(List<TaskEntityCompanion> entities) async {
+    await db.transaction(() async {
+      for (final entity in entities) {
+        await into(db.taskEntity).insert(entity);
+      }
+    });
   }
 }
