@@ -42,6 +42,8 @@ void _setupThemeModule() {
   getIt.registerLazySingleton<ThemeRepository>(
     () => ThemeRepositoryImpl(getIt()),
   );
+
+  getIt.registerLazySingleton<ThemeProvider>(() => ThemeProvider());
 }
 
 void _setupTaskModule() {
@@ -65,9 +67,7 @@ void _setupTaskModule() {
     () => GetTaskByIdUseCase(getIt()),
   );
 
-  getIt.registerLazySingleton<ListTaskUseCase>(
-    () => ListTaskUseCase(getIt()),
-  );
+  getIt.registerLazySingleton<ListTaskUseCase>(() => ListTaskUseCase(getIt()));
 
   getIt.registerLazySingleton<DeleteTaskUseCase>(
     () => DeleteTaskUseCase(getIt()),
@@ -118,7 +118,4 @@ void _setupCoreServices() {
       fileShareService: getIt(),
     ),
   );
-
-  // Theme Provider (agora usando use cases)
-  getIt.registerLazySingleton<ThemeProvider>(() => ThemeProvider());
 }

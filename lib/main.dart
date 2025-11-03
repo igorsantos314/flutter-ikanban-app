@@ -16,10 +16,14 @@ void main() async {
   setupLocator();
 
   final theme = await ThemeRepositoryImpl.getThemePrefs();
+  getIt<ThemeProvider>().setTheme(theme);
+
+  // Initialize App Navigation to ensure have just one Route instance
+  AppNavigation.initRouter();
 
   runApp(
     ChangeNotifierProvider(
-      create: (context) => ThemeProvider()..setTheme(theme),
+      create: (context) => getIt<ThemeProvider>(),
       child: const iKanbanApp(),
     ),
   );
