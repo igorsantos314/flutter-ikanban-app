@@ -82,6 +82,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
               StatusSelectorBottomSheet.show(
                 context: context,
                 selectedStatus: task.status,
+                isShowArchived: true,
                 onStatusSelected: (status) {
                   context.read<TaskListBloc>().add(
                     TaskListUpdateStatus(status: status),

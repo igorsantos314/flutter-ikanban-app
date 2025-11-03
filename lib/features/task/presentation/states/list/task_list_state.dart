@@ -23,7 +23,7 @@ abstract class TaskListState with _$TaskListState {
     @Default("") String notificationMessage,
     @Default(NotificationType.info) NotificationType notificationType,
 
-    @Default(TaskStatus.all) TaskStatus statusFilter,
+    @Default(TaskStatus.todo) TaskStatus statusFilter,
 
     @Default(false) bool showStatusSelector,
     @Default(TaskLayout.list) TaskLayout layoutMode,

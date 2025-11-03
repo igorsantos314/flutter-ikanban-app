@@ -173,7 +173,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     } catch (e) {
       log('Error to update task: $e');
       _handleTaskRepositoryError(
-        deleteError: DeleteTaskUseCaseError.genericError,
+        updateError: UpdateTaskUseCaseError.genericError,
         emit: emit,
       );
     }

@@ -5,11 +5,13 @@ import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors
 class StatusSelectorBottomSheet extends StatelessWidget {
   final TaskStatus selectedStatus;
   final Function(TaskStatus) onStatusSelected;
+  final bool isShowArchived;
 
   const StatusSelectorBottomSheet({
     super.key,
     required this.selectedStatus,
     required this.onStatusSelected,
+    this.isShowArchived = false,
   });
 
   @override
@@ -34,22 +36,19 @@ class StatusSelectorBottomSheet extends StatelessWidget {
           ),
           Text(
             'Selecione o Status',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             'Status atual: ${selectedStatus.displayName}',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+            style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
           ),
           const SizedBox(height: 16),
           Flexible(
             child: SingleChildScrollView(
               child: StatusSelector(
                 selectedStatus: selectedStatus,
+                isShowArchived: isShowArchived,
                 onStatusSelected: (status) {
                   onStatusSelected(status);
                   Navigator.of(context).pop();
@@ -74,6 +73,7 @@ class StatusSelectorBottomSheet extends StatelessWidget {
     required BuildContext context,
     required TaskStatus selectedStatus,
     required Function(TaskStatus) onStatusSelected,
+    bool isShowArchived = false,
     VoidCallback? onDismissed,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -90,6 +90,7 @@ class StatusSelectorBottomSheet extends StatelessWidget {
         child: StatusSelectorBottomSheet(
           selectedStatus: selectedStatus,
           onStatusSelected: onStatusSelected,
+          isShowArchived: isShowArchived,
         ),
       ),
     );

@@ -232,7 +232,7 @@ return $default(_that.selectedTask,_that.searchQuery,_that.tasks,_that.isLoading
 
 
 class _TaskListState implements TaskListState {
-  const _TaskListState({this.selectedTask, this.searchQuery = "", final  List<TaskModel> tasks = const [], this.isLoading = false, this.isLoadingMore = false, this.hasMorePages = true, this.currentPage = 1, this.hasError = false, this.errorMessage = "", this.showNotification = false, this.notificationMessage = "", this.notificationType = NotificationType.info, this.statusFilter = TaskStatus.all, this.showStatusSelector = false, this.layoutMode = TaskLayout.list}): _tasks = tasks;
+  const _TaskListState({this.selectedTask, this.searchQuery = "", final  List<TaskModel> tasks = const [], this.isLoading = false, this.isLoadingMore = false, this.hasMorePages = true, this.currentPage = 1, this.hasError = false, this.errorMessage = "", this.showNotification = false, this.notificationMessage = "", this.notificationType = NotificationType.info, this.statusFilter = TaskStatus.todo, this.showStatusSelector = false, this.layoutMode = TaskLayout.list}): _tasks = tasks;
   
 
 @override final  TaskModel? selectedTask;

@@ -87,6 +87,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     // Cancela stream anterior se existir
     _taskStreamSubscription?.cancel();
 
+    log(state.statusFilter.toString());
+
     // Inicia stream para primeira página (observa mudanças em tempo real)
     _taskStreamSubscription = _listTaskUseCase
         .execute(
@@ -158,7 +160,9 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         page: nextPage,
         limitPerPage: _pageSize,
         search: _currentSearch,
-        status: state.statusFilter,
+        status: state.statusFilter == TaskStatus.all
+              ? null
+              : state.statusFilter,
         onlyActive: true,
         ascending: false,
       );
