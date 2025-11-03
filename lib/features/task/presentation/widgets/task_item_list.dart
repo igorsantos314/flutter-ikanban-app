@@ -197,11 +197,14 @@ class TaskItemList extends StatelessWidget {
         ],
 
         // Título
-        Text(
-          task.title,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: layoutMode == LayoutMode.compact ? 14 : 16,
+        Expanded(
+          child: Text(
+            task.title,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: layoutMode == LayoutMode.compact ? 14 : 16,
+              overflow: TextOverflow.ellipsis
+            ),
           ),
         ),
       ],

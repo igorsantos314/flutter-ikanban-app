@@ -2,7 +2,11 @@ import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 
-enum UpdateTaskUseCaseError { genericError }
+enum UpdateTaskUseCaseError {
+  genericError,
+  taskNotFoundError,
+  invalidDataError,
+}
 
 class UpdateTaskUseCase {
   final TaskRepository taskRepository;

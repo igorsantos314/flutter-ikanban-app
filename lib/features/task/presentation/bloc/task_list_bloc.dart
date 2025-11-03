@@ -6,7 +6,8 @@ import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
-import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/list_task_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/update_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/enums/task_layout.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/list/task_list_events.dart';
@@ -19,7 +20,8 @@ import 'package:flutter_ikanban_app/features/task/presentation/states/list/task_
 /// - Controle robusto de estado e erro
 /// - Performance otimizada
 class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
-  final TaskRepository taskRepository;
+  final UpdateTaskUseCase _updateTaskUseCase;
+  final ListTaskUseCase _listTaskUseCase;
 
   // Stream management
   StreamSubscription? _taskStreamSubscription;
@@ -32,7 +34,10 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   // Search and filter state
   String? _currentSearch;
 
-  TaskListBloc(this.taskRepository) : super(TaskListState.initial()) {
+  TaskListBloc(
+    this._updateTaskUseCase,
+    this._listTaskUseCase,
+  ) : super(TaskListState.initial()) {
     // Core events
     on<LoadTasksEvent>(_onLoadTasks);
     on<LoadMoreTasksEvent>(_onLoadMoreTasks);
@@ -43,7 +48,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     on<TasksStreamDataReceived>(_onTasksStreamDataReceived);
     on<TasksPageDataReceived>(_onTasksPageDataReceived);
 
-    on<ToggleTaskCompletion>(_onToggleTaskCompletion);
+    on<ToggleTaskCompletionEvent>(_onToggleTaskCompletion);
     on<TaskSelectedEvent>(_onTaskSelected);
 
     // UI events
@@ -83,12 +88,14 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     _taskStreamSubscription?.cancel();
 
     // Inicia stream para primeira página (observa mudanças em tempo real)
-    _taskStreamSubscription = taskRepository
-        .watchTasks(
+    _taskStreamSubscription = _listTaskUseCase
+        .execute(
           page: 1,
           limitPerPage: _pageSize,
           search: _currentSearch,
-          status: state.statusFilter == TaskStatus.all ? null : state.statusFilter,
+          status: state.statusFilter == TaskStatus.all
+              ? null
+              : state.statusFilter,
           onlyActive: true,
           ascending: false, // Mais recentes primeiro
         )
@@ -147,7 +154,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
 
     try {
       // Usa método direto do repository (não stream) para paginação
-      final stream = taskRepository.watchTasks(
+      final stream = _listTaskUseCase.execute(
         page: nextPage,
         limitPerPage: _pageSize,
         search: _currentSearch,
@@ -287,7 +294,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     Emitter<TaskListState> emit,
   ) {
     log('[TaskListBloc] Processing page data for page ${event.page}...');
-
     final outcome = event.outcome as Outcome;
 
     outcome.when(
@@ -354,20 +360,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     );
   }
 
-  /// Métodos utilitários para debugging e monitoramento
-  void logCurrentState() {
-    log('[TaskListBloc] Current State:');
-    log('  - Tasks: ${state.tasks.length}');
-    log('  - Current Page: ${state.currentPage}');
-    log('  - Has More: ${state.hasMorePages}');
-    log('  - Loading: ${state.isLoading}');
-    log('  - Loading More: ${state.isLoadingMore}');
-    log('  - Search: "${state.searchQuery}"');
-    log('  - Has Error: ${state.hasError}');
-  }
-
   FutureOr<void> _onToggleTaskCompletion(
-    ToggleTaskCompletion event,
+    ToggleTaskCompletionEvent event,
     Emitter<TaskListState> emit,
   ) async {
     final task = state.tasks.firstWhere((t) => t.id == event.id);
@@ -377,7 +371,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     final updatedTask = task.copyWith(status: updatedStatus);
 
     // Atualiza no repositório
-    var outcome = await taskRepository.updateTask(updatedTask);
+    var outcome = await _updateTaskUseCase.execute(updatedTask);
 
     outcome.when(
       success: (_) {
@@ -385,7 +379,15 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         final updatedTasks = state.tasks
             .map((t) => t.id == updatedTask.id ? updatedTask : t)
             .toList();
-        emit(state.copyWith(tasks: updatedTasks));
+        emit(
+          state.copyWith(
+            tasks: updatedTasks,
+            notificationType: NotificationType.success,
+            showNotification: true,
+            notificationMessage:
+                'Tarefa marcada como ${updatedStatus.displayName}',
+          ),
+        );
       },
       failure: (error, message, throwable) {
         log(
@@ -421,7 +423,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     final updatedTask = task.copyWith(status: event.status);
 
     // Atualiza no repositório
-    await taskRepository.updateTask(updatedTask).then((outcome) {
+    await _updateTaskUseCase.execute(updatedTask).then((outcome) {
       outcome.when(
         success: (_) {
           // Atualiza localmente o estado

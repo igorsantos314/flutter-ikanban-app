@@ -5,6 +5,11 @@ import 'package:flutter_ikanban_app/core/use_cases/theme/get_theme_use_case.dart
 import 'package:flutter_ikanban_app/core/use_cases/theme/set_theme_use_case.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/use_cases/load_settings_use_case.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/use_cases/save_settings_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/create_task_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/delete_task_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/get_task_by_id_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/list_task_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/update_task_use_case.dart';
 import 'package:flutter_ikanban_app/shared/theme/presentation/theme_provider.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/use_cases/export_data_use_case.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/use_cases/import_data_use_case.dart';
@@ -46,6 +51,26 @@ void _setupTaskModule() {
 
   getIt.registerLazySingleton<TaskRepository>(
     () => TaskRepositoryImpl(getIt()),
+  );
+
+  getIt.registerLazySingleton<CreateTaskUseCase>(
+    () => CreateTaskUseCase(getIt()),
+  );
+
+  getIt.registerLazySingleton<UpdateTaskUseCase>(
+    () => UpdateTaskUseCase(getIt()),
+  );
+
+  getIt.registerLazySingleton<GetTaskByIdUseCase>(
+    () => GetTaskByIdUseCase(getIt()),
+  );
+
+  getIt.registerLazySingleton<ListTaskUseCase>(
+    () => ListTaskUseCase(getIt()),
+  );
+
+  getIt.registerLazySingleton<DeleteTaskUseCase>(
+    () => DeleteTaskUseCase(getIt()),
   );
 }
 

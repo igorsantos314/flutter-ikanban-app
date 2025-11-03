@@ -10,6 +10,7 @@ enum TaskStatus {
   testing,      // Em Teste
   done,         // Concluído
   cancelled,    // Cancelado
+  archived,    // Arquivado (não usado atualmente)
 }
 
 extension TaskStatusExtension on TaskStatus {
@@ -34,6 +35,8 @@ extension TaskStatusExtension on TaskStatus {
         return 'Concluído';
       case TaskStatus.cancelled:
         return 'Cancelado';
+      case TaskStatus.archived:
+        return 'Arquivado';
     }
   }
 
@@ -58,6 +61,8 @@ extension TaskStatusExtension on TaskStatus {
         return Colors.green;
       case TaskStatus.cancelled:
         return Colors.grey[700]!;
+      case TaskStatus.archived:
+        return Colors.brown;
     }
   }
 
@@ -82,6 +87,8 @@ extension TaskStatusExtension on TaskStatus {
         return Icons.check_circle;
       case TaskStatus.cancelled:
         return Icons.cancel;
+      case TaskStatus.archived:
+        return Icons.archive;
     }
   }
 
@@ -121,6 +128,8 @@ extension TaskStatusExtension on TaskStatus {
         return 1.0;
       case TaskStatus.cancelled:
         return 0.0;
+      case TaskStatus.archived:
+        return 0.0;
       default:
         return 0.0;
     }
@@ -147,6 +156,8 @@ extension TaskStatusExtension on TaskStatus {
         return 'Tarefa finalizada';
       case TaskStatus.cancelled:
         return 'Tarefa cancelada';
+      case TaskStatus.archived:
+        return 'Tarefa arquivada';
     }
   }
 
@@ -168,6 +179,8 @@ extension TaskStatusExtension on TaskStatus {
       case TaskStatus.done:
         return null;
       case TaskStatus.cancelled:
+        return null;
+      case TaskStatus.archived:
         return null;
       default:
         return null;
@@ -192,6 +205,8 @@ extension TaskStatusExtension on TaskStatus {
       case TaskStatus.done:
         return TaskStatus.review;
       case TaskStatus.cancelled:
+        return null;
+      case TaskStatus.archived:
         return null;
       default:
         return null;

@@ -4,16 +4,27 @@ import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
-import 'package:flutter_ikanban_app/features/task/domain/errors/task_repository_errors.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
-import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/create_task_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/delete_task_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/get_task_by_id_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/update_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/shared/task_shared_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/states/form/task_form_state.dart';
 
 class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
-  final TaskRepository taskRepository;
-  TaskFormBloc(this.taskRepository) : super(TaskFormState.initial()) {
+  final CreateTaskUseCase _createTaskUseCase;
+  final UpdateTaskUseCase _updateTaskUseCase;
+  final GetTaskByIdUseCase _getTaskByIdUseCase;
+  final DeleteTaskUseCase _deleteTaskUseCase;
+
+  TaskFormBloc(
+    this._createTaskUseCase,
+    this._updateTaskUseCase,
+    this._getTaskByIdUseCase,
+    this._deleteTaskUseCase,
+  ) : super(TaskFormState.initial()) {
     on<TaskFormUpdateFieldsEvent>(_onUpdateFields);
     on<CreateTaskEvent>(_onCreateTask);
     on<UpdateTaskEvent>(_onUpdateTask);
@@ -77,12 +88,12 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         dueDate: state.dueDate,
         color: state.color,
       );
-      Outcome<void, TaskRepositoryErrors> outcome;
+      Outcome<void, dynamic> outcome;
 
-      outcome = await taskRepository.createTask(task);
+      outcome = await _createTaskUseCase.execute(task);
       if (state.taskId != null) {
         // If taskId is not null, we are updating an existing task
-        outcome = await taskRepository.updateTask(task);
+        outcome = await _updateTaskUseCase.execute(task);
       }
 
       outcome.when(
@@ -101,12 +112,15 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         },
         failure: (error, message, throwable) {
           log('Failed to create task: $message');
-          _handleTaskRepositoryError(error, emit);
+          _handleTaskRepositoryError(createError: error, emit: emit);
         },
       );
     } catch (e) {
       log('Error creating task: $e');
-      _handleTaskRepositoryError(GenericError(), emit);
+      _handleTaskRepositoryError(
+        createError: CreateTaskUseCaseError.genericError,
+        emit: emit,
+      );
     }
   }
 
@@ -136,7 +150,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         color: state.color,
       );
 
-      final outcome = await taskRepository.updateTask(task);
+      final outcome = await _updateTaskUseCase.execute(task);
 
       outcome.when(
         success: (task) {
@@ -153,12 +167,15 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         },
         failure: (error, message, throwable) {
           log('Failed to update task: $message');
-          _handleTaskRepositoryError(error, emit);
+          _handleTaskRepositoryError(updateError: error, emit: emit);
         },
       );
     } catch (e) {
       log('Error to update task: $e');
-      _handleTaskRepositoryError(GenericError(), emit);
+      _handleTaskRepositoryError(
+        deleteError: DeleteTaskUseCaseError.genericError,
+        emit: emit,
+      );
     }
   }
 
@@ -172,16 +189,13 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
       if (state.taskId == null) {
         log('Task ID is null, cannot delete task');
         _handleTaskRepositoryError(
-          TaskRepositoryErrors.validationError(
-            message: 'Task ID is required for deletion',
-            throwable: null,
-          ),
-          emit,
+          deleteError: DeleteTaskUseCaseError.invalidDataError,
+          emit: emit,
         );
         return;
       }
 
-      final outcome = await taskRepository.deleteTask(state.taskId!);
+      final outcome = await _deleteTaskUseCase.execute(state.taskId!);
 
       outcome.when(
         success: (_) {
@@ -198,12 +212,18 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         },
         failure: (error, message, throwable) {
           log('Failed to delete task: $message');
-          _handleTaskRepositoryError(error, emit);
+          _handleTaskRepositoryError(
+            deleteError: DeleteTaskUseCaseError.genericError,
+            emit: emit,
+          );
         },
       );
     } catch (e) {
       log('Error deleting task: $e');
-      _handleTaskRepositoryError(GenericError(), emit);
+      _handleTaskRepositoryError(
+        deleteError: DeleteTaskUseCaseError.genericError,
+        emit: emit,
+      );
     }
   }
 
@@ -214,7 +234,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     try {
-      final outcome = await taskRepository.getTaskById(event.taskId);
+      final outcome = await _getTaskByIdUseCase.execute(event.taskId);
 
       outcome.when(
         success: (task) {
@@ -223,11 +243,8 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
           if (task == null) {
             log('Task not found with id: ${event.taskId}');
             _handleTaskRepositoryError(
-              TaskRepositoryErrors.notFound(
-                message: 'Task not found',
-                throwable: null,
-              ),
-              emit,
+              getError: GetTaskByIdUseCaseError.taskNotFoundError,
+              emit: emit,
             );
             return;
           }
@@ -249,37 +266,84 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         },
         failure: (error, message, throwable) {
           log('Failed to load task: $message');
-          _handleTaskRepositoryError(error, emit);
+          _handleTaskRepositoryError(
+            getError: GetTaskByIdUseCaseError.genericError,
+            emit: emit,
+          );
         },
       );
     } catch (e) {
       log('Error loading task: $e');
-      _handleTaskRepositoryError(GenericError(), emit);
+      _handleTaskRepositoryError(
+        getError: GetTaskByIdUseCaseError.genericError,
+        emit: emit,
+      );
     }
   }
 
-  void _handleTaskRepositoryError(
-    TaskRepositoryErrors error,
-    Emitter<TaskFormState> emit,
-  ) {
+  void _handleTaskRepositoryError({
+    CreateTaskUseCaseError? createError,
+    UpdateTaskUseCaseError? updateError,
+    GetTaskByIdUseCaseError? getError,
+    DeleteTaskUseCaseError? deleteError,
+    required Emitter<TaskFormState> emit,
+  }) {
     String message = "";
-    error.when(
-      genericError: (message, throwable) {
-        message = 'Ocorreu um erro inesperado.';
-      },
-      validationError: (message, throwable) {
-        message = 'Verifique os campos e tente novamente.';
-      },
-      databaseError: (message, throwable) {
-        message = 'Erro ao acessar o banco de dados.';
-      },
-      networkError: (message, throwable) {
-        message = 'Erro de rede. Verifique sua conexão.';
-      },
-      notFound: (message, throwable) {
-        message = 'Recurso não encontrado.';
-      },
-    );
+    if (createError != null) {
+      switch (createError) {
+        case CreateTaskUseCaseError.genericError:
+          message = 'Ocorreu um erro inesperado.';
+          break;
+        case CreateTaskUseCaseError.invalidDataError:
+          message = 'Verifique os campos e tente novamente.';
+          break;
+      }
+
+      return;
+    }
+
+    if (updateError != null) {
+      switch (updateError) {
+        case UpdateTaskUseCaseError.genericError:
+          message = 'Ocorreu um erro inesperado.';
+          break;
+        case UpdateTaskUseCaseError.taskNotFoundError:
+          message = 'Tarefa não encontrada.';
+          break;
+        case UpdateTaskUseCaseError.invalidDataError:
+          message = 'Verifique os campos e tente novamente.';
+          break;
+      }
+
+      return;
+    }
+
+    if (getError != null) {
+      switch (getError) {
+        case GetTaskByIdUseCaseError.genericError:
+          message = 'Ocorreu um erro inesperado.';
+          break;
+        case GetTaskByIdUseCaseError.taskNotFoundError:
+          message = 'Tarefa não encontrada.';
+          break;
+      }
+
+      return;
+    }
+
+    if (deleteError != null) {
+      switch (deleteError) {
+        case DeleteTaskUseCaseError.genericError:
+          message = 'Ocorreu um erro inesperado.';
+          break;
+        case DeleteTaskUseCaseError.taskNotFoundError:
+          message = 'Tarefa não encontrada.';
+          break;
+        case DeleteTaskUseCaseError.invalidDataError:
+          message = 'Dados inválidos para deletar a tarefa.';
+          break;
+      }
+    }
     emit(state.copyWith(isLoading: false, errorMessage: message));
   }
 }

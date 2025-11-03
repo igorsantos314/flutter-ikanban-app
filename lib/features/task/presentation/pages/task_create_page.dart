@@ -13,7 +13,8 @@ class TaskCreatePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => TaskFormBloc(getIt.get()),
+      create: (context) =>
+          TaskFormBloc(getIt.get(), getIt.get(), getIt.get(), getIt.get()),
       child: const TaskCreatePageContent(),
     );
   }

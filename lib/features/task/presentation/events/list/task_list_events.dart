@@ -26,10 +26,10 @@ class TaskSelectedEvent extends TaskEvent {
   List<Object> get props => [task];
 }
 
-class ToggleTaskCompletion extends TaskEvent {
+class ToggleTaskCompletionEvent extends TaskEvent {
   final int id;
 
-  const ToggleTaskCompletion({required this.id});
+  const ToggleTaskCompletionEvent({required this.id});
 
   @override
   List<Object> get props => [id];

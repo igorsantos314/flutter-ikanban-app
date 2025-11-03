@@ -23,7 +23,7 @@ class TaskListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => TaskListBloc(getIt.get()),
+      create: (context) => TaskListBloc(getIt.get(), getIt.get()),
       child: const TaskListPageContent(),
     );
   }
@@ -122,9 +122,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                     selectedStatus: selectedStatus,
                     onChanged: (newSelection) {
                       context.read<TaskListBloc>().add(
-                        TaskListUpdateStatusFilterEvent(
-                          status: newSelection
-                        ),
+                        TaskListUpdateStatusFilterEvent(status: newSelection),
                       );
                     },
                     showSelectAll: true,
@@ -209,6 +207,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                               ? GridView.builder(
                                   gridDelegate:
                                       SliverGridDelegateWithFixedCrossAxisCount(
+                                        mainAxisSpacing: 8.0,
                                         crossAxisCount:
                                             state.layoutMode == TaskLayout.list
                                             ? 1
@@ -288,7 +287,9 @@ class _TaskListPageContentState extends State<TaskListPageContent>
           context.read<TaskListBloc>().add(TaskSelectedEvent(task: task));
         },
         onToggleCompletion: () {
-          context.read<TaskListBloc>().add(ToggleTaskCompletion(id: task.id!));
+          context.read<TaskListBloc>().add(
+            ToggleTaskCompletionEvent(id: task.id!),
+          );
         },
       );
     }
