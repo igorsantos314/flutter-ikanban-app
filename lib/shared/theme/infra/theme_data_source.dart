@@ -2,12 +2,12 @@ import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
 import 'package:flutter_ikanban_app/core/services/shared_prefs_service.dart';
 
 class ThemeDataSource {
-  static const String darkModeKey = 'dark_mode';
+  static const String themeKey = 'theme';
   
   final SharedPrefsService _preferences = SharedPrefsService.instance;
 
   Future<AppTheme> getTheme() async {
-    final themeString = await _preferences.getString(darkModeKey);
+    final themeString = await _preferences.getString(themeKey);
     return AppTheme.values.firstWhere(
       (e) => e.name == themeString,
       orElse: () => AppTheme.system,
@@ -15,6 +15,6 @@ class ThemeDataSource {
   }
 
   Future<void> setTheme(AppTheme theme) async {
-    await _preferences.setString(darkModeKey, theme.name);
+    await _preferences.setString(themeKey, theme.name);
   }
 }
