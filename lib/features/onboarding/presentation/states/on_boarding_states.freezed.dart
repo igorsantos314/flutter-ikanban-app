@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$OnBoardingState {
 
- int get currentPage; bool get isLastPage; bool get isOnBoardingCompleted; bool get isLoading; NotificationType get notificationType; String get notificationMessage; bool get showNotification;
+ bool get isOnBoardingCompleted; bool get isLoading;
 /// Create a copy of OnBoardingState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $OnBoardingStateCopyWith<OnBoardingState> get copyWith => _$OnBoardingStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OnBoardingState&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.isLastPage, isLastPage) || other.isLastPage == isLastPage)&&(identical(other.isOnBoardingCompleted, isOnBoardingCompleted) || other.isOnBoardingCompleted == isOnBoardingCompleted)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OnBoardingState&&(identical(other.isOnBoardingCompleted, isOnBoardingCompleted) || other.isOnBoardingCompleted == isOnBoardingCompleted)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,currentPage,isLastPage,isOnBoardingCompleted,isLoading,notificationType,notificationMessage,showNotification);
+int get hashCode => Object.hash(runtimeType,isOnBoardingCompleted,isLoading);
 
 @override
 String toString() {
-  return 'OnBoardingState(currentPage: $currentPage, isLastPage: $isLastPage, isOnBoardingCompleted: $isOnBoardingCompleted, isLoading: $isLoading, notificationType: $notificationType, notificationMessage: $notificationMessage, showNotification: $showNotification)';
+  return 'OnBoardingState(isOnBoardingCompleted: $isOnBoardingCompleted, isLoading: $isLoading)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $OnBoardingStateCopyWith<$Res>  {
   factory $OnBoardingStateCopyWith(OnBoardingState value, $Res Function(OnBoardingState) _then) = _$OnBoardingStateCopyWithImpl;
 @useResult
 $Res call({
- int currentPage, bool isLastPage, bool isOnBoardingCompleted, bool isLoading, NotificationType notificationType, String notificationMessage, bool showNotification
+ bool isOnBoardingCompleted, bool isLoading
 });
 
 
@@ -62,15 +62,10 @@ class _$OnBoardingStateCopyWithImpl<$Res>
 
 /// Create a copy of OnBoardingState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? currentPage = null,Object? isLastPage = null,Object? isOnBoardingCompleted = null,Object? isLoading = null,Object? notificationType = null,Object? notificationMessage = null,Object? showNotification = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? isOnBoardingCompleted = null,Object? isLoading = null,}) {
   return _then(_self.copyWith(
-currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
-as int,isLastPage: null == isLastPage ? _self.isLastPage : isLastPage // ignore: cast_nullable_to_non_nullable
-as bool,isOnBoardingCompleted: null == isOnBoardingCompleted ? _self.isOnBoardingCompleted : isOnBoardingCompleted // ignore: cast_nullable_to_non_nullable
+isOnBoardingCompleted: null == isOnBoardingCompleted ? _self.isOnBoardingCompleted : isOnBoardingCompleted // ignore: cast_nullable_to_non_nullable
 as bool,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
-as NotificationType,notificationMessage: null == notificationMessage ? _self.notificationMessage : notificationMessage // ignore: cast_nullable_to_non_nullable
-as String,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -156,10 +151,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int currentPage,  bool isLastPage,  bool isOnBoardingCompleted,  bool isLoading,  NotificationType notificationType,  String notificationMessage,  bool showNotification)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isOnBoardingCompleted,  bool isLoading)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _OnBoardingState() when $default != null:
-return $default(_that.currentPage,_that.isLastPage,_that.isOnBoardingCompleted,_that.isLoading,_that.notificationType,_that.notificationMessage,_that.showNotification);case _:
+return $default(_that.isOnBoardingCompleted,_that.isLoading);case _:
   return orElse();
 
 }
@@ -177,10 +172,10 @@ return $default(_that.currentPage,_that.isLastPage,_that.isOnBoardingCompleted,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int currentPage,  bool isLastPage,  bool isOnBoardingCompleted,  bool isLoading,  NotificationType notificationType,  String notificationMessage,  bool showNotification)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isOnBoardingCompleted,  bool isLoading)  $default,) {final _that = this;
 switch (_that) {
 case _OnBoardingState():
-return $default(_that.currentPage,_that.isLastPage,_that.isOnBoardingCompleted,_that.isLoading,_that.notificationType,_that.notificationMessage,_that.showNotification);case _:
+return $default(_that.isOnBoardingCompleted,_that.isLoading);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +192,10 @@ return $default(_that.currentPage,_that.isLastPage,_that.isOnBoardingCompleted,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int currentPage,  bool isLastPage,  bool isOnBoardingCompleted,  bool isLoading,  NotificationType notificationType,  String notificationMessage,  bool showNotification)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isOnBoardingCompleted,  bool isLoading)?  $default,) {final _that = this;
 switch (_that) {
 case _OnBoardingState() when $default != null:
-return $default(_that.currentPage,_that.isLastPage,_that.isOnBoardingCompleted,_that.isLoading,_that.notificationType,_that.notificationMessage,_that.showNotification);case _:
+return $default(_that.isOnBoardingCompleted,_that.isLoading);case _:
   return null;
 
 }
@@ -212,16 +207,11 @@ return $default(_that.currentPage,_that.isLastPage,_that.isOnBoardingCompleted,_
 
 
 class _OnBoardingState implements OnBoardingState {
-  const _OnBoardingState({this.currentPage = 0, this.isLastPage = false, this.isOnBoardingCompleted = false, this.isLoading = false, this.notificationType = NotificationType.info, this.notificationMessage = "", this.showNotification = false});
+  const _OnBoardingState({this.isOnBoardingCompleted = false, this.isLoading = false});
   
 
-@override@JsonKey() final  int currentPage;
-@override@JsonKey() final  bool isLastPage;
 @override@JsonKey() final  bool isOnBoardingCompleted;
 @override@JsonKey() final  bool isLoading;
-@override@JsonKey() final  NotificationType notificationType;
-@override@JsonKey() final  String notificationMessage;
-@override@JsonKey() final  bool showNotification;
 
 /// Create a copy of OnBoardingState
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +223,16 @@ _$OnBoardingStateCopyWith<_OnBoardingState> get copyWith => __$OnBoardingStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OnBoardingState&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.isLastPage, isLastPage) || other.isLastPage == isLastPage)&&(identical(other.isOnBoardingCompleted, isOnBoardingCompleted) || other.isOnBoardingCompleted == isOnBoardingCompleted)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OnBoardingState&&(identical(other.isOnBoardingCompleted, isOnBoardingCompleted) || other.isOnBoardingCompleted == isOnBoardingCompleted)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,currentPage,isLastPage,isOnBoardingCompleted,isLoading,notificationType,notificationMessage,showNotification);
+int get hashCode => Object.hash(runtimeType,isOnBoardingCompleted,isLoading);
 
 @override
 String toString() {
-  return 'OnBoardingState(currentPage: $currentPage, isLastPage: $isLastPage, isOnBoardingCompleted: $isOnBoardingCompleted, isLoading: $isLoading, notificationType: $notificationType, notificationMessage: $notificationMessage, showNotification: $showNotification)';
+  return 'OnBoardingState(isOnBoardingCompleted: $isOnBoardingCompleted, isLoading: $isLoading)';
 }
 
 
@@ -253,7 +243,7 @@ abstract mixin class _$OnBoardingStateCopyWith<$Res> implements $OnBoardingState
   factory _$OnBoardingStateCopyWith(_OnBoardingState value, $Res Function(_OnBoardingState) _then) = __$OnBoardingStateCopyWithImpl;
 @override @useResult
 $Res call({
- int currentPage, bool isLastPage, bool isOnBoardingCompleted, bool isLoading, NotificationType notificationType, String notificationMessage, bool showNotification
+ bool isOnBoardingCompleted, bool isLoading
 });
 
 
@@ -270,15 +260,10 @@ class __$OnBoardingStateCopyWithImpl<$Res>
 
 /// Create a copy of OnBoardingState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? currentPage = null,Object? isLastPage = null,Object? isOnBoardingCompleted = null,Object? isLoading = null,Object? notificationType = null,Object? notificationMessage = null,Object? showNotification = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? isOnBoardingCompleted = null,Object? isLoading = null,}) {
   return _then(_OnBoardingState(
-currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
-as int,isLastPage: null == isLastPage ? _self.isLastPage : isLastPage // ignore: cast_nullable_to_non_nullable
-as bool,isOnBoardingCompleted: null == isOnBoardingCompleted ? _self.isOnBoardingCompleted : isOnBoardingCompleted // ignore: cast_nullable_to_non_nullable
+isOnBoardingCompleted: null == isOnBoardingCompleted ? _self.isOnBoardingCompleted : isOnBoardingCompleted // ignore: cast_nullable_to_non_nullable
 as bool,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
-as NotificationType,notificationMessage: null == notificationMessage ? _self.notificationMessage : notificationMessage // ignore: cast_nullable_to_non_nullable
-as String,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

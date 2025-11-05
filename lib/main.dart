@@ -1,7 +1,6 @@
 // ignore_for_file: camel_case_types
 
 import 'package:flutter/material.dart';
-import 'package:flutter_ikanban_app/core/app/app_startup/presentation/app_startup_page.dart';
 import 'package:flutter_ikanban_app/shared/theme/presentation/ikanban_theme.dart';
 import 'package:flutter_ikanban_app/shared/theme/data/theme_repository_impl.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';

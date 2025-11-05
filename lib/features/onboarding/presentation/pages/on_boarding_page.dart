@@ -1,15 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
 import 'package:flutter_ikanban_app/features/onboarding/domain/model/on_boarding_model.dart';
+import 'package:flutter_ikanban_app/features/onboarding/presentation/bloc/on_boarding_bloc.dart';
+import 'package:flutter_ikanban_app/features/onboarding/presentation/events/on_boarding_event.dart';
+import 'package:flutter_ikanban_app/features/onboarding/presentation/states/on_boarding_states.dart';
 
-class OnBoardingPage extends StatefulWidget {
+class OnBoardingPage extends StatelessWidget {
   const OnBoardingPage({super.key});
 
   @override
-  State<OnBoardingPage> createState() => _OnBoardingPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => OnBoardingBloc(getIt()),
+      child: const OnBoardingPageContent(),
+    );
+  }
 }
 
-class _OnBoardingPageState extends State<OnBoardingPage> {
+class OnBoardingPageContent extends StatefulWidget {
+  const OnBoardingPageContent({super.key});
+
+  @override
+  State<OnBoardingPageContent> createState() => _OnBoardingPageContentState();
+}
+
+class _OnBoardingPageContentState extends State<OnBoardingPageContent> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
 
@@ -71,208 +88,246 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   }
 
   void _finishOnboarding() {
-    AppNavigation.navigateToHome(context);
+    context.read<OnBoardingBloc>().add(CompleteOnBoardingEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header com botão Skip
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Logo
-                  Row(
-                    children: [
-                      Image.asset(
-                        'assets/images/name_logo_right.png',
-                        width: 128,
-                      ),
-                    ],
-                  ),
-
-                  // Botão Skip
-                  TextButton(
-                    onPressed: _skipOnboarding,
-                    child: Text(
-                      'Pular',
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.7,
-                        ),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // PageView com conteúdo
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                },
-                itemCount: _onboardingData.length,
-                itemBuilder: (context, index) {
-                  final data = _onboardingData[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Column(
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<OnBoardingBloc, OnBoardingState>(
+          listener: (context, state) {
+            if (state.isOnBoardingCompleted) {
+              AppNavigation.navigateToHome(context);
+            }
+          },
+        ),
+      ],
+      child: BlocConsumer<OnBoardingBloc, OnBoardingState>(
+        listener: (context, state) => state.isLoading,
+        builder: (context, state) {
+          return Scaffold(
+            body: SafeArea(
+              child: state.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : Column(
                       children: [
-                        // Imagem com blur na parte inferior
-                        Expanded(
-                          flex: 3,
-                          child: Container(
-                            margin: const EdgeInsets.only(
-                              top: 50, bottom: 20),
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.4),
-                                  blurRadius: 50,
+                        // Header com botão Skip
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Logo
+                              Row(
+                                children: [
+                                  Image.asset(
+                                    'assets/images/name_logo_right.png',
+                                    width: 128,
+                                  ),
+                                ],
+                              ),
+
+                              // Botão Skip
+                              TextButton(
+                                onPressed: _skipOnboarding,
+                                child: Text(
+                                  'Pular',
+                                  style: TextStyle(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.7),
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ],
-                            ),
-                            child: Image.asset(
-                              data.imagePath,
-                              fit: BoxFit.contain,
-                            ),
+                              ),
+                            ],
                           ),
                         ),
 
-                        // Conteúdo de texto
+                        // PageView com conteúdo
                         Expanded(
-                          flex: 2,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // Título
-                              Text(
-                                data.title,
-                                style: theme.textTheme.headlineMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.onSurface,
+                          child: PageView.builder(
+                            controller: _pageController,
+                            onPageChanged: (index) {
+                              setState(() {
+                                _currentIndex = index;
+                              });
+                            },
+                            itemCount: _onboardingData.length,
+                            itemBuilder: (context, index) {
+                              final data = _onboardingData[index];
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0,
                                 ),
-                                textAlign: TextAlign.center,
+                                child: Column(
+                                  children: [
+                                    // Imagem com blur na parte inferior
+                                    Expanded(
+                                      flex: 3,
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                          top: 50,
+                                          bottom: 20,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.4),
+                                              blurRadius: 50,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Image.asset(
+                                          data.imagePath,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+
+                                    // Conteúdo de texto
+                                    Expanded(
+                                      flex: 2,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          // Título
+                                          Text(
+                                            data.title,
+                                            style: theme
+                                                .textTheme
+                                                .headlineMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: theme
+                                                      .colorScheme
+                                                      .onSurface,
+                                                ),
+                                            textAlign: TextAlign.center,
+                                          ),
+
+                                          const SizedBox(height: 16),
+
+                                          // Descrição
+                                          Text(
+                                            data.description,
+                                            style: theme.textTheme.bodyLarge
+                                                ?.copyWith(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .onSurface
+                                                      .withValues(alpha: 0.7),
+                                                  height: 1.5,
+                                                ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+
+                        // Indicadores de página e botões de navegação
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            children: [
+                              // Indicadores de página (bolinhas)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: List.generate(
+                                  _onboardingData.length,
+                                  (index) => AnimatedContainer(
+                                    duration: const Duration(milliseconds: 300),
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
+                                    width: _currentIndex == index ? 24 : 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(4),
+                                      color: _currentIndex == index
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                ),
                               ),
 
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 24),
 
-                              // Descrição
-                              Text(
-                                data.description,
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  color: theme.colorScheme.onSurface.withValues(
-                                    alpha: 0.7,
+                              // Botões de navegação
+                              Row(
+                                children: [
+                                  // Botão Anterior (só aparece se não for a primeira página)
+                                  if (_currentIndex > 0)
+                                    Expanded(
+                                      child: OutlinedButton.icon(
+                                        onPressed: _previousPage,
+                                        icon: const Icon(Icons.arrow_back),
+                                        label: const Text('Anterior'),
+                                        style: OutlinedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 12,
+                                          ),
+                                          side: BorderSide(
+                                            color: theme.colorScheme.outline,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    const Expanded(child: SizedBox()),
+
+                                  const SizedBox(width: 16),
+
+                                  // Botão Próximo/Começar
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: _nextPage,
+                                      icon: Icon(
+                                        _currentIndex ==
+                                                _onboardingData.length - 1
+                                            ? Icons.check
+                                            : Icons.arrow_forward,
+                                      ),
+                                      label: Text(
+                                        _currentIndex ==
+                                                _onboardingData.length - 1
+                                            ? 'Começar'
+                                            : 'Próximo',
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            theme.colorScheme.primary,
+                                        foregroundColor:
+                                            theme.colorScheme.onPrimary,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 12,
+                                        ),
+                                        elevation: 2,
+                                      ),
+                                    ),
                                   ),
-                                  height: 1.5,
-                                ),
-                                textAlign: TextAlign.center,
+                                ],
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                  );
-                },
-              ),
             ),
-
-            // Indicadores de página e botões de navegação
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  // Indicadores de página (bolinhas)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: List.generate(
-                      _onboardingData.length,
-                      (index) => AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: _currentIndex == index ? 24 : 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: _currentIndex == index
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.onSurface.withValues(
-                                  alpha: 0.3,
-                                ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Botões de navegação
-                  Row(
-                    children: [
-                      // Botão Anterior (só aparece se não for a primeira página)
-                      if (_currentIndex > 0)
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: _previousPage,
-                            icon: const Icon(Icons.arrow_back),
-                            label: const Text('Anterior'),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              side: BorderSide(
-                                color: theme.colorScheme.outline,
-                              ),
-                            ),
-                          ),
-                        )
-                      else
-                        const Expanded(child: SizedBox()),
-
-                      const SizedBox(width: 16),
-
-                      // Botão Próximo/Começar
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: _nextPage,
-                          icon: Icon(
-                            _currentIndex == _onboardingData.length - 1
-                                ? Icons.check
-                                : Icons.arrow_forward,
-                          ),
-                          label: Text(
-                            _currentIndex == _onboardingData.length - 1
-                                ? 'Começar'
-                                : 'Próximo',
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primary,
-                            foregroundColor: theme.colorScheme.onPrimary,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            elevation: 2,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
