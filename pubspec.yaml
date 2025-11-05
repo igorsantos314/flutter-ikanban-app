@@ -46,6 +46,7 @@ flutter:
 
   assets:
   - assets/images/
+  - assets/images/screen_shots/
 
 flutter_launcher_icons:
     android: "launcher_icon" # or true, or a custom name like "my_app_icon"

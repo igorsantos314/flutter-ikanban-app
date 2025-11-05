@@ -7,7 +7,6 @@ import 'package:flutter_ikanban_app/core/app/app_startup/presentation/app_startu
 import 'package:flutter_ikanban_app/core/app/app_startup/presentation/app_startup_state.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
-import 'package:go_router/go_router.dart';
 
 class AppStartupPage extends StatelessWidget {
   const AppStartupPage({super.key});
