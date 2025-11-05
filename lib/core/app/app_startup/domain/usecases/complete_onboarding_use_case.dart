@@ -1,12 +1,12 @@
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/repository/app_startup_repository.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
-import 'package:flutter_ikanban_app/features/onboarding/domain/repository/on_boarding_repository.dart';
 
 enum CompleteOnBoardingResult { success, failure }
 
-class CompleteOnBoarding {
-  final OnBoardingRepository repository;
+class CompleteOnBoardingUseCase {
+  final AppStartupRepository repository;
 
-  CompleteOnBoarding(this.repository);
+  CompleteOnBoardingUseCase(this.repository);
 
   Future<Outcome<void, CompleteOnBoardingResult>> execute() async {
     final result = await repository.completeOnBoarding();

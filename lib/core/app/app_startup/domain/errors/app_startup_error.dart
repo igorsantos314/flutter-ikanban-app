@@ -1,26 +1,26 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'on_boarding_errors.freezed.dart';
+part 'app_startup_error.freezed.dart';
 
 @freezed
-abstract class OnBoardingError with _$OnBoardingError {
-  const factory OnBoardingError.notFound({
+abstract class AppStartupError with _$AppStartupError {
+  const factory AppStartupError.notFound({
     String? message,
     Object? throwable,
   }) = _NotFound;
-  const factory OnBoardingError.databaseError({
+  const factory AppStartupError.databaseError({
     String? message,
     Object? throwable,
   }) = _DatabaseError;
-  const factory OnBoardingError.validationError({
+  const factory AppStartupError.validationError({
     String? message,
     Object? throwable,
   }) = _ValidationError;
-  const factory OnBoardingError.networkError({
+  const factory AppStartupError.networkError({
     String? message,
     Object? throwable,
   }) = _NetworkError;
-  const factory OnBoardingError.genericError({
+  const factory AppStartupError.genericError({
     String? message,
     Object? throwable,
   }) = GenericError;

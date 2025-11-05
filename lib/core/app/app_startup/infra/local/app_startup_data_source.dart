@@ -1,6 +1,6 @@
 import 'package:flutter_ikanban_app/core/services/shared_prefs_service.dart';
 
-class OnBoardingDataSource {
+class AppStartupDataSource {
   final SharedPrefsService _preferences = SharedPrefsService.instance;
   static const String onBoardingKey = 'on_boarding_completed';
 

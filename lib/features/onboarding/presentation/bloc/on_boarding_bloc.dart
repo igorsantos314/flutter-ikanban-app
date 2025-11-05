@@ -1,18 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/check_onboarding_completed_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/complete_onboarding_use_case.dart';
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
-import 'package:flutter_ikanban_app/features/onboarding/domain/use_cases/complete_onboarding.dart';
-import 'package:flutter_ikanban_app/features/onboarding/domain/use_cases/is_on_boarding_completed_use_case.dart';
 import 'package:flutter_ikanban_app/features/onboarding/presentation/events/on_boarding_event.dart';
 import 'package:flutter_ikanban_app/features/onboarding/presentation/states/on_boarding_states.dart';
 
 class OnBoardingBloc extends Bloc<OnBoardingEvent, OnBoardingState> {
-  final CompleteOnBoarding _completeOnBoarding;
-  final IsOnBoardingCompleted _isOnBoardingCompletedUseCase;
+  final CompleteOnBoardingUseCase _completeOnBoarding;
+  final CheckOnboardingCompletedUseCase _checkOnboardingCompletionUseCase;
 
-  OnBoardingBloc(this._completeOnBoarding, this._isOnBoardingCompletedUseCase)
+  OnBoardingBloc(this._completeOnBoarding, this._checkOnboardingCompletionUseCase)
     : super(OnBoardingState()) {
     on<LoadOnBoardingEvent>(_mapLoadOnBoardingEventToState);
     on<CompleteOnBoardingEvent>(_mapCompleteOnBoardingEventToState);
@@ -23,7 +23,7 @@ class OnBoardingBloc extends Bloc<OnBoardingEvent, OnBoardingState> {
     Emitter<OnBoardingState> emit,
   ) async {
     emit(state.copyWith(isLoading: true));
-    final result = await _isOnBoardingCompletedUseCase.execute();
+    final result = await _checkOnboardingCompletionUseCase.execute();
     result.when(
       success: (isCompleted) {
         if (isCompleted == null) {

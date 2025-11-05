@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'on_boarding_errors.dart';
+part of 'app_startup_error.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -12,20 +12,20 @@ part of 'on_boarding_errors.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$OnBoardingError {
+mixin _$AppStartupError {
 
  String? get message; Object? get throwable;
-/// Create a copy of OnBoardingError
+/// Create a copy of AppStartupError
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$OnBoardingErrorCopyWith<OnBoardingError> get copyWith => _$OnBoardingErrorCopyWithImpl<OnBoardingError>(this as OnBoardingError, _$identity);
+$AppStartupErrorCopyWith<AppStartupError> get copyWith => _$AppStartupErrorCopyWithImpl<AppStartupError>(this as AppStartupError, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OnBoardingError&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.throwable, throwable));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppStartupError&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.throwable, throwable));
 }
 
 
@@ -34,15 +34,15 @@ int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality
 
 @override
 String toString() {
-  return 'OnBoardingError(message: $message, throwable: $throwable)';
+  return 'AppStartupError(message: $message, throwable: $throwable)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $OnBoardingErrorCopyWith<$Res>  {
-  factory $OnBoardingErrorCopyWith(OnBoardingError value, $Res Function(OnBoardingError) _then) = _$OnBoardingErrorCopyWithImpl;
+abstract mixin class $AppStartupErrorCopyWith<$Res>  {
+  factory $AppStartupErrorCopyWith(AppStartupError value, $Res Function(AppStartupError) _then) = _$AppStartupErrorCopyWithImpl;
 @useResult
 $Res call({
  String? message, Object? throwable
@@ -53,14 +53,14 @@ $Res call({
 
 }
 /// @nodoc
-class _$OnBoardingErrorCopyWithImpl<$Res>
-    implements $OnBoardingErrorCopyWith<$Res> {
-  _$OnBoardingErrorCopyWithImpl(this._self, this._then);
+class _$AppStartupErrorCopyWithImpl<$Res>
+    implements $AppStartupErrorCopyWith<$Res> {
+  _$AppStartupErrorCopyWithImpl(this._self, this._then);
 
-  final OnBoardingError _self;
-  final $Res Function(OnBoardingError) _then;
+  final AppStartupError _self;
+  final $Res Function(AppStartupError) _then;
 
-/// Create a copy of OnBoardingError
+/// Create a copy of AppStartupError
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? message = freezed,Object? throwable = freezed,}) {
   return _then(_self.copyWith(
@@ -72,8 +72,8 @@ as String?,throwable: freezed == throwable ? _self.throwable : throwable ,
 }
 
 
-/// Adds pattern-matching-related methods to [OnBoardingError].
-extension OnBoardingErrorPatterns on OnBoardingError {
+/// Adds pattern-matching-related methods to [AppStartupError].
+extension AppStartupErrorPatterns on AppStartupError {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -229,14 +229,14 @@ return genericError(_that.message,_that.throwable);case _:
 /// @nodoc
 
 
-class _NotFound implements OnBoardingError {
+class _NotFound implements AppStartupError {
   const _NotFound({this.message, this.throwable});
   
 
 @override final  String? message;
 @override final  Object? throwable;
 
-/// Create a copy of OnBoardingError
+/// Create a copy of AppStartupError
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -255,14 +255,14 @@ int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality
 
 @override
 String toString() {
-  return 'OnBoardingError.notFound(message: $message, throwable: $throwable)';
+  return 'AppStartupError.notFound(message: $message, throwable: $throwable)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$NotFoundCopyWith<$Res> implements $OnBoardingErrorCopyWith<$Res> {
+abstract mixin class _$NotFoundCopyWith<$Res> implements $AppStartupErrorCopyWith<$Res> {
   factory _$NotFoundCopyWith(_NotFound value, $Res Function(_NotFound) _then) = __$NotFoundCopyWithImpl;
 @override @useResult
 $Res call({
@@ -281,7 +281,7 @@ class __$NotFoundCopyWithImpl<$Res>
   final _NotFound _self;
   final $Res Function(_NotFound) _then;
 
-/// Create a copy of OnBoardingError
+/// Create a copy of AppStartupError
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? message = freezed,Object? throwable = freezed,}) {
   return _then(_NotFound(
@@ -296,14 +296,14 @@ as String?,throwable: freezed == throwable ? _self.throwable : throwable ,
 /// @nodoc
 
 
-class _DatabaseError implements OnBoardingError {
+class _DatabaseError implements AppStartupError {
   const _DatabaseError({this.message, this.throwable});
   
 
 @override final  String? message;
 @override final  Object? throwable;
 
-/// Create a copy of OnBoardingError
+/// Create a copy of AppStartupError
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -322,14 +322,14 @@ int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality
 
 @override
 String toString() {
-  return 'OnBoardingError.databaseError(message: $message, throwable: $throwable)';
+  return 'AppStartupError.databaseError(message: $message, throwable: $throwable)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$DatabaseErrorCopyWith<$Res> implements $OnBoardingErrorCopyWith<$Res> {
+abstract mixin class _$DatabaseErrorCopyWith<$Res> implements $AppStartupErrorCopyWith<$Res> {
   factory _$DatabaseErrorCopyWith(_DatabaseError value, $Res Function(_DatabaseError) _then) = __$DatabaseErrorCopyWithImpl;
 @override @useResult
 $Res call({
@@ -348,7 +348,7 @@ class __$DatabaseErrorCopyWithImpl<$Res>
   final _DatabaseError _self;
   final $Res Function(_DatabaseError) _then;
 
-/// Create a copy of OnBoardingError
+/// Create a copy of AppStartupError
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? message = freezed,Object? throwable = freezed,}) {
   return _then(_DatabaseError(
@@ -363,14 +363,14 @@ as String?,throwable: freezed == throwable ? _self.throwable : throwable ,
 /// @nodoc
 
 
-class _ValidationError implements OnBoardingError {
+class _ValidationError implements AppStartupError {
   const _ValidationError({this.message, this.throwable});
   
 
 @override final  String? message;
 @override final  Object? throwable;
 
-/// Create a copy of OnBoardingError
+/// Create a copy of AppStartupError
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -389,14 +389,14 @@ int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality
 
 @override
 String toString() {
-  return 'OnBoardingError.validationError(message: $message, throwable: $throwable)';
+  return 'AppStartupError.validationError(message: $message, throwable: $throwable)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$ValidationErrorCopyWith<$Res> implements $OnBoardingErrorCopyWith<$Res> {
+abstract mixin class _$ValidationErrorCopyWith<$Res> implements $AppStartupErrorCopyWith<$Res> {
   factory _$ValidationErrorCopyWith(_ValidationError value, $Res Function(_ValidationError) _then) = __$ValidationErrorCopyWithImpl;
 @override @useResult
 $Res call({
@@ -415,7 +415,7 @@ class __$ValidationErrorCopyWithImpl<$Res>
   final _ValidationError _self;
   final $Res Function(_ValidationError) _then;
 
-/// Create a copy of OnBoardingError
+/// Create a copy of AppStartupError
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? message = freezed,Object? throwable = freezed,}) {
   return _then(_ValidationError(
@@ -430,14 +430,14 @@ as String?,throwable: freezed == throwable ? _self.throwable : throwable ,
 /// @nodoc
 
 
-class _NetworkError implements OnBoardingError {
+class _NetworkError implements AppStartupError {
   const _NetworkError({this.message, this.throwable});
   
 
 @override final  String? message;
 @override final  Object? throwable;
 
-/// Create a copy of OnBoardingError
+/// Create a copy of AppStartupError
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -456,14 +456,14 @@ int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality
 
 @override
 String toString() {
-  return 'OnBoardingError.networkError(message: $message, throwable: $throwable)';
+  return 'AppStartupError.networkError(message: $message, throwable: $throwable)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$NetworkErrorCopyWith<$Res> implements $OnBoardingErrorCopyWith<$Res> {
+abstract mixin class _$NetworkErrorCopyWith<$Res> implements $AppStartupErrorCopyWith<$Res> {
   factory _$NetworkErrorCopyWith(_NetworkError value, $Res Function(_NetworkError) _then) = __$NetworkErrorCopyWithImpl;
 @override @useResult
 $Res call({
@@ -482,7 +482,7 @@ class __$NetworkErrorCopyWithImpl<$Res>
   final _NetworkError _self;
   final $Res Function(_NetworkError) _then;
 
-/// Create a copy of OnBoardingError
+/// Create a copy of AppStartupError
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? message = freezed,Object? throwable = freezed,}) {
   return _then(_NetworkError(
@@ -497,14 +497,14 @@ as String?,throwable: freezed == throwable ? _self.throwable : throwable ,
 /// @nodoc
 
 
-class GenericError implements OnBoardingError {
+class GenericError implements AppStartupError {
   const GenericError({this.message, this.throwable});
   
 
 @override final  String? message;
 @override final  Object? throwable;
 
-/// Create a copy of OnBoardingError
+/// Create a copy of AppStartupError
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -523,14 +523,14 @@ int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality
 
 @override
 String toString() {
-  return 'OnBoardingError.genericError(message: $message, throwable: $throwable)';
+  return 'AppStartupError.genericError(message: $message, throwable: $throwable)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $GenericErrorCopyWith<$Res> implements $OnBoardingErrorCopyWith<$Res> {
+abstract mixin class $GenericErrorCopyWith<$Res> implements $AppStartupErrorCopyWith<$Res> {
   factory $GenericErrorCopyWith(GenericError value, $Res Function(GenericError) _then) = _$GenericErrorCopyWithImpl;
 @override @useResult
 $Res call({
@@ -549,7 +549,7 @@ class _$GenericErrorCopyWithImpl<$Res>
   final GenericError _self;
   final $Res Function(GenericError) _then;
 
-/// Create a copy of OnBoardingError
+/// Create a copy of AppStartupError
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? message = freezed,Object? throwable = freezed,}) {
   return _then(GenericError(

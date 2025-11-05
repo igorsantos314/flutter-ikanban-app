@@ -1,3 +1,8 @@
+import 'package:flutter_ikanban_app/core/app/app_startup/data/app_startup_repository_impl.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/repository/app_startup_repository.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/check_onboarding_completed_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/complete_onboarding_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/infra/local/app_startup_data_source.dart';
 import 'package:flutter_ikanban_app/core/database/app_database.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_service.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
@@ -30,10 +35,26 @@ final getIt = GetIt.instance;
 void setupLocator() {
   getIt.registerLazySingleton<AppDatabase>(() => AppDatabase());
 
+  _setupAppStartupModule();
   _setupThemeModule();
   _setupTaskModule();
   _setupSettingsModule();
   _setupCoreServices();
+}
+
+void _setupAppStartupModule() {
+  getIt.registerLazySingleton<AppStartupDataSource>(() => AppStartupDataSource());
+  getIt.registerLazySingleton<AppStartupRepository>(
+    () => AppStartupRepositoryImpl(getIt()),
+  );
+
+  getIt.registerLazySingleton<CheckOnboardingCompletedUseCase>(
+    () => CheckOnboardingCompletedUseCase(getIt()),
+  );
+
+  getIt.registerLazySingleton<CompleteOnBoardingUseCase>(
+    () => CompleteOnBoardingUseCase(getIt()),
+  );
 }
 
 void _setupThemeModule() {
