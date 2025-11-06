@@ -37,11 +37,13 @@ class TaskItemList extends StatelessWidget {
     Color cardColor;
     Color priorityColor;
     bool showAllDetails = true;
+    Color textColor = theme.colorScheme.onSurface;
 
     if (task.status == TaskStatus.done) {
       priorityColor = TaskColors.green.color;
       borderColor = TaskColors.green.color;
       cardColor = TaskColors.green.color;
+      textColor = Colors.black;
       showAllDetails = false;
     } else if (task.status == TaskStatus.cancelled) {
       priorityColor = Colors.grey;
@@ -86,11 +88,14 @@ class TaskItemList extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
-                      Icon(task.priority.icon, size: 20),
+                      Icon(task.priority.icon, size: 20, color: textColor),
                       SizedBox(width: 4),
                       Text(
                         task.priority.displayName,
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ),
                       ),
                     ],
                   ),
@@ -100,8 +105,8 @@ class TaskItemList extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: layoutMode == LayoutMode.compact
-                  ? _buildCompactContent(theme, showAllDetails)
-                  : _buildFullWidgetContent(theme, showAllDetails),
+                  ? _buildCompactContent(theme, showAllDetails, textColor)
+                  : _buildFullWidgetContent(theme, showAllDetails, textColor),
             ),
           ],
         ),
@@ -109,7 +114,7 @@ class TaskItemList extends StatelessWidget {
     );
   }
 
-  Widget _buildFullWidgetContent(ThemeData theme, bool showAllDetails) {
+  Widget _buildFullWidgetContent(ThemeData theme, bool showAllDetails, Color textColor) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -119,7 +124,7 @@ class TaskItemList extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Título e botão de conclusão
-              _buildTitleRow(theme),
+              _buildTitleRow(theme, textColor),
 
               // Descrição
               _buildDescription(theme, showAllDetails),
@@ -143,7 +148,7 @@ class TaskItemList extends StatelessWidget {
     );
   }
 
-  Widget _buildCompactContent(ThemeData theme, bool showAllDetails) {
+  Widget _buildCompactContent(ThemeData theme, bool showAllDetails, Color textColor) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -152,7 +157,7 @@ class TaskItemList extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Título e botão de conclusão
-            _buildTitleRow(theme),
+            _buildTitleRow(theme, textColor),
 
             // Descrição
             _buildDescription(theme, showAllDetails),
@@ -175,7 +180,7 @@ class TaskItemList extends StatelessWidget {
     );
   }
 
-  Widget _buildTitleRow(ThemeData theme) {
+  Widget _buildTitleRow(ThemeData theme, Color textColor) {
     return Row(
       children: [
         // Marcar como concluído
@@ -203,7 +208,8 @@ class TaskItemList extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: layoutMode == LayoutMode.compact ? 14 : 16,
-              overflow: TextOverflow.ellipsis
+              overflow: TextOverflow.ellipsis,
+              color: textColor,
             ),
           ),
         ),
