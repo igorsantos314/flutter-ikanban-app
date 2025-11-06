@@ -39,12 +39,14 @@ dev_dependencies:
   drift_dev: ^2.28.1
   build_runner: ^2.6.0
   flutter_lints: ^5.0.0
+  change_app_package_name: ^1.5.0
 
 flutter:
   uses-material-design: true
 
   assets:
   - assets/images/
+  - assets/images/screen_shots/
 
 flutter_launcher_icons:
     android: "launcher_icon" # or true, or a custom name like "my_app_icon"
