@@ -65,7 +65,7 @@ class ComplexitySelectorBottomSheet extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isSelected 
                               ? complexity.color.withValues(alpha: 0.1)
-                              : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                              : theme.colorScheme.surface.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: isSelected ? complexity.color : theme.colorScheme.onSurface.withValues(alpha: 0.3),

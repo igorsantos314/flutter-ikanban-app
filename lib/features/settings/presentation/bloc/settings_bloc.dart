@@ -127,7 +127,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     log("Exporting data...");
     emit(state.copyWith(isLoading: true));
     
-    final outcome = await exportDataUseCase.execute();
+    final outcome = await exportDataUseCase.execute(shareAfterExport: true);
     
     outcome.when(
       success: (result) {

@@ -2,13 +2,11 @@
 import 'package:flutter/material.dart';
 
 enum TaskType {
-  // Técnicos
   feature,
   bug,
   improvement,
   documentation,
-  
-  // Domésticos
+  work,
   housework,
   shopping,
   maintenance,
@@ -36,7 +34,6 @@ extension TaskTypeExtension on TaskType {
   // Ícone para cada tipo
   IconData get icon {
     switch (this) {
-      // Técnicos
       case TaskType.feature:
         return Icons.star;
       case TaskType.bug:
@@ -45,8 +42,8 @@ extension TaskTypeExtension on TaskType {
         return Icons.trending_up;
       case TaskType.documentation:
         return Icons.description;
-      
-      // Domésticos
+      case TaskType.work:
+        return Icons.work;
       case TaskType.housework:
         return Icons.home_work;
       case TaskType.shopping:
@@ -95,7 +92,6 @@ extension TaskTypeExtension on TaskType {
   // Cor para cada tipo
   Color get color {
     switch (this) {
-      // Técnicos
       case TaskType.feature:
         return Colors.blue;
       case TaskType.bug:
@@ -104,8 +100,8 @@ extension TaskTypeExtension on TaskType {
         return Colors.green;
       case TaskType.documentation:
         return Colors.purple;
-      
-      // Domésticos
+      case TaskType.work:
+        return Colors.indigo;
       case TaskType.housework:
         return Colors.brown;
       case TaskType.shopping:
@@ -154,7 +150,6 @@ extension TaskTypeExtension on TaskType {
   // Nome amigável em português
   String get displayName {
     switch (this) {
-      // Técnicos
       case TaskType.feature:
         return 'Nova Funcionalidade';
       case TaskType.bug:
@@ -163,8 +158,8 @@ extension TaskTypeExtension on TaskType {
         return 'Melhoria';
       case TaskType.documentation:
         return 'Documentação';
-      
-      // Domésticos
+      case TaskType.work:
+        return 'Trabalho';
       case TaskType.housework:
         return 'Trabalho Doméstico';
       case TaskType.shopping:
@@ -255,8 +250,16 @@ extension TaskTypeExtension on TaskType {
         return 'Presentes para comprar ou fazer';
       case TaskType.call:
         return 'Ligações e contatos a fazer';
-      default:
-        return '';
+      case TaskType.feature:
+        return 'Tarefa relacionada ao desenvolvimento de software';
+      case TaskType.bug:
+        return 'Tarefa relacionada ao desenvolvimento de software';
+      case TaskType.improvement:
+        return 'Tarefa relacionada ao desenvolvimento de software';
+      case TaskType.documentation:
+        return 'Tarefa relacionada a documentação';
+      case TaskType.work:
+        return 'Tarefa relacionada ao trabalho';
     }
   }
 }

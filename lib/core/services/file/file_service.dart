@@ -1,41 +1,25 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 
 /// Serviço multiplataforma para operações de arquivo
 /// Abstrai as diferenças entre Android, iOS, Desktop
 class FileService {
-  /// Obtém o diretório apropriado para salvar backups
-  /// - Android: Diretório de documentos da app (sem permissão especial)
-  /// - Desktop: Diretório de documentos do usuário
-  /// - iOS: Diretório de documentos da app
+  /// Obtém o diretório temporário para salvar backups (sem permissões especiais)
+  /// - Android/iOS: Diretório temporário da app
+  /// - Desktop: Diretório temporário do sistema
   Future<Outcome<Directory, FileServiceError>> getBackupDirectory() async {
     try {
       Directory directory;
       
-      if (kIsWeb) {
-        return Outcome.failure(
-          error: FileServiceError.platformNotSupported,
-          message: 'Web não suporta salvamento de arquivos local',
-        );
-      }
-      
       if (Platform.isAndroid || Platform.isIOS) {
-        // Mobile: usa diretório de documentos da app (sem permissões especiais)
-        final appDocDir = await _getApplicationDocumentsDirectory();
-        directory = Directory('${appDocDir.path}/backups');
+        // Mobile: usa diretório temporário (sem permissões especiais)
+        final tempDir = await getTemporaryDirectory();
+        directory = Directory('${tempDir.path}/backups');
       } else {
-        // Desktop: usa diretório de documentos do usuário
-        final homeDir = Platform.environment['USERPROFILE'] ?? 
-                       Platform.environment['HOME'] ?? 
-                       '';
-        if (homeDir.isEmpty) {
-          return Outcome.failure(
-            error: FileServiceError.directoryNotFound,
-            message: 'Não foi possível encontrar diretório home',
-          );
-        }
-        directory = Directory('$homeDir/Documents/iKanban');
+        // Desktop: usa diretório temporário do sistema
+        final tempDir = await getTemporaryDirectory();
+        directory = Directory('${tempDir.path}/iKanban');
       }
       
       // Cria o diretório se não existir
@@ -173,19 +157,7 @@ class FileService {
     }
   }
 
-  // Método auxiliar para obter diretório de documentos
-  Future<Directory> _getApplicationDocumentsDirectory() async {
-    // Implementação específica por plataforma
-    if (Platform.isAndroid) {
-      // Android: usa getApplicationDocumentsDirectory do path_provider
-      return Directory('/data/data/com.example.flutter_ikanban_app/app_flutter/documents');
-    } else if (Platform.isIOS) {
-      // iOS: usa getApplicationDocumentsDirectory do path_provider
-      return Directory('/var/mobile/Containers/Data/Application/documents');
-    } else {
-      throw UnsupportedError('Plataforma não suportada para documentos da app');
-    }
-  }
+
 }
 
 /// Informações sobre um arquivo

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/services.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_service.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
@@ -6,8 +7,6 @@ import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/repository/settings_repository.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 
-/// Caso de uso responsável por exportar todos os dados do app
-/// Segue os princípios da Clean Architecture não dependendo de features específicas
 class ExportDataUseCase {
   final SettingsRepository _settingsRepository;
   final TaskRepository _taskRepository;
@@ -24,19 +23,10 @@ class ExportDataUseCase {
         _fileService = fileService,
         _fileShareService = fileShareService;
 
-  /// Exporta todos os dados do aplicativo
-  /// 
-  /// Parameters:
-  /// - [shareAfterExport]: Se true, abre dialog de compartilhamento após exportar
-  /// 
-  /// Returns:
-  /// - Success: ExportResult com caminho do arquivo e informações
-  /// - Failure: Erro ocorrido durante a exportação
   Future<Outcome<ExportResult, ExportDataError>> execute({
     bool shareAfterExport = false,
   }) async {
     try {
-      // 1. Buscar configurações
       final settingsOutcome = await _settingsRepository.loadSettings();
       
       Map<String, dynamic>? settingsData;
@@ -52,45 +42,77 @@ class ExportDataUseCase {
         },
       );
 
-      // 2. Buscar tarefas
-      final tasksStream = _taskRepository.watchTasks(
-        page: 1,
-        limitPerPage: 1000, // Em produção, implementar paginação
-        onlyActive: false, // Incluir todas as tarefas
-      );
-
-      final tasksOutcome = await tasksStream.first;
-      
+      // 2. Buscar todas as tarefas (paginação completa)
       List<Map<String, dynamic>> tasksData = [];
       int totalTasks = 0;
-      
-      tasksOutcome.when(
-        success: (resultPage) {
-          if (resultPage != null) {
-            tasksData = resultPage.items.map((task) => {
-              'id': task.id,
-              'title': task.title,
-              'description': task.description,
-              'status': task.status.name,
-              'priority': task.priority.name,
-              'complexity': task.complexity.name,
-              'type': task.type.name,
-              'dueDate': task.dueDate?.toIso8601String(),
-              'isActive': task.isActive,
-            }).toList();
-            totalTasks = resultPage.totalItems;
-          }
-        },
-        failure: (error, message, throwable) {
+      int currentPage = 1;
+      const int pageSize = 100; // Tamanho menor para melhor performance
+      bool hasMorePages = true;
+
+      while (hasMorePages) {
+        final tasksStream = _taskRepository.watchTasks(
+          page: currentPage,
+          limitPerPage: pageSize,
+          onlyActive: false,
+        );
+
+        final tasksOutcome = await tasksStream.first;
+        
+        final success = tasksOutcome.when(
+          success: (resultPage) {
+            if (resultPage != null) {
+              // Adiciona as tarefas da página atual à lista completa
+              final pageTasksData = resultPage.items.map((task) => {
+                'id': task.id,
+                'title': task.title,
+                'description': task.description,
+                'status': task.status.name,
+                'priority': task.priority.name,
+                'complexity': task.complexity.name,
+                'type': task.type.name,
+                'dueDate': task.dueDate?.toIso8601String(),
+                'isActive': task.isActive,
+                'createdAt': DateTime.now().toIso8601String(), // Adiciona timestamp de criação
+                'color': task.color.name, // Adiciona cor da tarefa
+              }).toList();
+              
+              tasksData.addAll(pageTasksData);
+              totalTasks = resultPage.totalItems;
+              
+              // Verifica se há mais páginas
+              final totalPages = (totalTasks / pageSize).ceil();
+              hasMorePages = currentPage < totalPages && resultPage.items.isNotEmpty;
+              
+              log('Página $currentPage de $totalPages carregada - ${resultPage.items.length} tarefas');
+              
+              return true;
+            }
+            return false;
+          },
+          failure: (error, message, throwable) {
+            log('Erro ao carregar página $currentPage: $message');
+            return false;
+          },
+        );
+
+        if (!success) {
           return Outcome.failure(
             error: ExportDataError.tasksLoadFailed,
-            message: 'Erro ao carregar tarefas: $message',
-            throwable: throwable,
+            message: 'Erro ao carregar tarefas na página $currentPage',
           );
-        },
-      );
+        }
 
-      // 3. Montar dados para exportação
+        currentPage++;
+        
+        // Proteção contra loop infinito
+        if (currentPage > 1000) {
+          log('Limite de páginas atingido (1000) - interrompendo busca');
+          break;
+        }
+      }
+
+      log('Exportação completa: ${tasksData.length} de $totalTasks tarefas carregadas');
+
       final exportData = {
         'app': 'iKanban',
         'version': '1.0.0+1',
@@ -98,17 +120,27 @@ class ExportDataUseCase {
         'settings': settingsData,
         'tasks': tasksData,
         'totalTasks': totalTasks,
+        'exportedTasks': tasksData.length,
         'metadata': {
           'exportedBy': 'iKanban Flutter App',
           'platform': 'mobile/desktop',
           'dataVersion': '1.0',
+          'paginationInfo': {
+            'pageSize': pageSize,
+            'totalPages': currentPage - 1,
+            'isComplete': tasksData.length == totalTasks,
+          },
+          'exportStats': {
+            'activeTasks': tasksData.where((task) => task['isActive'] == true).length,
+            'inactiveTasks': tasksData.where((task) => task['isActive'] == false).length,
+            'tasksByStatus': _groupTasksByStatus(tasksData),
+            'tasksByPriority': _groupTasksByPriority(tasksData),
+          }
         }
       };
 
-      // 4. Converter para JSON
       final jsonData = const JsonEncoder.withIndent('  ').convert(exportData);
 
-      // 5. Salvar arquivo usando FileService
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final fileName = 'ikanban_backup_$timestamp.json';
       
@@ -119,10 +151,8 @@ class ExportDataUseCase {
 
       return await fileOutcome.when(
         success: (file) async {
-          // 6. Copiar para clipboard como backup
           await Clipboard.setData(ClipboardData(text: jsonData));
 
-          // 7. Compartilhar se solicitado
           if (shareAfterExport && _fileShareService.canShare) {
             final shareOutcome = await _fileShareService.shareFile(
               filePath: file!.path,
@@ -130,12 +160,11 @@ class ExportDataUseCase {
               text: 'Backup dos dados do iKanban criado em ${DateTime.now().toString()}',
             );
             
-            // Se o compartilhamento falhar, não é erro crítico
             shareOutcome.when(
               success: (_) {},
               failure: (error, message, throwable) {
                 // Log do erro mas continue
-                print('Aviso: Falha no compartilhamento: $message');
+                log('Aviso: Falha no compartilhamento: $message');
               },
             );
           }
@@ -144,7 +173,7 @@ class ExportDataUseCase {
             filePath: file!.path,
             fileName: fileName,
             fileSize: jsonData.length,
-            tasksCount: totalTasks,
+            tasksCount: tasksData.length, // Número real de tarefas exportadas
             hasSettings: settingsData != null,
             shareAttempted: shareAfterExport,
           );
@@ -166,6 +195,30 @@ class ExportDataUseCase {
         throwable: e,
       );
     }
+  }
+
+  /// Agrupa tarefas por status para estatísticas
+  Map<String, int> _groupTasksByStatus(List<Map<String, dynamic>> tasks) {
+    final Map<String, int> statusCount = {};
+    
+    for (final task in tasks) {
+      final status = task['status'] as String;
+      statusCount[status] = (statusCount[status] ?? 0) + 1;
+    }
+    
+    return statusCount;
+  }
+
+  /// Agrupa tarefas por prioridade para estatísticas
+  Map<String, int> _groupTasksByPriority(List<Map<String, dynamic>> tasks) {
+    final Map<String, int> priorityCount = {};
+    
+    for (final task in tasks) {
+      final priority = task['priority'] as String;
+      priorityCount[priority] = (priorityCount[priority] ?? 0) + 1;
+    }
+    
+    return priorityCount;
   }
 }
 
@@ -194,10 +247,9 @@ class ExportResult {
   }
 
   String get summary => 
-      '$tasksCount tarefas exportadas • ${formattedSize}';
+      '$tasksCount tarefas exportadas • $formattedSize';
 }
 
-/// Erros possíveis durante a exportação
 enum ExportDataError {
   settingsLoadFailed,
   tasksLoadFailed,
@@ -206,7 +258,6 @@ enum ExportDataError {
   unexpectedError,
 }
 
-/// Extensão para facilitar o uso dos erros
 extension ExportDataErrorExtension on ExportDataError {
   String get message {
     switch (this) {
