@@ -34,10 +34,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   // Search and filter state
   String? _currentSearch;
 
-  TaskListBloc(
-    this._updateTaskUseCase,
-    this._listTaskUseCase,
-  ) : super(TaskListState.initial()) {
+  TaskListBloc(this._updateTaskUseCase, this._listTaskUseCase)
+    : super(TaskListState.initial()) {
     // Core events
     on<LoadTasksEvent>(_onLoadTasks);
     on<LoadMoreTasksEvent>(_onLoadMoreTasks);
@@ -56,6 +54,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     on<TaskListUpdateStatus>(_onTaskListUpdateStatus);
     on<TaskListUpdateStatusFilterEvent>(_onTaskListUpdateStatusFilter);
     on<ToggleLayoutModeEvent>(_onToggleLayoutMode);
+    on<FilterTasksClickEvent>(_onFilterTasksClick);
+    on<FilterTasksApplyEvent>(_onFilterTasksApply);
   }
 
   @override
@@ -98,6 +98,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
           status: state.statusFilter == TaskStatus.all
               ? null
               : state.statusFilter,
+          type: state.typeFilters.isNotEmpty ? state.typeFilters : null,
           onlyActive: true,
           ascending: false, // Mais recentes primeiro
         )
@@ -161,13 +162,12 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         limitPerPage: _pageSize,
         search: _currentSearch,
         status: state.statusFilter == TaskStatus.all
-              ? null
-              : state.statusFilter,
+            ? null
+            : state.statusFilter,
+        type: state.typeFilters.isNotEmpty ? state.typeFilters : null,
         onlyActive: true,
         ascending: false,
-      );
-
-      // Pega apenas o primeiro resultado do stream (single call)
+      ); // Pega apenas o primeiro resultado do stream (single call)
       final outcome = await stream.first;
 
       add(TasksPageDataReceived(outcome, nextPage));
@@ -360,6 +360,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         showNotification: event.showNotification ?? state.showNotification,
         showStatusSelector:
             event.showStatusSelector ?? state.showStatusSelector,
+        showFilterOptions: event.showFilterOptions ?? state.showFilterOptions,
       ),
     );
   }
@@ -478,5 +479,24 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
             : TaskLayout.list,
       ),
     );
+  }
+
+  FutureOr<void> _onFilterTasksClick(
+    FilterTasksClickEvent event,
+    Emitter<TaskListState> emit,
+  ) {
+    emit(state.copyWith(showFilterOptions: true));
+  }
+
+  FutureOr<void> _onFilterTasksApply(
+    FilterTasksApplyEvent event,
+    Emitter<TaskListState> emit,
+  ) {
+    log('[TaskListBloc] Applying filters: types=${event.selectedTypes}');
+
+    emit(state.copyWith(typeFilters: event.selectedTypes));
+
+    // Recarrega as tarefas com os novos filtros
+    add(const LoadTasksEvent());
   }
 }

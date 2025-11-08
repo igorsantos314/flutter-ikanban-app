@@ -238,7 +238,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
 
       outcome.when(
         success: (task) {
-          log('Task loaded successfully');
+          log('Task loaded successfully $task');
 
           if (task == null) {
             log('Task not found with id: ${event.taskId}');

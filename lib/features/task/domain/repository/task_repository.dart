@@ -18,7 +18,7 @@ abstract class TaskRepository {
     TaskStatus? status,
     TaskPriority? priority,
     TaskComplexity? complexity,
-    TaskType? type,
+    List<TaskType>? type,
     bool onlyActive = true,
     bool ascending = true,
   });

@@ -47,7 +47,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
     TaskStatus? status,
     TaskPriority? priority,
     TaskComplexity? complexity,
-    TaskType? type,
+    List<TaskType>? type,
     bool onlyActive = true,
     bool ascending = true,
   }) async* {
@@ -82,7 +82,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
     }
 
     if (type != null) {
-      query.where((tbl) => tbl.type.equals(type.name));
+      query.where((tbl) => tbl.type.isIn(type.map((e) => e.name)));
     }
 
     if (orderBy != null) {
@@ -141,7 +141,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
       }
       if (type != null) {
         totalItemsQuery.where(
-          db.taskEntity.type.equals(type.name),
+          db.taskEntity.type.isIn(type.map((e) => e.name)),
         );
       } 
       if (onlyActive) {

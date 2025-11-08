@@ -1,5 +1,6 @@
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/enums/task_layout.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -24,6 +25,8 @@ abstract class TaskListState with _$TaskListState {
     @Default(NotificationType.info) NotificationType notificationType,
 
     @Default(TaskStatus.todo) TaskStatus statusFilter,
+    @Default(false) bool showFilterOptions,
+    @Default([]) List<TaskType> typeFilters,
 
     @Default(false) bool showStatusSelector,
     @Default(TaskLayout.list) TaskLayout layoutMode,

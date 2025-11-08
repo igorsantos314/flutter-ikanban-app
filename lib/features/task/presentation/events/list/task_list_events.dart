@@ -1,4 +1,5 @@
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/shared/task_shared_events.dart';
 
@@ -81,6 +82,30 @@ class TaskListUpdateStatus extends TaskEvent {
   List<Object> get props => [status];
 }
 
+class TaskListUpdateFilter extends TaskEvent {
+  final List<TaskType> types;
+
+  const TaskListUpdateFilter({required this.types});
+
+  @override
+  List<Object> get props => [types];
+}
+
 class ToggleLayoutModeEvent extends TaskEvent {
   const ToggleLayoutModeEvent();
+}
+
+class FilterTasksClickEvent extends TaskEvent {
+  const FilterTasksClickEvent();
+}
+
+class FilterTasksApplyEvent extends TaskEvent {
+  final List<TaskType> selectedTypes;
+
+  const FilterTasksApplyEvent({
+    required this.selectedTypes,
+  });
+
+  @override
+  List<Object> get props => [selectedTypes];
 }
