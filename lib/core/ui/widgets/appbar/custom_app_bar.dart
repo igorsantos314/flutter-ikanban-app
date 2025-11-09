@@ -4,12 +4,14 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Function(String)? onChanged;
   final Function(String)? onSubmit;
   final VoidCallback? onClose;
+  final VoidCallback? onFilter;
 
   const CustomAppBar({
     super.key,
     this.onChanged,
     this.onSubmit,
     this.onClose,
+    this.onFilter,
   });
 
   @override
@@ -131,6 +133,13 @@ class _CustomAppBarState extends State<CustomAppBar>
             ),
           ),
         ] else ...[
+          // Ícone de filtro
+          if (widget.onFilter != null)
+            IconButton(
+              icon: const Icon(Icons.filter_list),
+              color: theme.colorScheme.onSurface,
+              onPressed: widget.onFilter,
+            ),
           // Ícone de busca
           IconButton(
             icon: const Icon(Icons.search),

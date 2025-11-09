@@ -2,6 +2,12 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_layout_mode_preferences.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_status_preferences_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_type_filter_preferences.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_layout_mode_preferences.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_status_preferences_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_type_filter_preferences.dart';
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
@@ -14,14 +20,18 @@ import 'package:flutter_ikanban_app/features/task/presentation/events/list/task_
 import 'package:flutter_ikanban_app/features/task/presentation/events/shared/task_shared_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/states/list/task_list_state.dart';
 
-/// TaskListBloc com implementação senior:
-/// - Stream para mudanças em tempo real (primeira página)
-/// - Paginação por API para páginas adicionais
-/// - Controle robusto de estado e erro
-/// - Performance otimizada
 class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   final UpdateTaskUseCase _updateTaskUseCase;
   final ListTaskUseCase _listTaskUseCase;
+
+  final SetTaskListStatusPreferencesUseCase _setStatusPreferencesUseCase;
+  final GetTaskListStatusPreferencesUseCase _getStatusUseCase;
+  final SetTaskListTypeFilterPreferencesUsecase
+  _setTypeFilterPreferencesUsecase;
+  final GetTaskListTypeFilterPreferencesUsecase
+  _getTypeFilterPreferencesUsecase;
+  final SetLayoutModePreferencesUseCase _setLayoutModePreferencesUsecase;
+  final GetLayoutModePreferencesUseCase _getLayoutModePreferencesUsecase;
 
   // Stream management
   StreamSubscription? _taskStreamSubscription;
@@ -37,6 +47,12 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   TaskListBloc(
     this._updateTaskUseCase,
     this._listTaskUseCase,
+    this._setStatusPreferencesUseCase,
+    this._getStatusUseCase,
+    this._setTypeFilterPreferencesUsecase,
+    this._getTypeFilterPreferencesUsecase,
+    this._setLayoutModePreferencesUsecase,
+    this._getLayoutModePreferencesUsecase,
   ) : super(TaskListState.initial()) {
     // Core events
     on<LoadTasksEvent>(_onLoadTasks);
@@ -56,6 +72,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     on<TaskListUpdateStatus>(_onTaskListUpdateStatus);
     on<TaskListUpdateStatusFilterEvent>(_onTaskListUpdateStatusFilter);
     on<ToggleLayoutModeEvent>(_onToggleLayoutMode);
+    on<FilterTasksClickEvent>(_onFilterTasksClick);
+    on<FilterTasksApplyEvent>(_onFilterTasksApply);
   }
 
   @override
@@ -65,7 +83,10 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   }
 
   /// Carrega primeira página + inicia stream para mudanças em tempo real
-  void _onLoadTasks(LoadTasksEvent event, Emitter<TaskListState> emit) {
+  FutureOr<void> _onLoadTasks(
+    LoadTasksEvent event,
+    Emitter<TaskListState> emit,
+  ) async {
     log('[TaskListBloc] Loading initial tasks...');
 
     // Evita múltiplas chamadas simultâneas
@@ -84,6 +105,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
       ),
     );
 
+    await _loadPreferences(emit);
+
     // Cancela stream anterior se existir
     _taskStreamSubscription?.cancel();
 
@@ -98,6 +121,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
           status: state.statusFilter == TaskStatus.all
               ? null
               : state.statusFilter,
+          type: state.typeFilters.isNotEmpty ? state.typeFilters : null,
           onlyActive: true,
           ascending: false, // Mais recentes primeiro
         )
@@ -134,6 +158,54 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         );
   }
 
+  FutureOr<void> _loadPreferences(Emitter<TaskListState> emit) async {
+    // Carrega preferências de status e tipo
+    final statusOutcome = await _getStatusUseCase.execute();
+    statusOutcome.when(
+      success: (status) {
+        log('[TaskListBloc] Loaded status preference: $status');
+        if (status != null) {
+          emit(state.copyWith(statusFilter: status));
+        }
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] Error loading status preference: $error, message: $message',
+        );
+      },
+    );
+
+    final typeOutcome = await _getTypeFilterPreferencesUsecase.execute();
+    typeOutcome.when(
+      success: (types) {
+        log('[TaskListBloc] Loaded type filter preferences: $types');
+        if (types != null) {
+          emit(state.copyWith(typeFilters: types));
+        }
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] Error loading type filter preferences: $error, message: $message',
+        );
+      },
+    );
+
+    final layoutOutcome = await _getLayoutModePreferencesUsecase.execute();
+    layoutOutcome.when(
+      success: (layout) {
+        log('[TaskListBloc] Loaded layout mode preference: $layout');
+        if (layout != null) {
+          emit(state.copyWith(layoutMode: layout));
+        }
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] Error loading layout mode preference: $error, message: $message',
+        );
+      },
+    );
+  }
+
   /// Carrega mais páginas (sem stream - apenas API call)
   void _onLoadMoreTasks(
     LoadMoreTasksEvent event,
@@ -161,13 +233,12 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         limitPerPage: _pageSize,
         search: _currentSearch,
         status: state.statusFilter == TaskStatus.all
-              ? null
-              : state.statusFilter,
+            ? null
+            : state.statusFilter,
+        type: state.typeFilters.isNotEmpty ? state.typeFilters : null,
         onlyActive: true,
         ascending: false,
-      );
-
-      // Pega apenas o primeiro resultado do stream (single call)
+      ); // Pega apenas o primeiro resultado do stream (single call)
       final outcome = await stream.first;
 
       add(TasksPageDataReceived(outcome, nextPage));
@@ -360,6 +431,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         showNotification: event.showNotification ?? state.showNotification,
         showStatusSelector:
             event.showStatusSelector ?? state.showStatusSelector,
+        showFilterOptions: event.showFilterOptions ?? state.showFilterOptions,
       ),
     );
   }
@@ -462,21 +534,76 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   FutureOr<void> _onTaskListUpdateStatusFilter(
     TaskListUpdateStatusFilterEvent event,
     Emitter<TaskListState> emit,
-  ) {
+  ) async {
     emit(state.copyWith(statusFilter: event.status));
+    final result = await _setStatusPreferencesUseCase.execute(event.status);
+
+    result.when(
+      success: (_) {
+        log('[TaskListBloc] Task status filter saved successfully');
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] Error saving task status filter: $error, message: $message',
+        );
+      },
+    );
+
     add(const LoadTasksEvent());
   }
 
   FutureOr<void> _onToggleLayoutMode(
     ToggleLayoutModeEvent event,
     Emitter<TaskListState> emit,
-  ) {
-    emit(
-      state.copyWith(
-        layoutMode: state.layoutMode == TaskLayout.list
-            ? TaskLayout.grid
-            : TaskLayout.list,
-      ),
+  ) async {
+    final newLayout = state.layoutMode == TaskLayout.list
+        ? TaskLayout.grid
+        : TaskLayout.list;
+
+    emit(state.copyWith(layoutMode: newLayout));
+
+    final result = await _setLayoutModePreferencesUsecase.execute(newLayout);
+
+    result.when(
+      success: (_) {
+        log('[TaskListBloc] Layout mode preference saved successfully');
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] Error saving layout mode preference: $error, message: $message',
+        );
+      },
     );
+  }
+
+  FutureOr<void> _onFilterTasksClick(
+    FilterTasksClickEvent event,
+    Emitter<TaskListState> emit,
+  ) {
+    emit(state.copyWith(showFilterOptions: true));
+  }
+
+  FutureOr<void> _onFilterTasksApply(
+    FilterTasksApplyEvent event,
+    Emitter<TaskListState> emit,
+  ) async {
+    emit(state.copyWith(typeFilters: event.selectedTypes));
+    final result = await _setTypeFilterPreferencesUsecase.call(
+      event.selectedTypes,
+    );
+
+    result.when(
+      success: (_) {
+        log('[TaskListBloc] Task type filters saved successfully');
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] Error saving task type filters: $error, message: $message',
+        );
+      },
+    );
+
+    // Recarrega as tarefas com os novos filtros
+    add(const LoadTasksEvent());
   }
 }
