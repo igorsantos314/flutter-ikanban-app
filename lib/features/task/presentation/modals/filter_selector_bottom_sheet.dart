@@ -287,12 +287,10 @@ class _FilterSelectorBottomSheetState extends State<FilterSelectorBottomSheet> {
                   onPressed: () => Navigator.of(context).pop(),
                   icon: Icon(
                     Icons.close,
-                    color: theme.colorScheme.onSurfaceVariant,
+                    color: theme.colorScheme.onSurface,
                   ),
                   style: IconButton.styleFrom(
-                    backgroundColor: theme.colorScheme.onSurface.withValues(
-                      alpha: 0.3,
-                    ),
+                    backgroundColor: theme.colorScheme.surface,
                     minimumSize: const Size(32, 32),
                   ),
                 ),

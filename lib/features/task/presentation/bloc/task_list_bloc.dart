@@ -2,6 +2,10 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_status_preferences_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_type_filter_preferences.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_status_preferences_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_type_filter_preferences.dart';
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
@@ -14,14 +18,16 @@ import 'package:flutter_ikanban_app/features/task/presentation/events/list/task_
 import 'package:flutter_ikanban_app/features/task/presentation/events/shared/task_shared_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/states/list/task_list_state.dart';
 
-/// TaskListBloc com implementação senior:
-/// - Stream para mudanças em tempo real (primeira página)
-/// - Paginação por API para páginas adicionais
-/// - Controle robusto de estado e erro
-/// - Performance otimizada
 class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   final UpdateTaskUseCase _updateTaskUseCase;
   final ListTaskUseCase _listTaskUseCase;
+
+  final SetTaskListStatusPreferencesUseCase _setStatusPreferencesUseCase;
+  final GetTaskListStatusPreferencesUseCase _getStatusUseCase;
+  final SetTaskListTypeFilterPreferencesUsecase
+  _setTypeFilterPreferencesUsecase;
+  final GetTaskListTypeFilterPreferencesUsecase
+  _getTypeFilterPreferencesUsecase;
 
   // Stream management
   StreamSubscription? _taskStreamSubscription;
@@ -34,8 +40,14 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   // Search and filter state
   String? _currentSearch;
 
-  TaskListBloc(this._updateTaskUseCase, this._listTaskUseCase)
-    : super(TaskListState.initial()) {
+  TaskListBloc(
+    this._updateTaskUseCase,
+    this._listTaskUseCase,
+    this._setStatusPreferencesUseCase,
+    this._getStatusUseCase,
+    this._setTypeFilterPreferencesUsecase,
+    this._getTypeFilterPreferencesUsecase,
+  ) : super(TaskListState.initial()) {
     // Core events
     on<LoadTasksEvent>(_onLoadTasks);
     on<LoadMoreTasksEvent>(_onLoadMoreTasks);
@@ -65,7 +77,10 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   }
 
   /// Carrega primeira página + inicia stream para mudanças em tempo real
-  void _onLoadTasks(LoadTasksEvent event, Emitter<TaskListState> emit) {
+  FutureOr<void> _onLoadTasks(
+    LoadTasksEvent event,
+    Emitter<TaskListState> emit,
+  ) async {
     log('[TaskListBloc] Loading initial tasks...');
 
     // Evita múltiplas chamadas simultâneas
@@ -83,6 +98,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         currentPage: 1,
       ),
     );
+
+    await _loadPreferences(emit);
 
     // Cancela stream anterior se existir
     _taskStreamSubscription?.cancel();
@@ -133,6 +150,39 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
             _isLoadingTasks = false;
           },
         );
+  }
+
+  FutureOr<void> _loadPreferences(Emitter<TaskListState> emit) async {
+    // Carrega preferências de status e tipo
+    final statusOutcome = await _getStatusUseCase.execute();
+    statusOutcome.when(
+      success: (status) {
+        log('[TaskListBloc] Loaded status preference: $status');
+        if (status != null) {
+          emit(state.copyWith(statusFilter: status));
+        }
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] Error loading status preference: $error, message: $message',
+        );
+      },
+    );
+
+    final typeOutcome = await _getTypeFilterPreferencesUsecase.execute();
+    typeOutcome.when(
+      success: (types) {
+        log('[TaskListBloc] Loaded type filter preferences: $types');
+        if (types != null) {
+          emit(state.copyWith(typeFilters: types));
+        }
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] Error loading type filter preferences: $error, message: $message',
+        );
+      },
+    );
   }
 
   /// Carrega mais páginas (sem stream - apenas API call)
@@ -463,8 +513,21 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   FutureOr<void> _onTaskListUpdateStatusFilter(
     TaskListUpdateStatusFilterEvent event,
     Emitter<TaskListState> emit,
-  ) {
+  ) async {
     emit(state.copyWith(statusFilter: event.status));
+    final result = await _setStatusPreferencesUseCase.execute(event.status);
+
+    result.when(
+      success: (_) {
+        log('[TaskListBloc] Task status filter saved successfully');
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] Error saving task status filter: $error, message: $message',
+        );
+      },
+    );
+
     add(const LoadTasksEvent());
   }
 
@@ -491,10 +554,22 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   FutureOr<void> _onFilterTasksApply(
     FilterTasksApplyEvent event,
     Emitter<TaskListState> emit,
-  ) {
-    log('[TaskListBloc] Applying filters: types=${event.selectedTypes}');
-
+  ) async {
     emit(state.copyWith(typeFilters: event.selectedTypes));
+    final result = await _setTypeFilterPreferencesUsecase.call(
+      event.selectedTypes,
+    );
+
+    result.when(
+      success: (_) {
+        log('[TaskListBloc] Task type filters saved successfully');
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] Error saving task type filters: $error, message: $message',
+        );
+      },
+    );
 
     // Recarrega as tarefas com os novos filtros
     add(const LoadTasksEvent());

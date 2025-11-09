@@ -1,8 +1,15 @@
 import 'package:flutter_ikanban_app/core/app/app_startup/data/app_startup_repository_impl.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/data/task_list_preferences_repository_impl.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/repository/app_startup_repository.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/repository/task_list_preferences_repository.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/check_onboarding_completed_use_case.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/complete_onboarding_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_status_preferences_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_type_filter_preferences.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_status_preferences_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_type_filter_preferences.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/infra/local/app_startup_data_source.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/infra/local/task_list_preferences_data_source.dart';
 import 'package:flutter_ikanban_app/core/database/app_database.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_service.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
@@ -37,13 +44,42 @@ void setupLocator() {
 
   _setupAppStartupModule();
   _setupThemeModule();
+  _setupPreferenceModule();
   _setupTaskModule();
   _setupSettingsModule();
   _setupCoreServices();
 }
 
+void _setupPreferenceModule() {
+  getIt.registerLazySingleton<TaskListPreferencesLocalDataSource>(
+    () => TaskListPreferencesLocalDataSource(),
+  );
+
+  getIt.registerLazySingleton<TaskListPreferencesRepository>(
+    () => TaskListPreferencesRepositoryImpl(getIt()),
+  );
+
+  getIt.registerLazySingleton<GetTaskListStatusPreferencesUseCase>(
+    () => GetTaskListStatusPreferencesUseCase(getIt()),
+  );
+
+  getIt.registerLazySingleton<SetTaskListStatusPreferencesUseCase>(
+    () => SetTaskListStatusPreferencesUseCase(getIt()),
+  );
+
+  getIt.registerLazySingleton<GetTaskListTypeFilterPreferencesUsecase>(
+    () => GetTaskListTypeFilterPreferencesUsecase(getIt()),
+  );
+
+  getIt.registerLazySingleton<SetTaskListTypeFilterPreferencesUsecase>(
+    () => SetTaskListTypeFilterPreferencesUsecase(getIt()),
+  );
+}
+
 void _setupAppStartupModule() {
-  getIt.registerLazySingleton<AppStartupDataSource>(() => AppStartupDataSource());
+  getIt.registerLazySingleton<AppStartupDataSource>(
+    () => AppStartupDataSource(),
+  );
   getIt.registerLazySingleton<AppStartupRepository>(
     () => AppStartupRepositoryImpl(getIt()),
   );

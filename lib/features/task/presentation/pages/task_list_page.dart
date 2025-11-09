@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_status_preferences_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_type_filter_preferences.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_status_preferences_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_type_filter_preferences.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
 import 'package:flutter_ikanban_app/core/ui/enums/layout_mode.dart';
@@ -7,6 +11,8 @@ import 'package:flutter_ikanban_app/core/ui/widgets/appbar/custom_app_bar.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/snackbars.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/list_task_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/update_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_list_bloc.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/enums/task_layout.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
@@ -25,7 +31,14 @@ class TaskListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => TaskListBloc(getIt.get(), getIt.get()),
+      create: (context) => TaskListBloc(
+        getIt.get<UpdateTaskUseCase>(),
+        getIt.get<ListTaskUseCase>(),
+        getIt.get<SetTaskListStatusPreferencesUseCase>(),
+        getIt.get<GetTaskListStatusPreferencesUseCase>(),
+        getIt.get<SetTaskListTypeFilterPreferencesUsecase>(),
+        getIt.get<GetTaskListTypeFilterPreferencesUsecase>(),
+      ),
       child: const TaskListPageContent(),
     );
   }
@@ -54,16 +67,12 @@ class _TaskListPageContentState extends State<TaskListPageContent>
       initialSelectedTypes: state.typeFilters,
       onApply: (selectedTypes) {
         context.read<TaskListBloc>().add(
-          FilterTasksApplyEvent(
-            selectedTypes: selectedTypes,
-          ),
+          FilterTasksApplyEvent(selectedTypes: selectedTypes),
         );
       },
       onClear: () {
         context.read<TaskListBloc>().add(
-          const FilterTasksApplyEvent(
-            selectedTypes: [],
-          ),
+          const FilterTasksApplyEvent(selectedTypes: []),
         );
       },
     );
@@ -177,7 +186,10 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                 if (typeFilters.isEmpty) return const SizedBox.shrink();
 
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -186,21 +198,22 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                         children: [
                           Text(
                             'Filtros ativos (${typeFilters.length})',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                           TextButton(
                             onPressed: () {
                               context.read<TaskListBloc>().add(
-                                const FilterTasksApplyEvent(
-                                  selectedTypes: [],
-                                ),
+                                const FilterTasksApplyEvent(selectedTypes: []),
                               );
                             },
                             style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
                               minimumSize: Size.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
@@ -234,8 +247,12 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                               color: type.color.withValues(alpha: .3),
                               width: 1,
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
                             visualDensity: VisualDensity.compact,
                           );
                         }).toList(),
