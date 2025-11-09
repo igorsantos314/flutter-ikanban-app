@@ -4,8 +4,10 @@ import 'package:flutter_ikanban_app/core/app/app_startup/domain/repository/app_s
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/repository/task_list_preferences_repository.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/check_onboarding_completed_use_case.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/complete_onboarding_use_case.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_layout_mode_preferences.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_status_preferences_use_case.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_type_filter_preferences.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_layout_mode_preferences.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_status_preferences_use_case.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_type_filter_preferences.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/infra/local/app_startup_data_source.dart';
@@ -73,6 +75,14 @@ void _setupPreferenceModule() {
 
   getIt.registerLazySingleton<SetTaskListTypeFilterPreferencesUsecase>(
     () => SetTaskListTypeFilterPreferencesUsecase(getIt()),
+  );
+
+  getIt.registerLazySingleton<SetLayoutModePreferencesUseCase>(
+    () => SetLayoutModePreferencesUseCase(getIt()),
+  );
+
+  getIt.registerLazySingleton<GetLayoutModePreferencesUseCase>(
+    () => GetLayoutModePreferencesUseCase(getIt()),
   );
 }
 

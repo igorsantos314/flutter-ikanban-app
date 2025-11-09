@@ -4,10 +4,12 @@ import 'package:flutter_ikanban_app/core/app/app_startup/infra/local/task_list_p
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/enums/task_layout.dart';
 
 class TaskListPreferencesRepositoryImpl
     implements TaskListPreferencesRepository {
   final TaskListPreferencesLocalDataSource _dataSource;
+
   TaskListPreferencesRepositoryImpl(this._dataSource);
 
   @override
@@ -50,6 +52,28 @@ class TaskListPreferencesRepositoryImpl
   ) async {
     try {
       await _dataSource.setTaskListTypeFilter(taskTypes);
+      return const Outcome.success();
+    } catch (e) {
+      return Outcome.failure(error: TaskListPreferencesError.genericError());
+    }
+  }
+
+  @override
+  Future<Outcome<TaskLayout, TaskListPreferencesError>> getLayoutMode() async {
+    try {
+      final layoutMode = await _dataSource.getLayoutMode();
+      return Outcome.success(value: layoutMode);
+    } catch (e) {
+      return Outcome.failure(error: TaskListPreferencesError.genericError());
+    }
+  }
+
+  @override
+  Future<Outcome<void, TaskListPreferencesError>> setLayoutMode(
+    TaskLayout layoutMode,
+  ) async {
+    try {
+      await _dataSource.setLayoutMode(layoutMode);
       return const Outcome.success();
     } catch (e) {
       return Outcome.failure(error: TaskListPreferencesError.genericError());

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_layout_mode_preferences.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_status_preferences_use_case.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_type_filter_preferences.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_layout_mode_preferences.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_status_preferences_use_case.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_type_filter_preferences.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
@@ -38,6 +40,8 @@ class TaskListPage extends StatelessWidget {
         getIt.get<GetTaskListStatusPreferencesUseCase>(),
         getIt.get<SetTaskListTypeFilterPreferencesUsecase>(),
         getIt.get<GetTaskListTypeFilterPreferencesUsecase>(),
+        getIt.get<SetLayoutModePreferencesUseCase>(),
+        getIt.get<GetLayoutModePreferencesUseCase>(),
       ),
       child: const TaskListPageContent(),
     );

@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_layout_mode_preferences.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_status_preferences_use_case.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_task_list_type_filter_preferences.dart';
+import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_layout_mode_preferences.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_status_preferences_use_case.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_type_filter_preferences.dart';
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
@@ -28,6 +30,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   _setTypeFilterPreferencesUsecase;
   final GetTaskListTypeFilterPreferencesUsecase
   _getTypeFilterPreferencesUsecase;
+  final SetLayoutModePreferencesUseCase _setLayoutModePreferencesUsecase;
+  final GetLayoutModePreferencesUseCase _getLayoutModePreferencesUsecase;
 
   // Stream management
   StreamSubscription? _taskStreamSubscription;
@@ -47,6 +51,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     this._getStatusUseCase,
     this._setTypeFilterPreferencesUsecase,
     this._getTypeFilterPreferencesUsecase,
+    this._setLayoutModePreferencesUsecase,
+    this._getLayoutModePreferencesUsecase,
   ) : super(TaskListState.initial()) {
     // Core events
     on<LoadTasksEvent>(_onLoadTasks);
@@ -180,6 +186,21 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
       failure: (error, message, throwable) {
         log(
           '[TaskListBloc] Error loading type filter preferences: $error, message: $message',
+        );
+      },
+    );
+
+    final layoutOutcome = await _getLayoutModePreferencesUsecase.execute();
+    layoutOutcome.when(
+      success: (layout) {
+        log('[TaskListBloc] Loaded layout mode preference: $layout');
+        if (layout != null) {
+          emit(state.copyWith(layoutMode: layout));
+        }
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] Error loading layout mode preference: $error, message: $message',
         );
       },
     );
@@ -534,13 +555,24 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   FutureOr<void> _onToggleLayoutMode(
     ToggleLayoutModeEvent event,
     Emitter<TaskListState> emit,
-  ) {
-    emit(
-      state.copyWith(
-        layoutMode: state.layoutMode == TaskLayout.list
-            ? TaskLayout.grid
-            : TaskLayout.list,
-      ),
+  ) async {
+    final newLayout = state.layoutMode == TaskLayout.list
+        ? TaskLayout.grid
+        : TaskLayout.list;
+
+    emit(state.copyWith(layoutMode: newLayout));
+
+    final result = await _setLayoutModePreferencesUsecase.execute(newLayout);
+
+    result.when(
+      success: (_) {
+        log('[TaskListBloc] Layout mode preference saved successfully');
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] Error saving layout mode preference: $error, message: $message',
+        );
+      },
     );
   }
 
