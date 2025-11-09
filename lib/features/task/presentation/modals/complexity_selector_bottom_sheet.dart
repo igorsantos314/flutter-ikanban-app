@@ -10,7 +10,7 @@ class ComplexitySelectorBottomSheet extends StatelessWidget {
     required this.selectedComplexity,
     required this.onComplexitySelected,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -63,12 +63,18 @@ class ComplexitySelectorBottomSheet extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: isSelected 
+                          color: isSelected
                               ? complexity.color.withValues(alpha: 0.1)
-                              : theme.colorScheme.surface.withValues(alpha: 0.1),
+                              : theme.colorScheme.surface.withValues(
+                                  alpha: 0.1,
+                                ),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: isSelected ? complexity.color : theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                            color: isSelected
+                                ? complexity.color
+                                : theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.3,
+                                  ),
                             width: isSelected ? 2 : 1,
                           ),
                         ),
@@ -89,8 +95,8 @@ class ComplexitySelectorBottomSheet extends StatelessWidget {
                                       Text(
                                         complexity.displayName,
                                         style: TextStyle(
-                                          fontWeight: isSelected 
-                                              ? FontWeight.bold 
+                                          fontWeight: isSelected
+                                              ? FontWeight.bold
                                               : FontWeight.normal,
                                           color: complexity.color,
                                         ),
@@ -102,8 +108,12 @@ class ComplexitySelectorBottomSheet extends StatelessWidget {
                                           vertical: 2,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: complexity.color.withValues(alpha: 0.2),
-                                          borderRadius: BorderRadius.circular(12),
+                                          color: complexity.color.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                         ),
                                         child: Text(
                                           '${complexity.suggestedStoryPoints} pts',
@@ -120,17 +130,15 @@ class ComplexitySelectorBottomSheet extends StatelessWidget {
                                     complexity.description,
                                     style: TextStyle(
                                       fontSize: 11,
-                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.7),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                             if (isSelected)
-                              Icon(
-                                Icons.check_circle,
-                                color: complexity.color,
-                              ),
+                              Icon(Icons.check_circle, color: complexity.color),
                           ],
                         ),
                       ),
@@ -163,6 +171,7 @@ class ComplexitySelectorBottomSheet extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      useSafeArea: true,
       builder: (context) => Container(
         decoration: BoxDecoration(
           color: colorScheme.surface,

@@ -19,7 +19,7 @@ class FilterSelectorBottomSheet extends StatefulWidget {
     required Function(List<TaskType>) onApply,
     VoidCallback? onClear,
   }) async {
-    return showModalBottomSheet<void>(
+    return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -30,6 +30,7 @@ class FilterSelectorBottomSheet extends StatefulWidget {
         onApply: onApply,
         onClear: onClear,
       ),
+      useSafeArea: true
     );
   }
 

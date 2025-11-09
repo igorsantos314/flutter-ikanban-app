@@ -148,9 +148,6 @@ class _TaskListPageContentState extends State<TaskListPageContent>
           onSubmit: (query) {
             context.read<TaskListBloc>().add(SearchTasksEvent(query: query));
           },
-          onFilter: () {
-            context.read<TaskListBloc>().add(const FilterTasksClickEvent());
-          },
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {

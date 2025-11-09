@@ -161,6 +161,7 @@ class PrioritySelectorBottomSheet extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      useSafeArea: true,
       builder: (context) => Container(
         decoration: BoxDecoration(
           color: colorScheme.surface,
