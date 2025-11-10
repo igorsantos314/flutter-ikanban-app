@@ -4,8 +4,6 @@ import 'package:flutter_ikanban_app/features/task/domain/enums/tasks_order_by.da
 extension SortFieldExtension on SortField {
   String get fieldName {
     switch (this) {
-      case SortField.id:
-        return 'id';
       case SortField.title:
         return 'title';
       case SortField.status:
@@ -25,8 +23,6 @@ extension SortFieldExtension on SortField {
 
   String get displayName {
     switch (this) {
-      case SortField.id:
-        return 'ID';
       case SortField.title:
         return 'Título';
       case SortField.status:
@@ -46,8 +42,6 @@ extension SortFieldExtension on SortField {
 
   IconData get icon {
     switch (this) {
-      case SortField.id:
-        return Icons.tag;
       case SortField.title:
         return Icons.title;
       case SortField.status:
@@ -67,8 +61,6 @@ extension SortFieldExtension on SortField {
 
   String get description {
     switch (this) {
-      case SortField.id:
-        return 'Ordenar pelo identificador único';
       case SortField.title:
         return 'Ordenar alfabeticamente pelo título';
       case SortField.status:
