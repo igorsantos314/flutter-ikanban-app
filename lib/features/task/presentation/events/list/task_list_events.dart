@@ -1,5 +1,6 @@
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/tasks_order_by.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/shared/task_shared_events.dart';
 
@@ -95,6 +96,11 @@ class ToggleLayoutModeEvent extends TaskEvent {
   const ToggleLayoutModeEvent();
 }
 
+class ToggleTaskItemSizeEvent extends TaskEvent {
+  const ToggleTaskItemSizeEvent();
+}
+
+
 class FilterTasksClickEvent extends TaskEvent {
   const FilterTasksClickEvent();
 }
@@ -108,4 +114,21 @@ class FilterTasksApplyEvent extends TaskEvent {
 
   @override
   List<Object> get props => [selectedTypes];
+}
+
+class SortTasksClickEvent extends TaskEvent {
+  const SortTasksClickEvent();
+}
+
+class ApplySortEvent extends TaskEvent {
+  final SortField sortBy;
+  final SortOrder sortOrder;
+
+  const ApplySortEvent({
+    required this.sortBy,
+    required this.sortOrder,
+  });
+
+  @override
+  List<Object> get props => [sortBy, sortOrder];
 }

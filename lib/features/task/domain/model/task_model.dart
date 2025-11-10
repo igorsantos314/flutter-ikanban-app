@@ -20,5 +20,6 @@ abstract class TaskModel with _$TaskModel {
     @Default(TaskType.personal) TaskType type,
     @Default(TaskColors.defaultColor) TaskColors color,
     @Default(true) bool isActive,
+    required DateTime createdAt,
   }) = _TaskModel;
 }

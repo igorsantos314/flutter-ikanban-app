@@ -13,6 +13,7 @@ import 'package:flutter_ikanban_app/core/ui/widgets/appbar/custom_app_bar.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/snackbars.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/tasks_order_by.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/list_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/update_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_list_bloc.dart';
@@ -20,11 +21,11 @@ import 'package:flutter_ikanban_app/features/task/presentation/enums/task_layout
 import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/list/task_list_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/filter_selector_bottom_sheet.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/modals/sort_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/states/list/task_list_state.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/status_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/task_form_selectors_mixin.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_item_list.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_list_layout_mode.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_status_filter.dart';
 
 class TaskListPage extends StatelessWidget {
@@ -77,6 +78,18 @@ class _TaskListPageContentState extends State<TaskListPageContent>
       onClear: () {
         context.read<TaskListBloc>().add(
           const FilterTasksApplyEvent(selectedTypes: []),
+        );
+      },
+    );
+  }
+
+  void _showSortModal(BuildContext context, TaskListState state) {
+    SortSelectorBottomSheet.show(
+      context: context,
+      initialSort: SortOption(field: state.sortBy, order: state.sortOrder),
+      onApply: (sortOption) {
+        context.read<TaskListBloc>().add(
+          ApplySortEvent(sortBy: sortOption.field, sortOrder: sortOption.order),
         );
       },
     );
@@ -139,6 +152,18 @@ class _TaskListPageContentState extends State<TaskListPageContent>
               _showFilterModal(context, state);
               context.read<TaskListBloc>().add(
                 const TaskFormResetEvent(showFilterOptions: false),
+              );
+            }
+          },
+        ),
+        BlocListener<TaskListBloc, TaskListState>(
+          listenWhen: (previous, current) =>
+              previous.showSortOptions != current.showSortOptions,
+          listener: (context, state) {
+            if (state.showSortOptions) {
+              _showSortModal(context, state);
+              context.read<TaskListBloc>().add(
+                const TaskFormResetEvent(showSortOptions: false),
               );
             }
           },
@@ -323,59 +348,39 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                         const RefreshTasksEvent(),
                       );
                     },
-                    child: Column(
-                      children: [
-                        // Layout Toggle
-                        Row(
-                          children: [
-                            const SizedBox(width: 8),
-                            IconButton(
-                              onPressed: () {
-                                context.read<TaskListBloc>().add(
-                                  const FilterTasksClickEvent(),
-                                );
-                              },
-                              icon: const Icon(Icons.filter_list),
-                            ),
-                            const SizedBox(width: 8),
-                            TaskListLayoutMode(
-                              taskLayout: state.layoutMode,
-                              onToggle: () {
-                                context.read<TaskListBloc>().add(
-                                  const ToggleLayoutModeEvent(),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Expanded(
-                          child: state.layoutMode == TaskLayout.grid
-                              ? GridView.builder(
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                        mainAxisSpacing: 8.0,
-                                        crossAxisCount:
-                                            state.layoutMode == TaskLayout.list
-                                            ? 1
-                                            : 2,
-                                        childAspectRatio: 1.0,
-                                      ),
-                                  itemCount:
-                                      state.tasks.length +
-                                      (state.hasMorePages ? 1 : 0),
-                                  itemBuilder: (context, index) =>
-                                      _taskItemBuilder(context, state, index),
-                                )
-                              : ListView.builder(
-                                  itemCount:
-                                      state.tasks.length +
-                                      (state.hasMorePages ? 1 : 0),
-                                  itemBuilder: (context, index) =>
-                                      _taskItemBuilder(context, state, index),
-                                ),
-                        ),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          // Layout Toggle
+                          _buildOptions(theme),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: state.layoutMode == TaskLayout.grid
+                                ? GridView.builder(
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                          mainAxisSpacing: 8.0,
+                                          crossAxisSpacing: 8.0,
+                                          crossAxisCount: 2,
+                                          childAspectRatio: 1.2,
+                                        ),
+                                    itemCount:
+                                        state.tasks.length +
+                                        (state.hasMorePages ? 1 : 0),
+                                    itemBuilder: (context, index) =>
+                                        _taskItemBuilder(context, state, index),
+                                  )
+                                : ListView.builder(
+                                    itemCount:
+                                        state.tasks.length +
+                                        (state.hasMorePages ? 1 : 0),
+                                    itemBuilder: (context, index) =>
+                                        _taskItemBuilder(context, state, index),
+                                  ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -440,5 +445,104 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         },
       );
     }
+  }
+
+  Widget _buildOptions(ThemeData theme) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 2.0),
+            child: Text(
+              'Opções:',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Filter Button
+                GestureDetector(
+                  onTap: () {
+                    context.read<TaskListBloc>().add(
+                      const FilterTasksClickEvent(),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: theme.colorScheme.onSurface.withAlpha(30),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.filter_list),
+                        const SizedBox(width: 4),
+                        Text('Filtrar'),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+
+                // Sort Button
+                GestureDetector(
+                  onTap: () {
+                    context.read<TaskListBloc>().add(
+                      const SortTasksClickEvent(),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: theme.colorScheme.onSurface.withAlpha(30),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.sort),
+                        const SizedBox(width: 4),
+                        Text('Ordenar por'),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Toggle Layout Mode
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    context.read<TaskListBloc>().add(ToggleLayoutModeEvent());
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: theme.colorScheme.onSurface.withAlpha(30),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.view_module),
+                        const SizedBox(width: 4),
+                        Text('Layout'),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

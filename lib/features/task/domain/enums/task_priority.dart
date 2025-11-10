@@ -99,4 +99,21 @@ extension TaskPriorityExtension on TaskPriority {
         return 'Crítico, fazer imediatamente!';
     }
   }
+
+  int get priorityValue {
+    switch (this) {
+      case TaskPriority.lowest:
+        return 0;
+      case TaskPriority.low:
+        return 10;
+      case TaskPriority.medium:
+        return 20;
+      case TaskPriority.high:
+        return 30;
+      case TaskPriority.highest:
+        return 40;
+      case TaskPriority.critical:
+        return 50;
+    }
+  }
 }

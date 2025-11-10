@@ -7,12 +7,14 @@ import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/tasks_order_by.dart';
 import 'package:flutter_ikanban_app/features/task/infra/local/tables/task_table_entity.dart';
 
 part 'task_local_data_source.g.dart';
 
 @DriftAccessor(tables: [TaskEntity])
-class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocalDataSourceMixin {
+class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
+    with _$TaskLocalDataSourceMixin {
   final AppDatabase db;
 
   TaskLocalDataSource(this.db) : super(db);
@@ -26,7 +28,9 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
   }
 
   Future<TaskData?> getTaskById(int id) {
-    return (select(db.taskEntity)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+    return (select(
+      db.taskEntity,
+    )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
 
   Future<bool> updateTask(TaskEntityCompanion task) {
@@ -43,7 +47,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
     String? search,
     DateTime? startDate,
     DateTime? endDate,
-    String? orderBy,
+    SortField? orderBy,
     TaskStatus? status,
     TaskPriority? priority,
     TaskComplexity? complexity,
@@ -58,7 +62,9 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
     }
 
     if (search != null && search.isNotEmpty) {
-      query.where((tbl) => tbl.title.contains(search) | tbl.description.contains(search));
+      query.where(
+        (tbl) => tbl.title.contains(search) | tbl.description.contains(search),
+      );
     }
 
     if (startDate != null) {
@@ -74,25 +80,20 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
     }
 
     if (priority != null) {
-      query.where((tbl) => tbl.priority.equals(priority.name));
+      query.where((tbl) => tbl.priority.equals(priority.priorityValue));
     }
 
     if (complexity != null) {
-      query.where((tbl) => tbl.complexity.equals(complexity.name));
+      query.where((tbl) => tbl.complexity.equals(complexity.complexityValue));
     }
 
     if (type != null) {
-      query.where((tbl) => tbl.type.isIn(type.map((e) => e.name)));
+      query.where((tbl) => tbl.type.isIn(type.map((e) => e.typeValue)));
     }
 
-    if (orderBy != null) {
-      final column = db.taskEntity.$columns.firstWhere(
-        (col) => col.$name == orderBy,
-        orElse: () => db.taskEntity.id,
-      );
-      query.orderBy([(tbl) => ascending ? OrderingTerm.asc(column) : OrderingTerm.desc(column)]);
-    }
-    
+    final column = _getOrderByColumn(orderBy, ascending);
+    query.orderBy([(tbl) => column]);
+
     await for (final items in query.watch().map((rows) {
       final start = (page - 1) * limitPerPage;
       final end = start + limitPerPage;
@@ -107,8 +108,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
         final description = db.taskEntity.description;
         final title = db.taskEntity.title;
         final searchExpression =
-            description.like('%$search%') |
-            title.like('%$search%');
+            description.like('%$search%') | title.like('%$search%');
         totalItemsQuery.where(searchExpression);
       }
 
@@ -125,35 +125,23 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
       }
 
       if (status != null) {
-        totalItemsQuery.where(
-          db.taskEntity.status.equals(status.name),
-        );
+        totalItemsQuery.where(db.taskEntity.status.equals(status.name));
       }
       if (priority != null) {
-        totalItemsQuery.where(
-          db.taskEntity.priority.equals(priority.name),
-        );
+        totalItemsQuery.where(db.taskEntity.priority.equals(priority.priorityValue));
       }
       if (complexity != null) {
-        totalItemsQuery.where(
-          db.taskEntity.complexity.equals(complexity.name),
-        );
+        totalItemsQuery.where(db.taskEntity.complexity.equals(complexity.complexityValue));
       }
       if (type != null) {
-        totalItemsQuery.where(
-          db.taskEntity.type.isIn(type.map((e) => e.name)),
-        );
-      } 
+        totalItemsQuery.where(db.taskEntity.type.isIn(type.map((e) => e.typeValue)));
+      }
       if (onlyActive) {
-        totalItemsQuery.where(
-          db.taskEntity.isActive.equals(true),
-        );
+        totalItemsQuery.where(db.taskEntity.isActive.equals(true));
       }
 
       final totalItems =
-          (await totalItemsQuery.getSingle()).read(
-            db.taskEntity.id.count(),
-          ) ??
+          (await totalItemsQuery.getSingle()).read(db.taskEntity.id.count()) ??
           0;
 
       log("Total items for current filters: $totalItems");
@@ -174,5 +162,19 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase> with _$TaskLocal
         await into(db.taskEntity).insert(entity);
       }
     });
+  }
+
+  OrderingTerm _getOrderByColumn(SortField? orderBy, bool ascending) {
+    final orderByColumn = switch (orderBy) {
+      SortField.title => db.taskEntity.title,
+      SortField.dueDate => db.taskEntity.dueDate,
+      SortField.priority => db.taskEntity.priority,
+      SortField.complexity => db.taskEntity.complexity,
+      SortField.createdAt => db.taskEntity.createdAt,
+      _ => db.taskEntity.id,
+    };
+    return ascending
+        ? OrderingTerm.asc(orderByColumn)
+        : OrderingTerm.desc(orderByColumn);
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart'
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/enums/task_size.dart';
 
 class TaskItemList extends StatelessWidget {
   final TaskModel task;
@@ -16,6 +17,7 @@ class TaskItemList extends StatelessWidget {
   final Color? cardColor;
   final Color? borderColor;
   final LayoutMode layoutMode;
+  final TaskSize taskSize;
 
   const TaskItemList({
     super.key,
@@ -27,6 +29,7 @@ class TaskItemList extends StatelessWidget {
     this.cardColor,
     this.borderColor,
     this.layoutMode = LayoutMode.fullWidth,
+    this.taskSize = TaskSize.comfortable,
   });
 
   @override
@@ -61,7 +64,6 @@ class TaskItemList extends StatelessWidget {
     }
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       color: cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

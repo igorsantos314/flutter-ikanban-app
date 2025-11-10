@@ -56,12 +56,12 @@ class $TaskEntityTable extends TaskEntity
         requiredDuringInsert: true,
       ).withConverter<TaskStatus>($TaskEntityTable.$converterstatus);
   @override
-  late final GeneratedColumnWithTypeConverter<TaskPriority, String> priority =
-      GeneratedColumn<String>(
+  late final GeneratedColumnWithTypeConverter<TaskPriority, int> priority =
+      GeneratedColumn<int>(
         'priority',
         aliasedName,
         false,
-        type: DriftSqlType.string,
+        type: DriftSqlType.int,
         requiredDuringInsert: true,
       ).withConverter<TaskPriority>($TaskEntityTable.$converterpriority);
   static const VerificationMeta _dueDateMeta = const VerificationMeta(
@@ -76,14 +76,14 @@ class $TaskEntityTable extends TaskEntity
     requiredDuringInsert: false,
   );
   @override
-  late final GeneratedColumnWithTypeConverter<TaskComplexity, String>
-  complexity = GeneratedColumn<String>(
-    'complexity',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  ).withConverter<TaskComplexity>($TaskEntityTable.$convertercomplexity);
+  late final GeneratedColumnWithTypeConverter<TaskComplexity, int> complexity =
+      GeneratedColumn<int>(
+        'complexity',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<TaskComplexity>($TaskEntityTable.$convertercomplexity);
   @override
   late final GeneratedColumnWithTypeConverter<TaskColors, String> color =
       GeneratedColumn<String>(
@@ -94,12 +94,12 @@ class $TaskEntityTable extends TaskEntity
         requiredDuringInsert: true,
       ).withConverter<TaskColors>($TaskEntityTable.$convertercolor);
   @override
-  late final GeneratedColumnWithTypeConverter<TaskType, String> type =
-      GeneratedColumn<String>(
+  late final GeneratedColumnWithTypeConverter<TaskType, int> type =
+      GeneratedColumn<int>(
         'type',
         aliasedName,
         false,
-        type: DriftSqlType.string,
+        type: DriftSqlType.int,
         requiredDuringInsert: true,
       ).withConverter<TaskType>($TaskEntityTable.$convertertype);
   static const VerificationMeta _isActiveMeta = const VerificationMeta(
@@ -117,6 +117,18 @@ class $TaskEntityTable extends TaskEntity
     ),
     defaultValue: const Constant(true),
   );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -129,6 +141,7 @@ class $TaskEntityTable extends TaskEntity
     color,
     type,
     isActive,
+    createdAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -174,6 +187,12 @@ class $TaskEntityTable extends TaskEntity
         isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
       );
     }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
     return context;
   }
 
@@ -203,7 +222,7 @@ class $TaskEntityTable extends TaskEntity
       ),
       priority: $TaskEntityTable.$converterpriority.fromSql(
         attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
+          DriftSqlType.int,
           data['${effectivePrefix}priority'],
         )!,
       ),
@@ -213,7 +232,7 @@ class $TaskEntityTable extends TaskEntity
       ),
       complexity: $TaskEntityTable.$convertercomplexity.fromSql(
         attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
+          DriftSqlType.int,
           data['${effectivePrefix}complexity'],
         )!,
       ),
@@ -225,13 +244,17 @@ class $TaskEntityTable extends TaskEntity
       ),
       type: $TaskEntityTable.$convertertype.fromSql(
         attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
+          DriftSqlType.int,
           data['${effectivePrefix}type'],
         )!,
       ),
       isActive: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
       )!,
     );
   }
@@ -243,14 +266,15 @@ class $TaskEntityTable extends TaskEntity
 
   static TypeConverter<TaskStatus, String> $converterstatus =
       GenericSqlTypeConverter(TaskStatus.values);
-  static TypeConverter<TaskPriority, String> $converterpriority =
-      GenericSqlTypeConverter(TaskPriority.values);
-  static TypeConverter<TaskComplexity, String> $convertercomplexity =
-      GenericSqlTypeConverter(TaskComplexity.values);
+  static TypeConverter<TaskPriority, int> $converterpriority =
+      PrioritySqlConverter();
+  static TypeConverter<TaskComplexity, int> $convertercomplexity =
+      ComplexitySqlConverter();
   static TypeConverter<TaskColors, String> $convertercolor =
       GenericSqlTypeConverter(TaskColors.values);
-  static TypeConverter<TaskType, String> $convertertype =
-      GenericSqlTypeConverter(TaskType.values);
+  static TypeConverter<TaskType, int> $convertertype = GenericSqlIntConverter(
+    TaskType.values,
+  );
 }
 
 class TaskData extends DataClass implements Insertable<TaskData> {
@@ -264,6 +288,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
   final TaskColors color;
   final TaskType type;
   final bool isActive;
+  final DateTime createdAt;
   const TaskData({
     required this.id,
     required this.title,
@@ -275,6 +300,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     required this.color,
     required this.type,
     required this.isActive,
+    required this.createdAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -290,7 +316,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       );
     }
     {
-      map['priority'] = Variable<String>(
+      map['priority'] = Variable<int>(
         $TaskEntityTable.$converterpriority.toSql(priority),
       );
     }
@@ -298,7 +324,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       map['due_date'] = Variable<DateTime>(dueDate);
     }
     {
-      map['complexity'] = Variable<String>(
+      map['complexity'] = Variable<int>(
         $TaskEntityTable.$convertercomplexity.toSql(complexity),
       );
     }
@@ -308,11 +334,10 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       );
     }
     {
-      map['type'] = Variable<String>(
-        $TaskEntityTable.$convertertype.toSql(type),
-      );
+      map['type'] = Variable<int>($TaskEntityTable.$convertertype.toSql(type));
     }
     map['is_active'] = Variable<bool>(isActive);
+    map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
 
@@ -332,6 +357,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       color: Value(color),
       type: Value(type),
       isActive: Value(isActive),
+      createdAt: Value(createdAt),
     );
   }
 
@@ -351,6 +377,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       color: serializer.fromJson<TaskColors>(json['color']),
       type: serializer.fromJson<TaskType>(json['type']),
       isActive: serializer.fromJson<bool>(json['isActive']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
   @override
@@ -367,6 +394,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       'color': serializer.toJson<TaskColors>(color),
       'type': serializer.toJson<TaskType>(type),
       'isActive': serializer.toJson<bool>(isActive),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
@@ -381,6 +409,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     TaskColors? color,
     TaskType? type,
     bool? isActive,
+    DateTime? createdAt,
   }) => TaskData(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -392,6 +421,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     color: color ?? this.color,
     type: type ?? this.type,
     isActive: isActive ?? this.isActive,
+    createdAt: createdAt ?? this.createdAt,
   );
   TaskData copyWithCompanion(TaskEntityCompanion data) {
     return TaskData(
@@ -409,6 +439,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       color: data.color.present ? data.color.value : this.color,
       type: data.type.present ? data.type.value : this.type,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
 
@@ -424,7 +455,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           ..write('complexity: $complexity, ')
           ..write('color: $color, ')
           ..write('type: $type, ')
-          ..write('isActive: $isActive')
+          ..write('isActive: $isActive, ')
+          ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
@@ -441,6 +473,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     color,
     type,
     isActive,
+    createdAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -455,7 +488,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           other.complexity == this.complexity &&
           other.color == this.color &&
           other.type == this.type &&
-          other.isActive == this.isActive);
+          other.isActive == this.isActive &&
+          other.createdAt == this.createdAt);
 }
 
 class TaskEntityCompanion extends UpdateCompanion<TaskData> {
@@ -469,6 +503,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
   final Value<TaskColors> color;
   final Value<TaskType> type;
   final Value<bool> isActive;
+  final Value<DateTime> createdAt;
   const TaskEntityCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -480,6 +515,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     this.color = const Value.absent(),
     this.type = const Value.absent(),
     this.isActive = const Value.absent(),
+    this.createdAt = const Value.absent(),
   });
   TaskEntityCompanion.insert({
     this.id = const Value.absent(),
@@ -492,6 +528,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     required TaskColors color,
     required TaskType type,
     this.isActive = const Value.absent(),
+    this.createdAt = const Value.absent(),
   }) : title = Value(title),
        status = Value(status),
        priority = Value(priority),
@@ -503,12 +540,13 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Expression<String>? title,
     Expression<String>? description,
     Expression<String>? status,
-    Expression<String>? priority,
+    Expression<int>? priority,
     Expression<DateTime>? dueDate,
-    Expression<String>? complexity,
+    Expression<int>? complexity,
     Expression<String>? color,
-    Expression<String>? type,
+    Expression<int>? type,
     Expression<bool>? isActive,
+    Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -521,6 +559,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       if (color != null) 'color': color,
       if (type != null) 'type': type,
       if (isActive != null) 'is_active': isActive,
+      if (createdAt != null) 'created_at': createdAt,
     });
   }
 
@@ -535,6 +574,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Value<TaskColors>? color,
     Value<TaskType>? type,
     Value<bool>? isActive,
+    Value<DateTime>? createdAt,
   }) {
     return TaskEntityCompanion(
       id: id ?? this.id,
@@ -547,6 +587,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       color: color ?? this.color,
       type: type ?? this.type,
       isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -568,7 +609,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       );
     }
     if (priority.present) {
-      map['priority'] = Variable<String>(
+      map['priority'] = Variable<int>(
         $TaskEntityTable.$converterpriority.toSql(priority.value),
       );
     }
@@ -576,7 +617,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       map['due_date'] = Variable<DateTime>(dueDate.value);
     }
     if (complexity.present) {
-      map['complexity'] = Variable<String>(
+      map['complexity'] = Variable<int>(
         $TaskEntityTable.$convertercomplexity.toSql(complexity.value),
       );
     }
@@ -586,12 +627,15 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       );
     }
     if (type.present) {
-      map['type'] = Variable<String>(
+      map['type'] = Variable<int>(
         $TaskEntityTable.$convertertype.toSql(type.value),
       );
     }
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
     return map;
   }
@@ -608,7 +652,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
           ..write('complexity: $complexity, ')
           ..write('color: $color, ')
           ..write('type: $type, ')
-          ..write('isActive: $isActive')
+          ..write('isActive: $isActive, ')
+          ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
@@ -1100,6 +1145,7 @@ typedef $$TaskEntityTableCreateCompanionBuilder =
       required TaskColors color,
       required TaskType type,
       Value<bool> isActive,
+      Value<DateTime> createdAt,
     });
 typedef $$TaskEntityTableUpdateCompanionBuilder =
     TaskEntityCompanion Function({
@@ -1113,6 +1159,7 @@ typedef $$TaskEntityTableUpdateCompanionBuilder =
       Value<TaskColors> color,
       Value<TaskType> type,
       Value<bool> isActive,
+      Value<DateTime> createdAt,
     });
 
 class $$TaskEntityTableFilterComposer
@@ -1145,7 +1192,7 @@ class $$TaskEntityTableFilterComposer
         builder: (column) => ColumnWithTypeConverterFilters(column),
       );
 
-  ColumnWithTypeConverterFilters<TaskPriority, TaskPriority, String>
+  ColumnWithTypeConverterFilters<TaskPriority, TaskPriority, int>
   get priority => $composableBuilder(
     column: $table.priority,
     builder: (column) => ColumnWithTypeConverterFilters(column),
@@ -1156,7 +1203,7 @@ class $$TaskEntityTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<TaskComplexity, TaskComplexity, String>
+  ColumnWithTypeConverterFilters<TaskComplexity, TaskComplexity, int>
   get complexity => $composableBuilder(
     column: $table.complexity,
     builder: (column) => ColumnWithTypeConverterFilters(column),
@@ -1168,7 +1215,7 @@ class $$TaskEntityTableFilterComposer
         builder: (column) => ColumnWithTypeConverterFilters(column),
       );
 
-  ColumnWithTypeConverterFilters<TaskType, TaskType, String> get type =>
+  ColumnWithTypeConverterFilters<TaskType, TaskType, int> get type =>
       $composableBuilder(
         column: $table.type,
         builder: (column) => ColumnWithTypeConverterFilters(column),
@@ -1176,6 +1223,11 @@ class $$TaskEntityTableFilterComposer
 
   ColumnFilters<bool> get isActive => $composableBuilder(
     column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1209,7 +1261,7 @@ class $$TaskEntityTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get priority => $composableBuilder(
+  ColumnOrderings<int> get priority => $composableBuilder(
     column: $table.priority,
     builder: (column) => ColumnOrderings(column),
   );
@@ -1219,7 +1271,7 @@ class $$TaskEntityTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get complexity => $composableBuilder(
+  ColumnOrderings<int> get complexity => $composableBuilder(
     column: $table.complexity,
     builder: (column) => ColumnOrderings(column),
   );
@@ -1229,13 +1281,18 @@ class $$TaskEntityTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get type => $composableBuilder(
+  ColumnOrderings<int> get type => $composableBuilder(
     column: $table.type,
     builder: (column) => ColumnOrderings(column),
   );
 
   ColumnOrderings<bool> get isActive => $composableBuilder(
     column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -1263,13 +1320,13 @@ class $$TaskEntityTableAnnotationComposer
   GeneratedColumnWithTypeConverter<TaskStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<TaskPriority, String> get priority =>
+  GeneratedColumnWithTypeConverter<TaskPriority, int> get priority =>
       $composableBuilder(column: $table.priority, builder: (column) => column);
 
   GeneratedColumn<DateTime> get dueDate =>
       $composableBuilder(column: $table.dueDate, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<TaskComplexity, String> get complexity =>
+  GeneratedColumnWithTypeConverter<TaskComplexity, int> get complexity =>
       $composableBuilder(
         column: $table.complexity,
         builder: (column) => column,
@@ -1278,11 +1335,14 @@ class $$TaskEntityTableAnnotationComposer
   GeneratedColumnWithTypeConverter<TaskColors, String> get color =>
       $composableBuilder(column: $table.color, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<TaskType, String> get type =>
+  GeneratedColumnWithTypeConverter<TaskType, int> get type =>
       $composableBuilder(column: $table.type, builder: (column) => column);
 
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
 
 class $$TaskEntityTableTableManager
@@ -1323,6 +1383,7 @@ class $$TaskEntityTableTableManager
                 Value<TaskColors> color = const Value.absent(),
                 Value<TaskType> type = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
               }) => TaskEntityCompanion(
                 id: id,
                 title: title,
@@ -1334,6 +1395,7 @@ class $$TaskEntityTableTableManager
                 color: color,
                 type: type,
                 isActive: isActive,
+                createdAt: createdAt,
               ),
           createCompanionCallback:
               ({
@@ -1347,6 +1409,7 @@ class $$TaskEntityTableTableManager
                 required TaskColors color,
                 required TaskType type,
                 Value<bool> isActive = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
               }) => TaskEntityCompanion.insert(
                 id: id,
                 title: title,
@@ -1358,6 +1421,7 @@ class $$TaskEntityTableTableManager
                 color: color,
                 type: type,
                 isActive: isActive,
+                createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
