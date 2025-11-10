@@ -80,15 +80,15 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
     }
 
     if (priority != null) {
-      query.where((tbl) => tbl.priority.equals(priority.name));
+      query.where((tbl) => tbl.priority.equals(priority.priorityValue));
     }
 
     if (complexity != null) {
-      query.where((tbl) => tbl.complexity.equals(complexity.name));
+      query.where((tbl) => tbl.complexity.equals(complexity.complexityValue));
     }
 
     if (type != null) {
-      query.where((tbl) => tbl.type.isIn(type.map((e) => e.name)));
+      query.where((tbl) => tbl.type.isIn(type.map((e) => e.typeValue)));
     }
 
     final column = _getOrderByColumn(orderBy, ascending);
@@ -128,13 +128,13 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
         totalItemsQuery.where(db.taskEntity.status.equals(status.name));
       }
       if (priority != null) {
-        totalItemsQuery.where(db.taskEntity.priority.equals(priority.name));
+        totalItemsQuery.where(db.taskEntity.priority.equals(priority.priorityValue));
       }
       if (complexity != null) {
-        totalItemsQuery.where(db.taskEntity.complexity.equals(complexity.name));
+        totalItemsQuery.where(db.taskEntity.complexity.equals(complexity.complexityValue));
       }
       if (type != null) {
-        totalItemsQuery.where(db.taskEntity.type.isIn(type.map((e) => e.name)));
+        totalItemsQuery.where(db.taskEntity.type.isIn(type.map((e) => e.typeValue)));
       }
       if (onlyActive) {
         totalItemsQuery.where(db.taskEntity.isActive.equals(true));
@@ -169,8 +169,6 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
       SortField.title => db.taskEntity.title,
       SortField.dueDate => db.taskEntity.dueDate,
       SortField.priority => db.taskEntity.priority,
-      SortField.status => db.taskEntity.status,
-      SortField.type => db.taskEntity.type,
       SortField.complexity => db.taskEntity.complexity,
       SortField.createdAt => db.taskEntity.createdAt,
       _ => db.taskEntity.id,

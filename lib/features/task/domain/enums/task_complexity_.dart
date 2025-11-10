@@ -58,18 +58,18 @@ extension TaskComplexityExtension on TaskComplexity {
   }
 
   // Valor numérico (1-5)
-  int get value {
+  int get complexityValue {
     switch (this) {
       case TaskComplexity.trivial:
-        return 1;
+        return 10;
       case TaskComplexity.easy:
-        return 2;
+        return 20;
       case TaskComplexity.medium:
-        return 3;
+        return 30;
       case TaskComplexity.hard:
-        return 4;
+        return 40;
       case TaskComplexity.veryHard:
-        return 5;
+        return 50;
     }
   }
 

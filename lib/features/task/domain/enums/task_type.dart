@@ -262,4 +262,35 @@ extension TaskTypeExtension on TaskType {
         return 'Tarefa relacionada ao trabalho';
     }
   }
+
+  int get typeValue {
+    return switch(this) {
+      TaskType.feature => 0,
+      TaskType.bug => 1,
+      TaskType.improvement => 2,
+      TaskType.documentation => 3,
+      TaskType.work => 4,
+      TaskType.housework => 5,
+      TaskType.shopping => 6,
+      TaskType.maintenance => 7,
+      TaskType.health => 8,
+      TaskType.finance => 9,
+      TaskType.study => 10,
+      TaskType.personal => 11,
+      TaskType.family => 12,
+      TaskType.pet => 13,
+      TaskType.garden => 14,
+      TaskType.cooking => 15,
+      TaskType.exercise => 16,
+      TaskType.appointment => 17,
+      TaskType.travel => 18,
+      TaskType.hobby => 19,
+      TaskType.social => 20,
+      TaskType.urgent => 21,
+      TaskType.routine => 22,
+      TaskType.project => 23,
+      TaskType.gift => 24,
+      TaskType.call => 25,
+    };
+  }
 }

@@ -1,10 +1,8 @@
 enum SortField {
   createdAt,
   title,
-  status,
   priority,
   complexity,
-  type,
   dueDate,
 }
 

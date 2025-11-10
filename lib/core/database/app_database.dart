@@ -1,12 +1,15 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter_ikanban_app/core/utils/mapper/generic_sql_int_conveter.dart';
 import 'package:flutter_ikanban_app/core/utils/mapper/generic_sql_type_converter.dart';
 import 'package:flutter_ikanban_app/features/board/infra/local/tables/board_entity_table.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/infra/local/mapper/complexity_sql_converter.dart';
+import 'package:flutter_ikanban_app/features/task/infra/local/mapper/priority_sql_converter.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 import 'package:path/path.dart' as p;
 import 'package:drift/drift.dart';
