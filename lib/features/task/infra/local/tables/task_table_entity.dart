@@ -19,5 +19,6 @@ class TaskEntity extends Table {
   TextColumn get color => text().map(GenericSqlTypeConverter(TaskColors.values))();
 
   TextColumn get type => text().map(GenericSqlTypeConverter(TaskType.values))();
-  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+  BoolColumn get isActive => boolean().named('is_active').withDefault(const Constant(true))();
+  DateTimeColumn get createdAt => dateTime().named('created_at').withDefault(currentDateAndTime)();
 }

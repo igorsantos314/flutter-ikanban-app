@@ -87,6 +87,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         type: state.type,
         dueDate: state.dueDate,
         color: state.color,
+        createdAt: DateTime.now(),
       );
       Outcome<void, dynamic> outcome;
 
@@ -148,6 +149,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         type: state.type,
         dueDate: state.dueDate,
         color: state.color,
+        createdAt: DateTime.now(),
       );
 
       final outcome = await _updateTaskUseCase.execute(task);

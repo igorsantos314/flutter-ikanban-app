@@ -15,6 +15,7 @@ class TaskMapper {
       type: Value(model.type),
       color: Value(model.color),
       isActive: Value(model.isActive),
+      createdAt: Value(model.createdAt),
     );
   }
   
@@ -30,6 +31,7 @@ class TaskMapper {
       type: entity.type,
       color: entity.color,
       isActive: entity.isActive,
+      createdAt: entity.createdAt,
     );
   }
 }

@@ -13,6 +13,7 @@ import 'package:flutter_ikanban_app/core/ui/widgets/appbar/custom_app_bar.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/snackbars.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/tasks_order_by.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/list_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/update_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_list_bloc.dart';
@@ -20,6 +21,7 @@ import 'package:flutter_ikanban_app/features/task/presentation/enums/task_layout
 import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/list/task_list_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/filter_selector_bottom_sheet.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/modals/sort_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/states/list/task_list_state.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/status_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/task_form_selectors_mixin.dart';
@@ -82,6 +84,18 @@ class _TaskListPageContentState extends State<TaskListPageContent>
     );
   }
 
+  void _showSortModal(BuildContext context, TaskListState state) {
+    SortSelectorBottomSheet.show(
+      context: context,
+      initialSort: SortOption(field: state.sortBy, order: state.sortOrder),
+      onApply: (sortOption) {
+        context.read<TaskListBloc>().add(
+          ApplySortEvent(sortBy: sortOption.field, sortOrder: sortOption.order),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -139,6 +153,18 @@ class _TaskListPageContentState extends State<TaskListPageContent>
               _showFilterModal(context, state);
               context.read<TaskListBloc>().add(
                 const TaskFormResetEvent(showFilterOptions: false),
+              );
+            }
+          },
+        ),
+        BlocListener<TaskListBloc, TaskListState>(
+          listenWhen: (previous, current) =>
+              previous.showSortOptions != current.showSortOptions,
+          listener: (context, state) {
+            if (state.showSortOptions) {
+              _showSortModal(context, state);
+              context.read<TaskListBloc>().add(
+                const TaskFormResetEvent(showSortOptions: false),
               );
             }
           },

@@ -10,6 +10,7 @@ import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart'
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
 
 /// Caso de uso responsável por importar dados para o app
@@ -25,13 +26,13 @@ class ImportDataUseCase {
     required TaskRepository taskRepository,
     required FileService fileService,
     required FileShareService fileShareService,
-  })  : _settingsRepository = settingsRepository,
-        _taskRepository = taskRepository,
-        _fileService = fileService,
-        _fileShareService = fileShareService;
+  }) : _settingsRepository = settingsRepository,
+       _taskRepository = taskRepository,
+       _fileService = fileService,
+       _fileShareService = fileShareService;
 
   /// Permite ao usuário selecionar um arquivo e importa os dados
-  /// 
+  ///
   /// Returns:
   /// - Success: Resultado da importação
   /// - Failure: Erro ocorrido durante a seleção ou importação
@@ -78,23 +79,25 @@ class ImportDataUseCase {
   }
 
   /// Importa dados de um arquivo JSON específico
-  /// 
+  ///
   /// Parameters:
   /// - [filePath]: Caminho do arquivo a ser importado
-  /// 
+  ///
   /// Returns:
   /// - Success: Resultado da importação
   /// - Failure: Erro ocorrido durante a importação
-  Future<Outcome<ImportResult, ImportDataError>> executeFromFile(String filePath) async {
+  Future<Outcome<ImportResult, ImportDataError>> executeFromFile(
+    String filePath,
+  ) async {
     try {
       // 1. Ler o arquivo usando o FileService
       final fileReadOutcome = await _fileService.readFile(filePath);
-      
+
       return await fileReadOutcome.when(
         success: (fileContent) async {
           // 2. Decodificar o arquivo JSON
           final Map<String, dynamic> data;
-          
+
           try {
             data = jsonDecode(fileContent ?? '') as Map<String, dynamic>;
           } catch (e) {
@@ -121,18 +124,21 @@ class ImportDataUseCase {
           if (data.containsKey('settings')) {
             try {
               final settingsData = data['settings'] as Map<String, dynamic>;
-              
+
               // Carregar configurações atuais
-              final currentSettingsOutcome = await _settingsRepository.loadSettings();
-              
+              final currentSettingsOutcome = await _settingsRepository
+                  .loadSettings();
+
               await currentSettingsOutcome.when(
                 success: (currentSettings) async {
                   final newSettings = SettingsModel(
                     appTheme: _parseTheme(settingsData['theme'] as String?),
-                    language: settingsData['language'] as String? ?? (currentSettings?.language ?? 'pt'),
+                    language:
+                        settingsData['language'] as String? ??
+                        (currentSettings?.language ?? 'pt'),
                     appVersion: currentSettings?.appVersion ?? '1.0.0',
                   );
-                  
+
                   await _settingsRepository.saveSettings(newSettings);
                 },
                 failure: (error, message, throwable) async {
@@ -142,11 +148,11 @@ class ImportDataUseCase {
                     language: settingsData['language'] as String? ?? 'pt',
                     appVersion: '1.0.0',
                   );
-                  
+
                   await _settingsRepository.saveSettings(newSettings);
                 },
               );
-              
+
               settingsImported = true;
             } catch (e) {
               return Outcome.failure(
@@ -161,7 +167,7 @@ class ImportDataUseCase {
           if (data.containsKey('tasks')) {
             try {
               final tasksData = data['tasks'] as List<dynamic>;
-              
+
               // Processar cada tarefa
               _taskRepository.createTasks(
                 tasksData.map((taskJson) {
@@ -175,11 +181,14 @@ class ImportDataUseCase {
                       orElse: () => TaskStatus.backlog,
                     ),
                     priority: TaskPriority.values.firstWhere(
-                      (e) => e.toString() == 'TaskPriority.${taskMap['priority']}',
+                      (e) =>
+                          e.toString() == 'TaskPriority.${taskMap['priority']}',
                       orElse: () => TaskPriority.medium,
                     ),
                     complexity: TaskComplexity.values.firstWhere(
-                      (e) => e.toString() == 'TaskComplexity.${taskMap['complexity']}',
+                      (e) =>
+                          e.toString() ==
+                          'TaskComplexity.${taskMap['complexity']}',
                       orElse: () => TaskComplexity.medium,
                     ),
                     type: TaskType.values.firstWhere(
@@ -187,10 +196,20 @@ class ImportDataUseCase {
                       orElse: () => TaskType.feature,
                     ),
                     isActive: taskMap['isActive'] as bool? ?? true,
+                    color: TaskColors.values.firstWhere(
+                      (e) => e.toString() == 'TaskColors.${taskMap['color']}',
+                      orElse: () => TaskColors.defaultColor,
+                    ),
+                    dueDate: taskMap['dueDate'] != null
+                        ? DateTime.parse(taskMap['dueDate'] as String)
+                        : null,
+                    createdAt: taskMap['createdAt'] != null
+                        ? DateTime.parse(taskMap['createdAt'] as String)
+                        : DateTime.now(),
                   );
                 }).toList(),
               );
-              
+
               // Por enquanto, apenas contamos as tarefas
               tasksImported = tasksData.length;
             } catch (e) {
@@ -230,15 +249,15 @@ class ImportDataUseCase {
   /// Valida se o arquivo tem a estrutura básica esperada
   bool _isValidBackupFile(Map<String, dynamic> data) {
     return data.containsKey('app') &&
-           data.containsKey('version') &&
-           data.containsKey('exportDate') &&
-           (data.containsKey('settings') || data.containsKey('tasks'));
+        data.containsKey('version') &&
+        data.containsKey('exportDate') &&
+        (data.containsKey('settings') || data.containsKey('tasks'));
   }
-  
+
   /// Converte string do tema para AppTheme enum
   AppTheme _parseTheme(String? themeString) {
     if (themeString == null) return AppTheme.system;
-    
+
     switch (themeString.toLowerCase()) {
       case 'light':
         return AppTheme.light;

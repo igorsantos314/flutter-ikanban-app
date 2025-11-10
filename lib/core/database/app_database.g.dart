@@ -117,6 +117,18 @@ class $TaskEntityTable extends TaskEntity
     ),
     defaultValue: const Constant(true),
   );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -129,6 +141,7 @@ class $TaskEntityTable extends TaskEntity
     color,
     type,
     isActive,
+    createdAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -172,6 +185,12 @@ class $TaskEntityTable extends TaskEntity
       context.handle(
         _isActiveMeta,
         isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
     return context;
@@ -233,6 +252,10 @@ class $TaskEntityTable extends TaskEntity
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
       )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
     );
   }
 
@@ -264,6 +287,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
   final TaskColors color;
   final TaskType type;
   final bool isActive;
+  final DateTime createdAt;
   const TaskData({
     required this.id,
     required this.title,
@@ -275,6 +299,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     required this.color,
     required this.type,
     required this.isActive,
+    required this.createdAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -313,6 +338,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       );
     }
     map['is_active'] = Variable<bool>(isActive);
+    map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
 
@@ -332,6 +358,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       color: Value(color),
       type: Value(type),
       isActive: Value(isActive),
+      createdAt: Value(createdAt),
     );
   }
 
@@ -351,6 +378,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       color: serializer.fromJson<TaskColors>(json['color']),
       type: serializer.fromJson<TaskType>(json['type']),
       isActive: serializer.fromJson<bool>(json['isActive']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
   @override
@@ -367,6 +395,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       'color': serializer.toJson<TaskColors>(color),
       'type': serializer.toJson<TaskType>(type),
       'isActive': serializer.toJson<bool>(isActive),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
@@ -381,6 +410,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     TaskColors? color,
     TaskType? type,
     bool? isActive,
+    DateTime? createdAt,
   }) => TaskData(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -392,6 +422,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     color: color ?? this.color,
     type: type ?? this.type,
     isActive: isActive ?? this.isActive,
+    createdAt: createdAt ?? this.createdAt,
   );
   TaskData copyWithCompanion(TaskEntityCompanion data) {
     return TaskData(
@@ -409,6 +440,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       color: data.color.present ? data.color.value : this.color,
       type: data.type.present ? data.type.value : this.type,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
 
@@ -424,7 +456,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           ..write('complexity: $complexity, ')
           ..write('color: $color, ')
           ..write('type: $type, ')
-          ..write('isActive: $isActive')
+          ..write('isActive: $isActive, ')
+          ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
@@ -441,6 +474,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     color,
     type,
     isActive,
+    createdAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -455,7 +489,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           other.complexity == this.complexity &&
           other.color == this.color &&
           other.type == this.type &&
-          other.isActive == this.isActive);
+          other.isActive == this.isActive &&
+          other.createdAt == this.createdAt);
 }
 
 class TaskEntityCompanion extends UpdateCompanion<TaskData> {
@@ -469,6 +504,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
   final Value<TaskColors> color;
   final Value<TaskType> type;
   final Value<bool> isActive;
+  final Value<DateTime> createdAt;
   const TaskEntityCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -480,6 +516,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     this.color = const Value.absent(),
     this.type = const Value.absent(),
     this.isActive = const Value.absent(),
+    this.createdAt = const Value.absent(),
   });
   TaskEntityCompanion.insert({
     this.id = const Value.absent(),
@@ -492,6 +529,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     required TaskColors color,
     required TaskType type,
     this.isActive = const Value.absent(),
+    this.createdAt = const Value.absent(),
   }) : title = Value(title),
        status = Value(status),
        priority = Value(priority),
@@ -509,6 +547,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Expression<String>? color,
     Expression<String>? type,
     Expression<bool>? isActive,
+    Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -521,6 +560,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       if (color != null) 'color': color,
       if (type != null) 'type': type,
       if (isActive != null) 'is_active': isActive,
+      if (createdAt != null) 'created_at': createdAt,
     });
   }
 
@@ -535,6 +575,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Value<TaskColors>? color,
     Value<TaskType>? type,
     Value<bool>? isActive,
+    Value<DateTime>? createdAt,
   }) {
     return TaskEntityCompanion(
       id: id ?? this.id,
@@ -547,6 +588,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       color: color ?? this.color,
       type: type ?? this.type,
       isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -593,6 +635,9 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
     }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
     return map;
   }
 
@@ -608,7 +653,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
           ..write('complexity: $complexity, ')
           ..write('color: $color, ')
           ..write('type: $type, ')
-          ..write('isActive: $isActive')
+          ..write('isActive: $isActive, ')
+          ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
@@ -1100,6 +1146,7 @@ typedef $$TaskEntityTableCreateCompanionBuilder =
       required TaskColors color,
       required TaskType type,
       Value<bool> isActive,
+      Value<DateTime> createdAt,
     });
 typedef $$TaskEntityTableUpdateCompanionBuilder =
     TaskEntityCompanion Function({
@@ -1113,6 +1160,7 @@ typedef $$TaskEntityTableUpdateCompanionBuilder =
       Value<TaskColors> color,
       Value<TaskType> type,
       Value<bool> isActive,
+      Value<DateTime> createdAt,
     });
 
 class $$TaskEntityTableFilterComposer
@@ -1178,6 +1226,11 @@ class $$TaskEntityTableFilterComposer
     column: $table.isActive,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$TaskEntityTableOrderingComposer
@@ -1238,6 +1291,11 @@ class $$TaskEntityTableOrderingComposer
     column: $table.isActive,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$TaskEntityTableAnnotationComposer
@@ -1283,6 +1341,9 @@ class $$TaskEntityTableAnnotationComposer
 
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
 
 class $$TaskEntityTableTableManager
@@ -1323,6 +1384,7 @@ class $$TaskEntityTableTableManager
                 Value<TaskColors> color = const Value.absent(),
                 Value<TaskType> type = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
               }) => TaskEntityCompanion(
                 id: id,
                 title: title,
@@ -1334,6 +1396,7 @@ class $$TaskEntityTableTableManager
                 color: color,
                 type: type,
                 isActive: isActive,
+                createdAt: createdAt,
               ),
           createCompanionCallback:
               ({
@@ -1347,6 +1410,7 @@ class $$TaskEntityTableTableManager
                 required TaskColors color,
                 required TaskType type,
                 Value<bool> isActive = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
               }) => TaskEntityCompanion.insert(
                 id: id,
                 title: title,
@@ -1358,6 +1422,7 @@ class $$TaskEntityTableTableManager
                 color: color,
                 type: type,
                 isActive: isActive,
+                createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

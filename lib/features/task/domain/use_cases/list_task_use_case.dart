@@ -4,6 +4,7 @@ import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/tasks_order_by.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 
@@ -18,7 +19,7 @@ class ListTaskUseCase {
     String? search,
     DateTime? startDate,
     DateTime? endDate,
-    String? orderBy,
+    SortField? orderBy,
     TaskStatus? status,
     TaskPriority? priority,
     TaskComplexity? complexity,

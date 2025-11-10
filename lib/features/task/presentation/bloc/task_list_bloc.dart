@@ -11,6 +11,7 @@ import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_tas
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/tasks_order_by.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/list_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/update_task_use_case.dart';
@@ -74,6 +75,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     on<ToggleLayoutModeEvent>(_onToggleLayoutMode);
     on<FilterTasksClickEvent>(_onFilterTasksClick);
     on<FilterTasksApplyEvent>(_onFilterTasksApply);
+    on<SortTasksClickEvent>(_onSortTasksClick);
+    on<ApplySortEvent>(_onApplySort);
   }
 
   @override
@@ -123,7 +126,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
               : state.statusFilter,
           type: state.typeFilters.isNotEmpty ? state.typeFilters : null,
           onlyActive: true,
-          ascending: false, // Mais recentes primeiro
+          orderBy: state.sortBy,
+          ascending: state.sortOrder == SortOrder.ascending,
         )
         .listen(
           (outcome) {
@@ -237,7 +241,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
             : state.statusFilter,
         type: state.typeFilters.isNotEmpty ? state.typeFilters : null,
         onlyActive: true,
-        ascending: false,
+        orderBy: state.sortBy,
+        ascending: state.sortOrder == SortOrder.ascending,
       ); // Pega apenas o primeiro resultado do stream (single call)
       final outcome = await stream.first;
 
@@ -432,6 +437,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         showStatusSelector:
             event.showStatusSelector ?? state.showStatusSelector,
         showFilterOptions: event.showFilterOptions ?? state.showFilterOptions,
+        showSortOptions: event.showSortOptions ?? state.showSortOptions,
       ),
     );
   }
@@ -604,6 +610,29 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     );
 
     // Recarrega as tarefas com os novos filtros
+    add(const LoadTasksEvent());
+  }
+
+  FutureOr<void> _onSortTasksClick(
+    SortTasksClickEvent event,
+    Emitter<TaskListState> emit,
+  ) {
+    emit(state.copyWith(showSortOptions: true));
+  }
+
+  FutureOr<void> _onApplySort(
+    ApplySortEvent event,
+    Emitter<TaskListState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        sortBy: event.sortBy,
+        sortOrder: event.sortOrder,
+        showSortOptions: false,
+      ),
+    );
+
+    // Recarrega as tarefas com a nova ordenação
     add(const LoadTasksEvent());
   }
 }
