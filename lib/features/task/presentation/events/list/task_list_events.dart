@@ -96,6 +96,11 @@ class ToggleLayoutModeEvent extends TaskEvent {
   const ToggleLayoutModeEvent();
 }
 
+class ToggleTaskItemSizeEvent extends TaskEvent {
+  const ToggleTaskItemSizeEvent();
+}
+
+
 class FilterTasksClickEvent extends TaskEvent {
   const FilterTasksClickEvent();
 }

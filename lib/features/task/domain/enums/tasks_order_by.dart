@@ -1,12 +1,9 @@
 enum SortField {
-  id,
+  createdAt,
   title,
-  status,
   priority,
   complexity,
-  type,
   dueDate,
-  createdAt,
 }
 
 enum SortOrder {

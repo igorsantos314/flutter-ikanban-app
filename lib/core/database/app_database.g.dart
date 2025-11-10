@@ -56,12 +56,12 @@ class $TaskEntityTable extends TaskEntity
         requiredDuringInsert: true,
       ).withConverter<TaskStatus>($TaskEntityTable.$converterstatus);
   @override
-  late final GeneratedColumnWithTypeConverter<TaskPriority, String> priority =
-      GeneratedColumn<String>(
+  late final GeneratedColumnWithTypeConverter<TaskPriority, int> priority =
+      GeneratedColumn<int>(
         'priority',
         aliasedName,
         false,
-        type: DriftSqlType.string,
+        type: DriftSqlType.int,
         requiredDuringInsert: true,
       ).withConverter<TaskPriority>($TaskEntityTable.$converterpriority);
   static const VerificationMeta _dueDateMeta = const VerificationMeta(
@@ -76,14 +76,14 @@ class $TaskEntityTable extends TaskEntity
     requiredDuringInsert: false,
   );
   @override
-  late final GeneratedColumnWithTypeConverter<TaskComplexity, String>
-  complexity = GeneratedColumn<String>(
-    'complexity',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  ).withConverter<TaskComplexity>($TaskEntityTable.$convertercomplexity);
+  late final GeneratedColumnWithTypeConverter<TaskComplexity, int> complexity =
+      GeneratedColumn<int>(
+        'complexity',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<TaskComplexity>($TaskEntityTable.$convertercomplexity);
   @override
   late final GeneratedColumnWithTypeConverter<TaskColors, String> color =
       GeneratedColumn<String>(
@@ -94,12 +94,12 @@ class $TaskEntityTable extends TaskEntity
         requiredDuringInsert: true,
       ).withConverter<TaskColors>($TaskEntityTable.$convertercolor);
   @override
-  late final GeneratedColumnWithTypeConverter<TaskType, String> type =
-      GeneratedColumn<String>(
+  late final GeneratedColumnWithTypeConverter<TaskType, int> type =
+      GeneratedColumn<int>(
         'type',
         aliasedName,
         false,
-        type: DriftSqlType.string,
+        type: DriftSqlType.int,
         requiredDuringInsert: true,
       ).withConverter<TaskType>($TaskEntityTable.$convertertype);
   static const VerificationMeta _isActiveMeta = const VerificationMeta(
@@ -222,7 +222,7 @@ class $TaskEntityTable extends TaskEntity
       ),
       priority: $TaskEntityTable.$converterpriority.fromSql(
         attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
+          DriftSqlType.int,
           data['${effectivePrefix}priority'],
         )!,
       ),
@@ -232,7 +232,7 @@ class $TaskEntityTable extends TaskEntity
       ),
       complexity: $TaskEntityTable.$convertercomplexity.fromSql(
         attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
+          DriftSqlType.int,
           data['${effectivePrefix}complexity'],
         )!,
       ),
@@ -244,7 +244,7 @@ class $TaskEntityTable extends TaskEntity
       ),
       type: $TaskEntityTable.$convertertype.fromSql(
         attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
+          DriftSqlType.int,
           data['${effectivePrefix}type'],
         )!,
       ),
@@ -266,14 +266,15 @@ class $TaskEntityTable extends TaskEntity
 
   static TypeConverter<TaskStatus, String> $converterstatus =
       GenericSqlTypeConverter(TaskStatus.values);
-  static TypeConverter<TaskPriority, String> $converterpriority =
-      GenericSqlTypeConverter(TaskPriority.values);
-  static TypeConverter<TaskComplexity, String> $convertercomplexity =
-      GenericSqlTypeConverter(TaskComplexity.values);
+  static TypeConverter<TaskPriority, int> $converterpriority =
+      PrioritySqlConverter();
+  static TypeConverter<TaskComplexity, int> $convertercomplexity =
+      ComplexitySqlConverter();
   static TypeConverter<TaskColors, String> $convertercolor =
       GenericSqlTypeConverter(TaskColors.values);
-  static TypeConverter<TaskType, String> $convertertype =
-      GenericSqlTypeConverter(TaskType.values);
+  static TypeConverter<TaskType, int> $convertertype = GenericSqlIntConverter(
+    TaskType.values,
+  );
 }
 
 class TaskData extends DataClass implements Insertable<TaskData> {
@@ -315,7 +316,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       );
     }
     {
-      map['priority'] = Variable<String>(
+      map['priority'] = Variable<int>(
         $TaskEntityTable.$converterpriority.toSql(priority),
       );
     }
@@ -323,7 +324,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       map['due_date'] = Variable<DateTime>(dueDate);
     }
     {
-      map['complexity'] = Variable<String>(
+      map['complexity'] = Variable<int>(
         $TaskEntityTable.$convertercomplexity.toSql(complexity),
       );
     }
@@ -333,9 +334,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       );
     }
     {
-      map['type'] = Variable<String>(
-        $TaskEntityTable.$convertertype.toSql(type),
-      );
+      map['type'] = Variable<int>($TaskEntityTable.$convertertype.toSql(type));
     }
     map['is_active'] = Variable<bool>(isActive);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -541,11 +540,11 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Expression<String>? title,
     Expression<String>? description,
     Expression<String>? status,
-    Expression<String>? priority,
+    Expression<int>? priority,
     Expression<DateTime>? dueDate,
-    Expression<String>? complexity,
+    Expression<int>? complexity,
     Expression<String>? color,
-    Expression<String>? type,
+    Expression<int>? type,
     Expression<bool>? isActive,
     Expression<DateTime>? createdAt,
   }) {
@@ -610,7 +609,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       );
     }
     if (priority.present) {
-      map['priority'] = Variable<String>(
+      map['priority'] = Variable<int>(
         $TaskEntityTable.$converterpriority.toSql(priority.value),
       );
     }
@@ -618,7 +617,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       map['due_date'] = Variable<DateTime>(dueDate.value);
     }
     if (complexity.present) {
-      map['complexity'] = Variable<String>(
+      map['complexity'] = Variable<int>(
         $TaskEntityTable.$convertercomplexity.toSql(complexity.value),
       );
     }
@@ -628,7 +627,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       );
     }
     if (type.present) {
-      map['type'] = Variable<String>(
+      map['type'] = Variable<int>(
         $TaskEntityTable.$convertertype.toSql(type.value),
       );
     }
@@ -1193,7 +1192,7 @@ class $$TaskEntityTableFilterComposer
         builder: (column) => ColumnWithTypeConverterFilters(column),
       );
 
-  ColumnWithTypeConverterFilters<TaskPriority, TaskPriority, String>
+  ColumnWithTypeConverterFilters<TaskPriority, TaskPriority, int>
   get priority => $composableBuilder(
     column: $table.priority,
     builder: (column) => ColumnWithTypeConverterFilters(column),
@@ -1204,7 +1203,7 @@ class $$TaskEntityTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<TaskComplexity, TaskComplexity, String>
+  ColumnWithTypeConverterFilters<TaskComplexity, TaskComplexity, int>
   get complexity => $composableBuilder(
     column: $table.complexity,
     builder: (column) => ColumnWithTypeConverterFilters(column),
@@ -1216,7 +1215,7 @@ class $$TaskEntityTableFilterComposer
         builder: (column) => ColumnWithTypeConverterFilters(column),
       );
 
-  ColumnWithTypeConverterFilters<TaskType, TaskType, String> get type =>
+  ColumnWithTypeConverterFilters<TaskType, TaskType, int> get type =>
       $composableBuilder(
         column: $table.type,
         builder: (column) => ColumnWithTypeConverterFilters(column),
@@ -1262,7 +1261,7 @@ class $$TaskEntityTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get priority => $composableBuilder(
+  ColumnOrderings<int> get priority => $composableBuilder(
     column: $table.priority,
     builder: (column) => ColumnOrderings(column),
   );
@@ -1272,7 +1271,7 @@ class $$TaskEntityTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get complexity => $composableBuilder(
+  ColumnOrderings<int> get complexity => $composableBuilder(
     column: $table.complexity,
     builder: (column) => ColumnOrderings(column),
   );
@@ -1282,7 +1281,7 @@ class $$TaskEntityTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get type => $composableBuilder(
+  ColumnOrderings<int> get type => $composableBuilder(
     column: $table.type,
     builder: (column) => ColumnOrderings(column),
   );
@@ -1321,13 +1320,13 @@ class $$TaskEntityTableAnnotationComposer
   GeneratedColumnWithTypeConverter<TaskStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<TaskPriority, String> get priority =>
+  GeneratedColumnWithTypeConverter<TaskPriority, int> get priority =>
       $composableBuilder(column: $table.priority, builder: (column) => column);
 
   GeneratedColumn<DateTime> get dueDate =>
       $composableBuilder(column: $table.dueDate, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<TaskComplexity, String> get complexity =>
+  GeneratedColumnWithTypeConverter<TaskComplexity, int> get complexity =>
       $composableBuilder(
         column: $table.complexity,
         builder: (column) => column,
@@ -1336,7 +1335,7 @@ class $$TaskEntityTableAnnotationComposer
   GeneratedColumnWithTypeConverter<TaskColors, String> get color =>
       $composableBuilder(column: $table.color, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<TaskType, String> get type =>
+  GeneratedColumnWithTypeConverter<TaskType, int> get type =>
       $composableBuilder(column: $table.type, builder: (column) => column);
 
   GeneratedColumn<bool> get isActive =>

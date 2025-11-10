@@ -1,0 +1,4 @@
+enum TaskSize {
+  compact,
+  comfortable,
+}

@@ -212,4 +212,38 @@ extension TaskStatusExtension on TaskStatus {
         return null;
     }
   }
+
+  int get statusValue {
+    switch (this) {
+      case TaskStatus.all:
+        return 0;
+      case TaskStatus.backlog:
+        return 10;
+      case TaskStatus.todo:
+        return 20;
+      case TaskStatus.inProgress:
+        return 30;
+      case TaskStatus.blocked:
+        return 40;
+      case TaskStatus.review:
+        return 50;
+      case TaskStatus.testing:
+        return 60;
+      case TaskStatus.done:
+        return 70;
+      case TaskStatus.cancelled:
+        return 80;
+      case TaskStatus.archived:
+        return 90;
+    }
+  }
+
+  TaskStatus? fromValue(int value) {
+    for (var status in TaskStatus.values) {
+      if (status.statusValue == value) {
+        return status;
+      }
+    }
+    return null;
+  }
 }

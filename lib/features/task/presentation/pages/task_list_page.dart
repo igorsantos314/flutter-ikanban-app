@@ -26,7 +26,6 @@ import 'package:flutter_ikanban_app/features/task/presentation/states/list/task_
 import 'package:flutter_ikanban_app/features/task/presentation/modals/status_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/task_form_selectors_mixin.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_item_list.dart';
-import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_list_layout_mode.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/task_status_filter.dart';
 
 class TaskListPage extends StatelessWidget {
@@ -349,59 +348,39 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                         const RefreshTasksEvent(),
                       );
                     },
-                    child: Column(
-                      children: [
-                        // Layout Toggle
-                        Row(
-                          children: [
-                            const SizedBox(width: 8),
-                            IconButton(
-                              onPressed: () {
-                                context.read<TaskListBloc>().add(
-                                  const FilterTasksClickEvent(),
-                                );
-                              },
-                              icon: const Icon(Icons.filter_list),
-                            ),
-                            const SizedBox(width: 8),
-                            TaskListLayoutMode(
-                              taskLayout: state.layoutMode,
-                              onToggle: () {
-                                context.read<TaskListBloc>().add(
-                                  const ToggleLayoutModeEvent(),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Expanded(
-                          child: state.layoutMode == TaskLayout.grid
-                              ? GridView.builder(
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                        mainAxisSpacing: 8.0,
-                                        crossAxisCount:
-                                            state.layoutMode == TaskLayout.list
-                                            ? 1
-                                            : 2,
-                                        childAspectRatio: 1.0,
-                                      ),
-                                  itemCount:
-                                      state.tasks.length +
-                                      (state.hasMorePages ? 1 : 0),
-                                  itemBuilder: (context, index) =>
-                                      _taskItemBuilder(context, state, index),
-                                )
-                              : ListView.builder(
-                                  itemCount:
-                                      state.tasks.length +
-                                      (state.hasMorePages ? 1 : 0),
-                                  itemBuilder: (context, index) =>
-                                      _taskItemBuilder(context, state, index),
-                                ),
-                        ),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          // Layout Toggle
+                          _buildOptions(theme),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: state.layoutMode == TaskLayout.grid
+                                ? GridView.builder(
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                          mainAxisSpacing: 8.0,
+                                          crossAxisSpacing: 8.0,
+                                          crossAxisCount: 2,
+                                          childAspectRatio: 1.2,
+                                        ),
+                                    itemCount:
+                                        state.tasks.length +
+                                        (state.hasMorePages ? 1 : 0),
+                                    itemBuilder: (context, index) =>
+                                        _taskItemBuilder(context, state, index),
+                                  )
+                                : ListView.builder(
+                                    itemCount:
+                                        state.tasks.length +
+                                        (state.hasMorePages ? 1 : 0),
+                                    itemBuilder: (context, index) =>
+                                        _taskItemBuilder(context, state, index),
+                                  ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -466,5 +445,104 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         },
       );
     }
+  }
+
+  Widget _buildOptions(ThemeData theme) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 2.0),
+            child: Text(
+              'Opções:',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Filter Button
+                GestureDetector(
+                  onTap: () {
+                    context.read<TaskListBloc>().add(
+                      const FilterTasksClickEvent(),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: theme.colorScheme.onSurface.withAlpha(30),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.filter_list),
+                        const SizedBox(width: 4),
+                        Text('Filtrar'),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+
+                // Sort Button
+                GestureDetector(
+                  onTap: () {
+                    context.read<TaskListBloc>().add(
+                      const SortTasksClickEvent(),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: theme.colorScheme.onSurface.withAlpha(30),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.sort),
+                        const SizedBox(width: 4),
+                        Text('Ordenar por'),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Toggle Layout Mode
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    context.read<TaskListBloc>().add(ToggleLayoutModeEvent());
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: theme.colorScheme.onSurface.withAlpha(30),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.view_module),
+                        const SizedBox(width: 4),
+                        Text('Layout'),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
