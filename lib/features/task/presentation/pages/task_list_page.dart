@@ -22,6 +22,7 @@ import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_
 import 'package:flutter_ikanban_app/features/task/presentation/events/list/task_list_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/filter_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/sort_selector_bottom_sheet.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/modals/task_details_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/states/list/task_list_state.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/status_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/task_form_selectors_mixin.dart';
@@ -166,6 +167,27 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                 const TaskFormResetEvent(showSortOptions: false),
               );
             }
+          },
+        ),
+        BlocListener<TaskListBloc, TaskListState>(
+          listenWhen: (previous, current) =>
+              previous.showTaskDetails != current.showTaskDetails &&
+              current.showTaskDetails == true,
+          listener: (context, state) {
+            final task = state.selectedTask;
+            if (task == null) return;
+
+            TaskDetailsBottomSheet.show(context: context, task: task, onEdit: () {
+              AppNavigation.navigateToTask(
+                context,
+                taskId: task.id,
+              );
+            },);
+
+            // Fechar detalhes da tarefa ao voltar
+            context.read<TaskListBloc>().add(
+              TaskFormResetEvent(showTaskDetails: false),
+            );
           },
         ),
       ],
@@ -433,7 +455,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
             ? LayoutMode.fullWidth
             : LayoutMode.compact,
         onTap: () {
-          AppNavigation.navigateToTask(context, taskId: task.id);
+          context.read<TaskListBloc>().add(ShowTaskDetailsEvent(task: task));
         },
         onLongPress: () {
           context.read<TaskListBloc>().add(TaskSelectedEvent(task: task));

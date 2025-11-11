@@ -55,6 +55,7 @@ class TaskFormResetEvent extends TaskEvent {
   final bool? showStatusSelector;
   final bool? showFilterOptions;
   final bool? showSortOptions;
+  final bool? showTaskDetails;
 
   const TaskFormResetEvent({
     this.closeScreen,
@@ -62,6 +63,7 @@ class TaskFormResetEvent extends TaskEvent {
     this.showStatusSelector,
     this.showFilterOptions,
     this.showSortOptions,
+    this.showTaskDetails,
   });
 
   @override

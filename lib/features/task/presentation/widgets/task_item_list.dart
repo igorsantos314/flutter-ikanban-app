@@ -207,6 +207,7 @@ class TaskItemList extends StatelessWidget {
         Expanded(
           child: Text(
             task.title,
+            maxLines: 2,
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: layoutMode == LayoutMode.compact ? 14 : 16,
@@ -296,14 +297,6 @@ class TaskItemList extends StatelessWidget {
           child: Row(
             children: [
               Icon(task.status.icon, size: 18, color: task.status.color),
-              const SizedBox(width: 4),
-              Text(
-                task.status.displayName,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ],
           ),
         ),
