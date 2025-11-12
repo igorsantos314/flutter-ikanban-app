@@ -72,7 +72,7 @@ class ExportDataUseCase {
                 'type': task.type.name,
                 'dueDate': task.dueDate?.toIso8601String(),
                 'isActive': task.isActive,
-                'createdAt': DateTime.now().toIso8601String(), // Adiciona timestamp de criação
+                'createdAt': task.createdAt.toIso8601String(), // Adiciona timestamp de criação
                 'color': task.color.name, // Adiciona cor da tarefa
               }).toList();
               
