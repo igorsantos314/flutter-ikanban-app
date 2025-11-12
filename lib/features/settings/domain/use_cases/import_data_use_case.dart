@@ -1,9 +1,9 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter_ikanban_app/core/services/file/file_service.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/repository/settings_repository.dart';
-import 'package:flutter_ikanban_app/features/settings/domain/model/settings_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
@@ -11,12 +11,10 @@ import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
-import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
 
 /// Caso de uso responsável por importar dados para o app
 /// Segue os princípios da Clean Architecture não dependendo de features específicas
 class ImportDataUseCase {
-  final SettingsRepository _settingsRepository;
   final TaskRepository _taskRepository;
   final FileService _fileService;
   final FileShareService _fileShareService;
@@ -26,8 +24,7 @@ class ImportDataUseCase {
     required TaskRepository taskRepository,
     required FileService fileService,
     required FileShareService fileShareService,
-  }) : _settingsRepository = settingsRepository,
-       _taskRepository = taskRepository,
+  }) : _taskRepository = taskRepository,
        _fileService = fileService,
        _fileShareService = fileShareService;
 
@@ -120,57 +117,13 @@ class ImportDataUseCase {
           int tasksImported = 0;
           bool settingsImported = false;
 
-          // 4a. Importar configurações se existirem
-          if (data.containsKey('settings')) {
-            try {
-              final settingsData = data['settings'] as Map<String, dynamic>;
-
-              // Carregar configurações atuais
-              final currentSettingsOutcome = await _settingsRepository
-                  .loadSettings();
-
-              await currentSettingsOutcome.when(
-                success: (currentSettings) async {
-                  final newSettings = SettingsModel(
-                    appTheme: _parseTheme(settingsData['theme'] as String?),
-                    language:
-                        settingsData['language'] as String? ??
-                        (currentSettings?.language ?? 'pt'),
-                    appVersion: currentSettings?.appVersion ?? '1.0.0',
-                  );
-
-                  await _settingsRepository.saveSettings(newSettings);
-                },
-                failure: (error, message, throwable) async {
-                  // Se não conseguir carregar as configurações atuais, usar valores padrão
-                  final newSettings = SettingsModel(
-                    appTheme: _parseTheme(settingsData['theme'] as String?),
-                    language: settingsData['language'] as String? ?? 'pt',
-                    appVersion: '1.0.0',
-                  );
-
-                  await _settingsRepository.saveSettings(newSettings);
-                },
-              );
-
-              settingsImported = true;
-            } catch (e) {
-              return Outcome.failure(
-                error: ImportDataError.settingsImportFailed,
-                message: 'Erro ao importar configurações: ${e.toString()}',
-                throwable: e,
-              );
-            }
-          }
-
           // 4b. Importar tarefas se existirem
           if (data.containsKey('tasks')) {
             try {
               final tasksData = data['tasks'] as List<dynamic>;
+              log("Importando ${tasksData.length} tarefas");
 
-              // Processar cada tarefa
-              _taskRepository.createTasks(
-                tasksData.map((taskJson) {
+              final tasks = tasksData.map((taskJson) {
                   final taskMap = taskJson as Map<String, dynamic>;
                   return TaskModel(
                     id: taskMap['id'] as int?,
@@ -207,11 +160,18 @@ class ImportDataUseCase {
                         ? DateTime.parse(taskMap['createdAt'] as String)
                         : DateTime.now(),
                   );
-                }).toList(),
+                }).toList();
+
+              // Processar cada tarefa
+              final result = await _taskRepository.createTasks(
+                tasks,
               );
 
-              // Por enquanto, apenas contamos as tarefas
-              tasksImported = tasksData.length;
+              result.when(success: (value) {
+                tasksImported = tasksData.length;
+              }, failure: (error, message, throwable) {
+                log('Erro ao importar tarefas: $message throwable: $throwable');
+              },);
             } catch (e) {
               return Outcome.failure(
                 error: ImportDataError.tasksImportFailed,
@@ -252,21 +212,6 @@ class ImportDataUseCase {
         data.containsKey('version') &&
         data.containsKey('exportDate') &&
         (data.containsKey('settings') || data.containsKey('tasks'));
-  }
-
-  /// Converte string do tema para AppTheme enum
-  AppTheme _parseTheme(String? themeString) {
-    if (themeString == null) return AppTheme.system;
-
-    switch (themeString.toLowerCase()) {
-      case 'light':
-        return AppTheme.light;
-      case 'dark':
-        return AppTheme.dark;
-      case 'system':
-      default:
-        return AppTheme.system;
-    }
   }
 }
 

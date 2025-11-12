@@ -160,7 +160,7 @@ class _TaskFormPageState extends State<TaskFormPage>
                       icon: state.status.icon,
                       iconColor: state.status.color,
                       onTap: () {
-                        FocusScope.of(context).requestFocus(FocusNode());
+                        _removeFocus();
                         showStatusSelector(context, state);
                       },
                     ),
@@ -171,7 +171,10 @@ class _TaskFormPageState extends State<TaskFormPage>
                       description: state.priority.description,
                       icon: state.priority.icon,
                       iconColor: state.priority.color,
-                      onTap: () => showPrioritySelector(context, state),
+                      onTap: () {
+                        _removeFocus();
+                        showPrioritySelector(context, state);
+                      }
                     ),
                     const SizedBox(height: 16),
                     ComplexitySelectorField(
@@ -181,7 +184,10 @@ class _TaskFormPageState extends State<TaskFormPage>
                       icon: state.complexity.icon,
                       iconColor: state.complexity.color,
                       storyPoints: state.complexity.suggestedStoryPoints,
-                      onTap: () => showComplexitySelector(context, state),
+                      onTap: () {
+                        _removeFocus();
+                        showComplexitySelector(context, state);
+                      }
                     ),
                     const SizedBox(height: 16),
                     FormSelectorField(
@@ -192,7 +198,10 @@ class _TaskFormPageState extends State<TaskFormPage>
                           : null,
                       icon: state.type.icon,
                       iconColor: state.type.color,
-                      onTap: () => showTypeSelector(context, state),
+                      onTap: () {
+                        _removeFocus();
+                        showTypeSelector(context, state);
+                      },
                     ),
                     const SizedBox(height: 16),
                     DateSelectorField<TaskFormBloc, TaskFormState>(

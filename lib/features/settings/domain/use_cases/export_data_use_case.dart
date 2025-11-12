@@ -8,7 +8,6 @@ import 'package:flutter_ikanban_app/features/settings/domain/repository/settings
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 
 class ExportDataUseCase {
-  final SettingsRepository _settingsRepository;
   final TaskRepository _taskRepository;
   final FileService _fileService;
   final FileShareService _fileShareService;
@@ -18,30 +17,14 @@ class ExportDataUseCase {
     required TaskRepository taskRepository,
     required FileService fileService,
     required FileShareService fileShareService,
-  })  : _settingsRepository = settingsRepository,
-        _taskRepository = taskRepository,
-        _fileService = fileService,
-        _fileShareService = fileShareService;
+  }) : _taskRepository = taskRepository,
+       _fileService = fileService,
+       _fileShareService = fileShareService;
 
   Future<Outcome<ExportResult, ExportDataError>> execute({
     bool shareAfterExport = false,
   }) async {
     try {
-      final settingsOutcome = await _settingsRepository.loadSettings();
-      
-      Map<String, dynamic>? settingsData;
-      settingsOutcome.when(
-        success: (settings) {
-          settingsData = {
-            'theme': 'light', // Placeholder - adaptar conforme modelo
-            'language': 'pt-BR',
-          };
-        },
-        failure: (error, message, throwable) {
-          settingsData = null; // Continue sem settings se não conseguir carregar
-        },
-      );
-
       // 2. Buscar todas as tarefas (paginação completa)
       List<Map<String, dynamic>> tasksData = [];
       int totalTasks = 0;
@@ -57,34 +40,42 @@ class ExportDataUseCase {
         );
 
         final tasksOutcome = await tasksStream.first;
-        
+
         final success = tasksOutcome.when(
           success: (resultPage) {
             if (resultPage != null) {
               // Adiciona as tarefas da página atual à lista completa
-              final pageTasksData = resultPage.items.map((task) => {
-                'id': task.id,
-                'title': task.title,
-                'description': task.description,
-                'status': task.status.name,
-                'priority': task.priority.name,
-                'complexity': task.complexity.name,
-                'type': task.type.name,
-                'dueDate': task.dueDate?.toIso8601String(),
-                'isActive': task.isActive,
-                'createdAt': DateTime.now().toIso8601String(), // Adiciona timestamp de criação
-                'color': task.color.name, // Adiciona cor da tarefa
-              }).toList();
-              
+              final pageTasksData = resultPage.items
+                  .map(
+                    (task) => {
+                      'id': task.id,
+                      'title': task.title,
+                      'description': task.description,
+                      'status': task.status.name,
+                      'priority': task.priority.name,
+                      'complexity': task.complexity.name,
+                      'type': task.type.name,
+                      'dueDate': task.dueDate?.toIso8601String(),
+                      'isActive': task.isActive,
+                      'createdAt': task.createdAt
+                          .toIso8601String(), // Adiciona timestamp de criação
+                      'color': task.color.name, // Adiciona cor da tarefa
+                    },
+                  )
+                  .toList();
+
               tasksData.addAll(pageTasksData);
               totalTasks = resultPage.totalItems;
-              
+
               // Verifica se há mais páginas
               final totalPages = (totalTasks / pageSize).ceil();
-              hasMorePages = currentPage < totalPages && resultPage.items.isNotEmpty;
-              
-              log('Página $currentPage de $totalPages carregada - ${resultPage.items.length} tarefas');
-              
+              hasMorePages =
+                  currentPage < totalPages && resultPage.items.isNotEmpty;
+
+              log(
+                'Página $currentPage de $totalPages carregada - ${resultPage.items.length} tarefas',
+              );
+
               return true;
             }
             return false;
@@ -103,7 +94,7 @@ class ExportDataUseCase {
         }
 
         currentPage++;
-        
+
         // Proteção contra loop infinito
         if (currentPage > 1000) {
           log('Limite de páginas atingido (1000) - interrompendo busca');
@@ -111,13 +102,14 @@ class ExportDataUseCase {
         }
       }
 
-      log('Exportação completa: ${tasksData.length} de $totalTasks tarefas carregadas');
+      log(
+        'Exportação completa: ${tasksData.length} de $totalTasks tarefas carregadas',
+      );
 
       final exportData = {
         'app': 'iKanban',
         'version': '1.0.0+1',
         'exportDate': DateTime.now().toIso8601String(),
-        'settings': settingsData,
         'tasks': tasksData,
         'totalTasks': totalTasks,
         'exportedTasks': tasksData.length,
@@ -130,20 +122,14 @@ class ExportDataUseCase {
             'totalPages': currentPage - 1,
             'isComplete': tasksData.length == totalTasks,
           },
-          'exportStats': {
-            'activeTasks': tasksData.where((task) => task['isActive'] == true).length,
-            'inactiveTasks': tasksData.where((task) => task['isActive'] == false).length,
-            'tasksByStatus': _groupTasksByStatus(tasksData),
-            'tasksByPriority': _groupTasksByPriority(tasksData),
-          }
-        }
+        },
       };
 
       final jsonData = const JsonEncoder.withIndent('  ').convert(exportData);
 
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final fileName = 'ikanban_backup_$timestamp.json';
-      
+
       final fileOutcome = await _fileService.saveFile(
         fileName: fileName,
         content: jsonData,
@@ -157,13 +143,13 @@ class ExportDataUseCase {
             final shareOutcome = await _fileShareService.shareFile(
               filePath: file!.path,
               subject: 'Backup iKanban - $fileName',
-              text: 'Backup dos dados do iKanban criado em ${DateTime.now().toString()}',
+              text:
+                  'Backup dos dados do iKanban criado em ${DateTime.now().toString()}',
             );
-            
+
             shareOutcome.when(
               success: (_) {},
               failure: (error, message, throwable) {
-                // Log do erro mas continue
                 log('Aviso: Falha no compartilhamento: $message');
               },
             );
@@ -173,8 +159,7 @@ class ExportDataUseCase {
             filePath: file!.path,
             fileName: fileName,
             fileSize: jsonData.length,
-            tasksCount: tasksData.length, // Número real de tarefas exportadas
-            hasSettings: settingsData != null,
+            tasksCount: tasksData.length,
             shareAttempted: shareAfterExport,
           );
 
@@ -196,30 +181,6 @@ class ExportDataUseCase {
       );
     }
   }
-
-  /// Agrupa tarefas por status para estatísticas
-  Map<String, int> _groupTasksByStatus(List<Map<String, dynamic>> tasks) {
-    final Map<String, int> statusCount = {};
-    
-    for (final task in tasks) {
-      final status = task['status'] as String;
-      statusCount[status] = (statusCount[status] ?? 0) + 1;
-    }
-    
-    return statusCount;
-  }
-
-  /// Agrupa tarefas por prioridade para estatísticas
-  Map<String, int> _groupTasksByPriority(List<Map<String, dynamic>> tasks) {
-    final Map<String, int> priorityCount = {};
-    
-    for (final task in tasks) {
-      final priority = task['priority'] as String;
-      priorityCount[priority] = (priorityCount[priority] ?? 0) + 1;
-    }
-    
-    return priorityCount;
-  }
 }
 
 /// Resultado da exportação
@@ -228,7 +189,6 @@ class ExportResult {
   final String fileName;
   final int fileSize;
   final int tasksCount;
-  final bool hasSettings;
   final bool shareAttempted;
 
   const ExportResult({
@@ -236,18 +196,17 @@ class ExportResult {
     required this.fileName,
     required this.fileSize,
     required this.tasksCount,
-    required this.hasSettings,
     required this.shareAttempted,
   });
 
   String get formattedSize {
     if (fileSize < 1024) return '${fileSize}B';
-    if (fileSize < 1024 * 1024) return '${(fileSize / 1024).toStringAsFixed(1)}KB';
+    if (fileSize < 1024 * 1024)
+      return '${(fileSize / 1024).toStringAsFixed(1)}KB';
     return '${(fileSize / (1024 * 1024)).toStringAsFixed(1)}MB';
   }
 
-  String get summary => 
-      '$tasksCount tarefas exportadas • $formattedSize';
+  String get summary => '$tasksCount tarefas exportadas • $formattedSize';
 }
 
 enum ExportDataError {

@@ -37,9 +37,9 @@ abstract class TaskListState with _$TaskListState {
     @Default(TaskSize.comfortable) TaskSize taskSize,
 
     @Default(false) bool showStatusSelector,
+    @Default(false) bool showTaskDetails,
     @Default(TaskLayout.list) TaskLayout layoutMode,
   }) = _TaskListState;
 
-  factory TaskListState.initial() =>
-      const TaskListState();
+  factory TaskListState.initial() => const TaskListState();
 }

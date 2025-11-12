@@ -4,6 +4,7 @@ import 'package:flutter_ikanban_app/features/settings/domain/model/settings_mode
 import 'package:flutter_ikanban_app/features/settings/domain/repository/settings_repository.dart';
 import 'package:flutter_ikanban_app/features/settings/infra/settings_data_source.dart';
 import 'package:flutter_ikanban_app/shared/theme/repository/theme_repository.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsRepositoryImpl implements SettingsRepository {
   final ThemeRepository themeRepository;
@@ -21,7 +22,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
       final settings = SettingsModel(
         appTheme: await themeRepository.getTheme(),
         language: "pt",
-        appVersion: "0.0.1",
+        appVersion: await _getAppVersion(),
       );
       return Outcome.success(value: settings);
     } catch (e) {
@@ -47,5 +48,10 @@ class SettingsRepositoryImpl implements SettingsRepository {
         throwable: e,
       );
     }
+  }
+
+  Future<String> _getAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return '${packageInfo.version} (${packageInfo.buildNumber})'; // Ex: "1.0.0 (42)"
   }
 }

@@ -77,6 +77,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     on<FilterTasksApplyEvent>(_onFilterTasksApply);
     on<SortTasksClickEvent>(_onSortTasksClick);
     on<ApplySortEvent>(_onApplySort);
+    on<ShowTaskDetailsEvent>(_onShowTaskDetails);
   }
 
   @override
@@ -438,6 +439,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
             event.showStatusSelector ?? state.showStatusSelector,
         showFilterOptions: event.showFilterOptions ?? state.showFilterOptions,
         showSortOptions: event.showSortOptions ?? state.showSortOptions,
+        showTaskDetails: event.showTaskDetails ?? state.showTaskDetails,
       ),
     );
   }
@@ -634,5 +636,9 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
 
     // Recarrega as tarefas com a nova ordenação
     add(const LoadTasksEvent());
+  }
+
+  FutureOr<void> _onShowTaskDetails(ShowTaskDetailsEvent event, Emitter<TaskListState> emit) {
+    emit(state.copyWith(selectedTask: event.task, showTaskDetails: true));
   }
 }
