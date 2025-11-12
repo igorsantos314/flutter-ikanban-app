@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 
 void showAboutDeveloperDialog(BuildContext context) {
+  final theme = Theme.of(context);
   showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.info_outline, color: Colors.blue),
+            Icon(Icons.info_outline, color: theme.colorScheme.primary),
             SizedBox(width: 8),
             Text('Sobre o Desenvolvedor'),
           ],
         ),
-        content: const Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '👨‍💻 Igor Santos',
+              'Igor Santos',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             SizedBox(height: 8),
@@ -25,13 +26,13 @@ void showAboutDeveloperDialog(BuildContext context) {
             ),
             SizedBox(height: 12),
             Text(
-              '💙 Desenvolvido com Flutter para te ajudar a ser mais produtivo!',
+              'Desenvolvido com Flutter para te ajudar a ser mais produtivo!',
               style: TextStyle(fontStyle: FontStyle.italic),
             ),
             SizedBox(height: 8),
             Text(
-              '📧 GitHub: @igorsantos314',
-              style: TextStyle(color: Colors.grey),
+              'GitHub: @igorsantos314',
+              style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.w600),
             ),
           ],
         ),

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/errors/settings_repository_errors.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/model/settings_model.dart';
@@ -18,6 +20,7 @@ class LoadSettingsUseCase {
         return Outcome.success(value: value);
       },
       failure: (error, message, throwable) {
+        log("Error loading settings: $message", error: throwable);
         switch (error) {
           case SettingsRepositoryErrors.notFound:
             return Outcome.failure(error: LoadSettingsError.notFound);

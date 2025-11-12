@@ -298,8 +298,17 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                                     ListTile(
                                       leading: const Icon(Icons.file_download),
                                       title: const Text('Exportar Dados'),
-                                      subtitle: const Text(
-                                        'Faça backup de todas suas tarefas e configurações',
+                                      subtitle: Column(
+                                        children: [
+                                          const Text(
+                                            'Faça backup de todas suas tarefas e configurações',
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Recomendamos usar serviços de nuvem como o Google Drive, para armazenar seu backup com segurança.',
+                                            style: TextStyle(fontSize: 12, color: Colors.orange, fontWeight: FontWeight.w500),
+                                          )
+                                        ],
                                       ),
                                       trailing: const Icon(
                                         Icons.arrow_forward_ios,
@@ -327,8 +336,6 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                             ),
 
                             const SizedBox(height: 32),
-
-                            // Sobre o Desenvolvedor
 
                             // Rodapé com informações
                             Container(
@@ -391,10 +398,6 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            '💙 ',
-            style: TextStyle(fontSize: 16, color: theme.colorScheme.primary),
-          ),
-          Text(
             'Desenvolvido por ',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -408,7 +411,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
             ),
           ),
           Text(
-            ' para te ajudar 😊',
+            ' para te ajudar !',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
