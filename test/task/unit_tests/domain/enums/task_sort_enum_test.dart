@@ -29,7 +29,7 @@ void main() {
       expect(SortField.title.displayName, 'Título');
       expect(SortField.priority.displayName, 'Prioridade');
       expect(SortField.complexity.displayName, 'Complexidade');
-      expect(SortField.dueDate.displayName, 'Data de Vencimento');
+      expect(SortField.dueDate.displayName, 'Data de Entrega');
     });
 
     test('should have correct icon values', () {
