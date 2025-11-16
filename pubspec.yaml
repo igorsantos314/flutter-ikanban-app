@@ -42,6 +42,7 @@ dev_dependencies:
   change_app_package_name: ^1.5.0
   flutter_launcher_icons: ^0.14.4
   test: ^1.26.2
+  mocktail: ^1.0.4
 
 flutter:
   uses-material-design: true
