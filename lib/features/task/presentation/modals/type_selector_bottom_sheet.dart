@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_type_enum_extensions.dart';
 
 class TypeSelectorBottomSheet extends StatelessWidget {
   final TaskType selectedType;

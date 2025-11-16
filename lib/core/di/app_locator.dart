@@ -29,7 +29,6 @@ import 'package:flutter_ikanban_app/features/settings/domain/use_cases/export_da
 import 'package:flutter_ikanban_app/features/settings/domain/use_cases/import_data_use_case.dart';
 import 'package:flutter_ikanban_app/features/settings/data/settings_repository_impl.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/repository/settings_repository.dart';
-import 'package:flutter_ikanban_app/features/settings/infra/settings_data_source.dart';
 import 'package:flutter_ikanban_app/features/task/data/task_repository_impl.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/features/task/infra/local/task_local_data_source.dart';
@@ -142,9 +141,8 @@ void _setupTaskModule() {
 }
 
 void _setupSettingsModule() {
-  getIt.registerLazySingleton<SettingsDataSource>(() => SettingsDataSource());
   getIt.registerLazySingleton<SettingsRepository>(
-    () => SettingsRepositoryImpl(themeRepository: getIt(), dataSource: getIt()),
+    () => SettingsRepositoryImpl(themeRepository: getIt()),
   );
 
   getIt.registerLazySingleton<LoadSettingsUseCase>(

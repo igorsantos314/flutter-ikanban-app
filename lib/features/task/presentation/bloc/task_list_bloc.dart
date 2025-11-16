@@ -10,8 +10,8 @@ import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_tas
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_type_filter_preferences.dart';
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_sort.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
-import 'package:flutter_ikanban_app/features/task/domain/enums/tasks_order_by.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/list_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/update_task_use_case.dart';
@@ -19,6 +19,7 @@ import 'package:flutter_ikanban_app/features/task/presentation/enums/task_layout
 import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/list/task_list_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/shared/task_shared_events.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_status_enum_extensions.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/states/list/task_list_state.dart';
 
 class TaskListBloc extends Bloc<TaskEvent, TaskListState> {

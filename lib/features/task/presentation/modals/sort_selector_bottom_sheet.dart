@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ikanban_app/features/task/domain/enums/tasks_order_by.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_sort.dart';
+import 'package:flutter_ikanban_app/features/task/domain/model/sort_model.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/sort_options_extensions.dart';
 
 class SortSelectorBottomSheet extends StatefulWidget {

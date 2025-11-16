@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/core/ui/enums/layout_mode.dart';
-import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
-import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
-import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/enums/task_size.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_complexity_enum_extensions.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_priority_enum_extensions.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_status_enum_extensions.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_type_enum_extensions.dart';
 
 class TaskItemList extends StatelessWidget {
   final TaskModel task;

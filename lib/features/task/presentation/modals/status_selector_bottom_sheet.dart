@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_status_enum_extensions.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/status_selector.dart';
 
 class StatusSelectorBottomSheet extends StatelessWidget {

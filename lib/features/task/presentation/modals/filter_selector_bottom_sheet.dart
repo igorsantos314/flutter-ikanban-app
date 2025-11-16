@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_type_enum_extensions.dart';
 
 class FilterSelectorBottomSheet extends StatefulWidget {
   final List<TaskType> initialSelectedTypes;
