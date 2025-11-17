@@ -4,7 +4,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'theme_preference_model.freezed.dart';
 part 'theme_preference_model.g.dart';
 
-/// Modelo que representa a preferência de tema do usuário
 @freezed
 abstract class ThemePreferenceModel with _$ThemePreferenceModel {
   const ThemePreferenceModel._();
@@ -20,10 +19,8 @@ abstract class ThemePreferenceModel with _$ThemePreferenceModel {
 }
 
 extension ThemePreferenceModelX on ThemePreferenceModel {
-  /// Verifica se deve usar tema do sistema
   bool get shouldFollowSystem => followSystemTheme && selectedTheme == AppTheme.system;
   
-  /// Retorna o tema efetivo considerando as configurações
   AppTheme get effectiveTheme {
     if (shouldFollowSystem) {
       return AppTheme.system;
@@ -31,7 +28,6 @@ extension ThemePreferenceModelX on ThemePreferenceModel {
     return selectedTheme;
   }
   
-  /// Cria uma cópia com nova configuração de tema
   ThemePreferenceModel withTheme(AppTheme theme) {
     return copyWith(
       selectedTheme: theme,

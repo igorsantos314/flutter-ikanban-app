@@ -2,33 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// [MultilineBlocTextField] integrado ao BLoC.
-///
-/// Agora não fixa altura; cresce com o conteúdo até `maxLines`.
 class MultilineBlocTextField<C extends StateStreamable<S>, S> extends StatelessWidget {
-  /// Como pegar o valor atual do estado (ex: `(s) => s.email`)
   final String Function(S state) valueSelector;
-
-  /// Como pegar a mensagem de erro do estado (ex: `(s) => s.emailError`)
   final String? Function(S state)? errorSelector;
-
-  /// Dispara quando o campo muda
   final void Function(String value) onChanged;
-
-  /// Controller externo (opcional, mas recomendado para controle mais avançado)
   final TextEditingController controller;
-
-  /// Label do campo
   final String label;
-
-  /// Largura máxima do campo; se null, ocupa o espaço do pai
   final double? maxWidth;
-
-  /// Linhas mínima e máxima do TextField — controla o redimensionamento.
   final int minLines;
   final int maxLines;
 
-  /// Espaçamentos e demais configs
   final double paddingTop;
   final double paddingBottom;
   final bool enabled;
@@ -63,7 +46,6 @@ class MultilineBlocTextField<C extends StateStreamable<S>, S> extends StatelessW
       listener: (context, state) {
         final value = valueSelector(state);
         if (controller.text != value) {
-          // Preserva a seleção para o final do texto atual
           controller.text = value;
           controller.selection = TextSelection.collapsed(offset: value.length);
         }
@@ -71,7 +53,6 @@ class MultilineBlocTextField<C extends StateStreamable<S>, S> extends StatelessW
       child: Padding(
         padding: EdgeInsets.only(top: paddingTop, bottom: paddingBottom),
         child: ConstrainedBox(
-          // Se maxWidth for null, não impõe limite (ocupa o espaço do pai)
           constraints: BoxConstraints(
             maxWidth: maxWidth ?? double.infinity,
           ),
@@ -86,7 +67,6 @@ class MultilineBlocTextField<C extends StateStreamable<S>, S> extends StatelessW
                 maxLength: maxLength,
                 minLines: minLines,
                 maxLines: maxLines,
-                // não usar expands quando queremos altura dinâmica baseada nas linhas
                 textAlignVertical: TextAlignVertical.top,
                 onEditingComplete: onEditingComplete,
                 decoration: InputDecoration(

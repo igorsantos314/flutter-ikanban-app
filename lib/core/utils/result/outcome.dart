@@ -6,12 +6,12 @@ part 'outcome.freezed.dart';
 @freezed
 sealed class Outcome<SuccessResultType, ErrorType> with _$Outcome<SuccessResultType, ErrorType> {
   const factory Outcome.success({
-    SuccessResultType? value, // O valor retornado em caso de sucesso
+    SuccessResultType? value,
   }) = _Success;
 
   const factory Outcome.failure({
-    required ErrorType error, // O tipo de erro que ocorreu
-    String? message, // Uma mensagem descritiva do erro (opcional)
-    Object? throwable, // A exceção/erro original que causou a falha (opcional)
+    required ErrorType error, 
+    String? message,
+    Object? throwable,
   }) = _Failure;
 }

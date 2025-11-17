@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 
 extension TaskTypeExtension on TaskType {
-  // Ícone para cada tipo
   IconData get icon {
     switch (this) {
       case TaskType.feature:
@@ -60,7 +59,6 @@ extension TaskTypeExtension on TaskType {
     }
   }
 
-  // Cor para cada tipo
   Color get color {
     switch (this) {
       case TaskType.feature:
@@ -118,7 +116,6 @@ extension TaskTypeExtension on TaskType {
     }
   }
 
-  // Nome amigável em português
   String get displayName {
     switch (this) {
       case TaskType.feature:
@@ -176,7 +173,6 @@ extension TaskTypeExtension on TaskType {
     }
   }
 
-  // Descrição do tipo
   String get description {
     switch (this) {
       case TaskType.housework:

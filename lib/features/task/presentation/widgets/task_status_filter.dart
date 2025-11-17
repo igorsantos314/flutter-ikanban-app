@@ -23,7 +23,7 @@ class TaskStatusFilter extends StatelessWidget {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          // Chips dos status
+          // Chips of status
           ...TaskStatus.values.map((status) {
             final bool isSelected = selectedStatus == status;
 

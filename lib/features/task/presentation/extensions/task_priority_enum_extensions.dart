@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 
 extension TaskPriorityExtension on TaskPriority {
-  // Nome em português
   String get displayName {
     switch (this) {
       case TaskPriority.lowest:
@@ -20,7 +19,6 @@ extension TaskPriorityExtension on TaskPriority {
     }
   }
 
-  // Cor
   Color get color {
     switch (this) {
       case TaskPriority.lowest:
@@ -38,7 +36,6 @@ extension TaskPriorityExtension on TaskPriority {
     }
   }
 
-  // Ícone
   IconData get icon {
     switch (this) {
       case TaskPriority.lowest:
@@ -56,7 +53,6 @@ extension TaskPriorityExtension on TaskPriority {
     }
   }
 
-  // Valor numérico (para ordenação)
   int get value {
     switch (this) {
       case TaskPriority.lowest:
@@ -74,7 +70,6 @@ extension TaskPriorityExtension on TaskPriority {
     }
   }
 
-  // Descrição
   String get description {
     switch (this) {
       case TaskPriority.lowest:

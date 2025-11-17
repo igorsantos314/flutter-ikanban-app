@@ -87,14 +87,12 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     return super.close();
   }
 
-  /// Carrega primeira página + inicia stream para mudanças em tempo real
   FutureOr<void> _onLoadTasks(
     LoadTasksEvent event,
     Emitter<TaskListState> emit,
   ) async {
     log('[TaskListBloc] Loading initial tasks...');
 
-    // Evita múltiplas chamadas simultâneas
     if (_isLoadingTasks) {
       log('[TaskListBloc] Already loading, skipping...');
       return;
@@ -112,12 +110,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
 
     await _loadPreferences(emit);
 
-    // Cancela stream anterior se existir
     _taskStreamSubscription?.cancel();
-
-    log(state.statusFilter.toString());
-
-    // Inicia stream para primeira página (observa mudanças em tempo real)
     _taskStreamSubscription = _listTaskUseCase
         .execute(
           page: 1,
@@ -142,7 +135,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
               error: error,
               stackTrace: stackTrace,
             );
-            // Nota: Como não temos construtor failure direto, vamos tratar no handler
+
             if (!isClosed) {
               emit(
                 state.copyWith(
@@ -165,7 +158,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
   }
 
   FutureOr<void> _loadPreferences(Emitter<TaskListState> emit) async {
-    // Carrega preferências de status e tipo
     final statusOutcome = await _getStatusUseCase.execute();
     statusOutcome.when(
       success: (status) {
@@ -212,14 +204,12 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     );
   }
 
-  /// Carrega mais páginas (sem stream - apenas API call)
   void _onLoadMoreTasks(
     LoadMoreTasksEvent event,
     Emitter<TaskListState> emit,
   ) async {
     log('[TaskListBloc] Loading more tasks...');
 
-    // Validações
     if (_isLoadingMore || !state.hasMorePages || state.isLoading) {
       log(
         '[TaskListBloc] Cannot load more: isLoadingMore=$_isLoadingMore, hasMorePages=${state.hasMorePages}, isLoading=${state.isLoading}',
@@ -233,7 +223,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     emit(state.copyWith(isLoadingMore: true));
 
     try {
-      // Usa método direto do repository (não stream) para paginação
       final stream = _listTaskUseCase.execute(
         page: nextPage,
         limitPerPage: _pageSize,
@@ -245,7 +234,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         onlyActive: true,
         orderBy: state.sortBy,
         ascending: state.sortOrder == SortOrder.ascending,
-      ); // Pega apenas o primeiro resultado do stream (single call)
+      );
       final outcome = await stream.first;
 
       add(TasksPageDataReceived(outcome, nextPage));
@@ -269,35 +258,28 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     }
   }
 
-  /// Refresh completo - reinicia tudo
   void _onRefreshTasks(RefreshTasksEvent event, Emitter<TaskListState> emit) {
     log('[TaskListBloc] Refreshing tasks...');
 
-    // Reset completo do estado
     _taskStreamSubscription?.cancel();
     _taskStreamSubscription = null;
     _isLoadingTasks = false;
     _isLoadingMore = false;
 
-    // Limpa estado e recarrega
     emit(TaskListState.initial().copyWith(searchQuery: _currentSearch ?? ''));
 
     add(const LoadTasksEvent());
   }
 
-  /// Busca com filtro
   void _onSearchTasks(SearchTasksEvent event, Emitter<TaskListState> emit) {
     log('[TaskListBloc] Searching tasks: "${event.query}"');
 
     _currentSearch = event.query.isEmpty ? null : event.query;
-
     emit(state.copyWith(searchQuery: event.query));
 
-    // Reinicia busca com novo filtro
     add(const LoadTasksEvent());
   }
 
-  /// Processa dados do stream (primeira página + mudanças em tempo real)
   void _onTasksStreamDataReceived(
     TasksStreamDataReceived event,
     Emitter<TaskListState> emit,
@@ -325,8 +307,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         final newTasks = resultPage.items ?? [];
         log('[TaskListBloc] Stream loaded ${newTasks.length} tasks for page 1');
 
-        // Para stream data: substitui apenas os itens da primeira página
-        // Mantém itens das páginas 2+ se existirem
         final existingTasksFromOtherPages = state.tasks.length > _pageSize
             ? state.tasks.skip(_pageSize).toList()
             : <TaskModel>[];
@@ -370,7 +350,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     );
   }
 
-  /// Processa dados da paginação (páginas 2+)
   void _onTasksPageDataReceived(
     TasksPageDataReceived event,
     Emitter<TaskListState> emit,
@@ -394,7 +373,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
           '[TaskListBloc] Page ${event.page} loaded ${newTasks.length} tasks',
         );
 
-        // Adiciona novos itens à lista existente
         final updatedTasks = <TaskModel>[...state.tasks, ...newTasks];
         final hasMore = newTasks.length >= _pageSize;
 
@@ -431,7 +409,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     );
   }
 
-  /// Reset de notificações e outros estados da UI
   void _onTaskFormReset(TaskFormResetEvent event, Emitter<TaskListState> emit) {
     emit(
       state.copyWith(
@@ -455,7 +432,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         : TaskStatus.done;
     final updatedTask = task.copyWith(status: updatedStatus);
 
-    // Atualiza no repositório
     var outcome = await _updateTaskUseCase.execute(updatedTask);
 
     outcome.when(
@@ -507,11 +483,9 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
 
     final updatedTask = task.copyWith(status: event.status);
 
-    // Atualiza no repositório
     await _updateTaskUseCase.execute(updatedTask).then((outcome) {
       outcome.when(
         success: (_) {
-          // Atualiza localmente o estado
           final updatedTasks = state.tasks
               .map((t) => t.id == updatedTask.id ? updatedTask : t)
               .toList();
@@ -612,7 +586,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
       },
     );
 
-    // Recarrega as tarefas com os novos filtros
     add(const LoadTasksEvent());
   }
 
@@ -635,7 +608,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
       ),
     );
 
-    // Recarrega as tarefas com a nova ordenação
     add(const LoadTasksEvent());
   }
 

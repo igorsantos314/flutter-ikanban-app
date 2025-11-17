@@ -25,11 +25,10 @@ class ExportDataUseCase {
     bool shareAfterExport = false,
   }) async {
     try {
-      // 2. Buscar todas as tarefas (paginação completa)
       List<Map<String, dynamic>> tasksData = [];
       int totalTasks = 0;
       int currentPage = 1;
-      const int pageSize = 100; // Tamanho menor para melhor performance
+      const int pageSize = 100;
       bool hasMorePages = true;
 
       while (hasMorePages) {
@@ -44,7 +43,7 @@ class ExportDataUseCase {
         final success = tasksOutcome.when(
           success: (resultPage) {
             if (resultPage != null) {
-              // Adiciona as tarefas da página atual à lista completa
+              // Adds the tasks from the current page to the complete list
               final pageTasksData = resultPage.items
                   .map(
                     (task) => {
@@ -58,8 +57,8 @@ class ExportDataUseCase {
                       'dueDate': task.dueDate?.toIso8601String(),
                       'isActive': task.isActive,
                       'createdAt': task.createdAt
-                          .toIso8601String(), // Adiciona timestamp de criação
-                      'color': task.color.name, // Adiciona cor da tarefa
+                          .toIso8601String(), // Adds creation timestamp
+                      'color': task.color.name, // Adds task color
                     },
                   )
                   .toList();
@@ -67,13 +66,13 @@ class ExportDataUseCase {
               tasksData.addAll(pageTasksData);
               totalTasks = resultPage.totalItems;
 
-              // Verifica se há mais páginas
+              // Check if there are more pages
               final totalPages = (totalTasks / pageSize).ceil();
               hasMorePages =
                   currentPage < totalPages && resultPage.items.isNotEmpty;
 
               log(
-                'Página $currentPage de $totalPages carregada - ${resultPage.items.length} tarefas',
+                'Page $currentPage of $totalPages loaded - ${resultPage.items.length} tasks',
               );
 
               return true;
@@ -81,7 +80,7 @@ class ExportDataUseCase {
             return false;
           },
           failure: (error, message, throwable) {
-            log('Erro ao carregar página $currentPage: $message');
+            log('Error loading page $currentPage: $message');
             return false;
           },
         );
@@ -201,12 +200,13 @@ class ExportResult {
 
   String get formattedSize {
     if (fileSize < 1024) return '${fileSize}B';
-    if (fileSize < 1024 * 1024)
+    if (fileSize < 1024 * 1024) {
       return '${(fileSize / 1024).toStringAsFixed(1)}KB';
+    }
     return '${(fileSize / (1024 * 1024)).toStringAsFixed(1)}MB';
   }
-
-  String get summary => '$tasksCount tarefas exportadas • $formattedSize';
+  
+  String get summary => '$tasksCount tasks exported • $formattedSize';
 }
 
 enum ExportDataError {

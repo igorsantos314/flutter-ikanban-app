@@ -112,7 +112,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
               state.notificationMessage,
               state.notificationType,
             );
-            // Usar Future.microtask para evitar problemas de timing
+
             Future.microtask(() {
               if (context.mounted) {
                 context.read<TaskListBloc>().add(
@@ -185,7 +185,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
               );
             },);
 
-            // Fechar detalhes da tarefa ao voltar
+            // Close task details on return
             context.read<TaskListBloc>().add(
               TaskFormResetEvent(showTaskDetails: false),
             );
@@ -336,7 +336,8 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                     );
                   }
 
-                  // Estado vazio
+
+                  // Empty state
                   if (state.tasks.isEmpty && !state.isLoading) {
                     return Center(
                       child: Column(
@@ -364,7 +365,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                     );
                   }
 
-                  // Lista com scroll infinito
+                  // Infinite scroll list
                   return RefreshIndicator(
                     onRefresh: () async {
                       context.read<TaskListBloc>().add(
@@ -375,7 +376,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          // Layout Toggle
+                          // Layout toggle
                           _buildOptions(theme),
                           const SizedBox(height: 8),
                           Expanded(
@@ -421,7 +422,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
     int index,
   ) {
     {
-      // Item de loading no final (scroll infinito)
+      // Loading item at the end (infinite scroll)
       if (index == state.tasks.length) {
         if (state.isLoadingMore) {
           return const Padding(
@@ -440,7 +441,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         return const SizedBox.shrink();
       }
 
-      // Trigger para load more (quando chegar perto do fim)
+      // Trigger to load more (when nearing the end of the list)
       if (index == state.tasks.length - 3 &&
           state.hasMorePages &&
           !state.isLoadingMore) {

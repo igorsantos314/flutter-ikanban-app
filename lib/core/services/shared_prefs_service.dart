@@ -69,7 +69,6 @@ class SharedPrefsService {
     return p.clear();
   }
 
-  // Exemplo: salvar objeto serializado (usar jsonEncode/jsonDecode)
   Future<bool> setObject<T>(String key, T object) async {
     final p = await _prefs;
     final json = jsonEncode(object);
