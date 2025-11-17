@@ -5,10 +5,11 @@ import 'package:flutter_ikanban_app/core/database/app_database.dart';
 import 'package:flutter_ikanban_app/core/utils/result/result_page.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_sort.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
-import 'package:flutter_ikanban_app/features/task/domain/enums/tasks_order_by.dart';
 import 'package:flutter_ikanban_app/features/task/infra/local/tables/task_table_entity.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_priority_enum_extensions.dart';
 
 part 'task_local_data_source.g.dart';
 
@@ -99,11 +100,9 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
       final end = start + limitPerPage;
       return rows.sublist(start, end > rows.length ? rows.length : end);
     })) {
-      // 4. Contagem total
       final totalItemsQuery = db.selectOnly(db.taskEntity)
         ..addColumns([db.taskEntity.id.count()]);
 
-      // reaplica filtros iguais na query de contagem
       if (search != null && search.isNotEmpty) {
         final description = db.taskEntity.description;
         final title = db.taskEntity.title;

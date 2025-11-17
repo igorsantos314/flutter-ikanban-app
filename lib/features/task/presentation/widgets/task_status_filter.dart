@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_status_enum_extensions.dart';
 
 class TaskStatusFilter extends StatelessWidget {
   final TaskStatus selectedStatus;
@@ -22,7 +23,7 @@ class TaskStatusFilter extends StatelessWidget {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          // Chips dos status
+          // Chips of status
           ...TaskStatus.values.map((status) {
             final bool isSelected = selectedStatus == status;
 

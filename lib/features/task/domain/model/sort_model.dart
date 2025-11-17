@@ -1,15 +1,4 @@
-enum SortField {
-  createdAt,
-  title,
-  priority,
-  complexity,
-  dueDate,
-}
-
-enum SortOrder {
-  ascending,
-  descending,
-}
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_sort.dart';
 
 class SortOption {
   final SortField field;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ikanban_app/features/task/domain/enums/tasks_order_by.dart';
+import 'package:flutter_ikanban_app/features/task/domain/enums/task_sort.dart';
 
 extension SortFieldExtension on SortField {
   String get fieldName {

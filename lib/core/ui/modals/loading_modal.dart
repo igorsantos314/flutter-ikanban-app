@@ -5,11 +5,12 @@ class LoadingModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -39,7 +40,7 @@ class LoadingModal extends StatelessWidget {
       });
     } else if (!isShow && _isLoading) {
       _isLoading = false;
-      // Fecha o dialog se estiver aberto
+      
       if (Navigator.canPop(context)) {
         Navigator.of(context, rootNavigator: true).pop();
       }

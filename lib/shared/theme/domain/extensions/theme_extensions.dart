@@ -1,7 +1,6 @@
 
 import 'package:flutter_ikanban_app/shared/theme/domain/errors/theme_errors.dart';
 
-/// Extensions para facilitar o uso dos erros
 extension SetThemeErrorExtension on SetThemeError {
   String get message {
     switch (this) {

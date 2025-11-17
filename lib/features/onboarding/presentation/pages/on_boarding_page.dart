@@ -114,7 +114,7 @@ class _OnBoardingPageContentState extends State<OnBoardingPageContent> {
                   ? const Center(child: CircularProgressIndicator())
                   : Column(
                       children: [
-                        // Header com botão Skip
+                        // Header with Skip button
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Row(
@@ -130,7 +130,6 @@ class _OnBoardingPageContentState extends State<OnBoardingPageContent> {
                                 ],
                               ),
 
-                              // Botão Skip
                               TextButton(
                                 onPressed: _skipOnboarding,
                                 child: Text(
@@ -146,7 +145,7 @@ class _OnBoardingPageContentState extends State<OnBoardingPageContent> {
                           ),
                         ),
 
-                        // PageView com conteúdo
+                        // PageView with content
                         Expanded(
                           child: PageView.builder(
                             controller: _pageController,
@@ -164,7 +163,7 @@ class _OnBoardingPageContentState extends State<OnBoardingPageContent> {
                                 ),
                                 child: Column(
                                   children: [
-                                    // Imagem com blur na parte inferior
+                                    // Image with blur at the bottom
                                     Expanded(
                                       flex: 3,
                                       child: Container(
@@ -188,14 +187,14 @@ class _OnBoardingPageContentState extends State<OnBoardingPageContent> {
                                       ),
                                     ),
 
-                                    // Conteúdo de texto
+                                    // Text content
                                     Expanded(
                                       flex: 2,
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          // Título
+                                          // Title
                                           Text(
                                             data.title,
                                             style: theme
@@ -212,7 +211,7 @@ class _OnBoardingPageContentState extends State<OnBoardingPageContent> {
 
                                           const SizedBox(height: 16),
 
-                                          // Descrição
+                                          // Description
                                           Text(
                                             data.description,
                                             style: theme.textTheme.bodyLarge
@@ -235,12 +234,12 @@ class _OnBoardingPageContentState extends State<OnBoardingPageContent> {
                           ),
                         ),
 
-                        // Indicadores de página e botões de navegação
+                        // Page indicators and navigation buttons
                         Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: Column(
                             children: [
-                              // Indicadores de página (bolinhas)
+                              // Page indicators (dots)
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: List.generate(
@@ -265,10 +264,10 @@ class _OnBoardingPageContentState extends State<OnBoardingPageContent> {
 
                               const SizedBox(height: 24),
 
-                              // Botões de navegação
+                              // Navigation buttons
                               Row(
                                 children: [
-                                  // Botão Anterior (só aparece se não for a primeira página)
+                                  // Previous button (only appears if not on the first page)
                                   if (_currentIndex > 0)
                                     Expanded(
                                       child: OutlinedButton.icon(
@@ -290,7 +289,7 @@ class _OnBoardingPageContentState extends State<OnBoardingPageContent> {
 
                                   const SizedBox(width: 16),
 
-                                  // Botão Próximo/Começar
+                                  // Next/Start button
                                   Expanded(
                                     child: ElevatedButton.icon(
                                       onPressed: _nextPage,

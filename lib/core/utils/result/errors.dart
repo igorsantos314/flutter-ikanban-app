@@ -1,4 +1,3 @@
-// Enum para tipos de erro
 enum ErrorType {
   // Auth
   authEmailAlreadyInUse,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_type_enum_extensions.dart';
 
 class TypeSelectorBottomSheet extends StatelessWidget {
   final TaskType selectedType;
@@ -15,7 +16,6 @@ class TypeSelectorBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Organiza os tipos em categorias
     final technicalTypes = [
       TaskType.feature,
       TaskType.bug,

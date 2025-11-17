@@ -2,17 +2,14 @@ import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/errors/settings_repository_errors.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/model/settings_model.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/repository/settings_repository.dart';
-import 'package:flutter_ikanban_app/features/settings/infra/settings_data_source.dart';
 import 'package:flutter_ikanban_app/shared/theme/repository/theme_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsRepositoryImpl implements SettingsRepository {
   final ThemeRepository themeRepository;
-  final SettingsDataSource dataSource;
 
   SettingsRepositoryImpl({
     required this.themeRepository,
-    required this.dataSource,
   });
 
   @override
