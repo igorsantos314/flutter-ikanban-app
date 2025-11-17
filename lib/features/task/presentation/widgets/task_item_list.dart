@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/core/ui/enums/layout_mode.dart';
-import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
-import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
-import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/enums/task_size.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_complexity_enum_extensions.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_priority_enum_extensions.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_status_enum_extensions.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_type_enum_extensions.dart';
 
 class TaskItemList extends StatelessWidget {
   final TaskModel task;
@@ -125,18 +126,18 @@ class TaskItemList extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Título e botão de conclusão
+              // Title and completion button
               _buildTitleRow(theme, textColor),
 
-              // Descrição
+              // Description
               _buildDescription(theme, showAllDetails),
 
-              // Data de vencimento
+              // Due date
               _buildDueDate(theme, showAllDetails),
 
               const SizedBox(height: 12),
 
-              // Tipo e Complexidade
+              // Type and Complexity
               _buildTypeAndComplexity(theme, showAllDetails),
             ],
           ),
@@ -144,7 +145,7 @@ class TaskItemList extends StatelessWidget {
 
         const SizedBox(width: 12),
 
-        // Status e Prioridade
+        // Status and Priority
         _buildStatusAndPriority(theme, showAllDetails),
       ],
     );
@@ -154,29 +155,29 @@ class TaskItemList extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        // Conteúdo principal
+        // Main content
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Título e botão de conclusão
+            // Title and completion button
             _buildTitleRow(theme, textColor),
 
-            // Descrição
+            // Description
             _buildDescription(theme, showAllDetails),
 
-            // Data de vencimento
+            // Due date
             _buildDueDate(theme, showAllDetails),
 
             const SizedBox(height: 12),
 
-            // Tipo e Complexidade
+            // Type and Complexity
             _buildTypeAndComplexity(theme, showAllDetails),
           ],
         ),
 
         const SizedBox(width: 12),
 
-        // Status e Prioridade
+        // Status and Priority
         _buildStatusAndPriority(theme, showAllDetails),
       ],
     );
@@ -185,7 +186,7 @@ class TaskItemList extends StatelessWidget {
   Widget _buildTitleRow(ThemeData theme, Color textColor) {
     return Row(
       children: [
-        // Marcar como concluído
+        // Mark as completed
         if (onToggleCompletion != null) ...[
           const SizedBox(height: 8),
           IconButton(
@@ -203,7 +204,7 @@ class TaskItemList extends StatelessWidget {
           ),
         ],
 
-        // Título
+        // Title
         Expanded(
           child: Text(
             task.title,

@@ -12,8 +12,6 @@ import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 
-/// Caso de uso responsável por importar dados para o app
-/// Segue os princípios da Clean Architecture não dependendo de features específicas
 class ImportDataUseCase {
   final TaskRepository _taskRepository;
   final FileService _fileService;
@@ -28,14 +26,8 @@ class ImportDataUseCase {
        _fileService = fileService,
        _fileShareService = fileShareService;
 
-  /// Permite ao usuário selecionar um arquivo e importa os dados
-  ///
-  /// Returns:
-  /// - Success: Resultado da importação
-  /// - Failure: Erro ocorrido durante a seleção ou importação
   Future<Outcome<ImportResult, ImportDataError>> executeWithFilePicker() async {
     try {
-      // 1. Permitir que o usuário selecione um arquivo
       final filePickerOutcome = await _fileShareService.pickFile(
         allowedExtensions: ['json'],
         dialogTitle: 'Selecione o arquivo de backup',
@@ -75,24 +67,14 @@ class ImportDataUseCase {
     }
   }
 
-  /// Importa dados de um arquivo JSON específico
-  ///
-  /// Parameters:
-  /// - [filePath]: Caminho do arquivo a ser importado
-  ///
-  /// Returns:
-  /// - Success: Resultado da importação
-  /// - Failure: Erro ocorrido durante a importação
   Future<Outcome<ImportResult, ImportDataError>> executeFromFile(
     String filePath,
   ) async {
     try {
-      // 1. Ler o arquivo usando o FileService
       final fileReadOutcome = await _fileService.readFile(filePath);
 
       return await fileReadOutcome.when(
         success: (fileContent) async {
-          // 2. Decodificar o arquivo JSON
           final Map<String, dynamic> data;
 
           try {
@@ -105,7 +87,6 @@ class ImportDataUseCase {
             );
           }
 
-          // 3. Validar estrutura do backup
           if (!_isValidBackupFile(data)) {
             return Outcome.failure(
               error: ImportDataError.invalidBackupFormat,
@@ -113,15 +94,13 @@ class ImportDataUseCase {
             );
           }
 
-          // 4. Importar dados
           int tasksImported = 0;
           bool settingsImported = false;
 
-          // 4b. Importar tarefas se existirem
           if (data.containsKey('tasks')) {
             try {
               final tasksData = data['tasks'] as List<dynamic>;
-              log("Importando ${tasksData.length} tarefas");
+              log("Importing ${tasksData.length} tasks");
 
               final tasks = tasksData.map((taskJson) {
                   final taskMap = taskJson as Map<String, dynamic>;
@@ -162,7 +141,6 @@ class ImportDataUseCase {
                   );
                 }).toList();
 
-              // Processar cada tarefa
               final result = await _taskRepository.createTasks(
                 tasks,
               );
@@ -170,7 +148,7 @@ class ImportDataUseCase {
               result.when(success: (value) {
                 tasksImported = tasksData.length;
               }, failure: (error, message, throwable) {
-                log('Erro ao importar tarefas: $message throwable: $throwable');
+                log('Error importing tasks: $message throwable: $throwable');
               },);
             } catch (e) {
               return Outcome.failure(
@@ -181,7 +159,6 @@ class ImportDataUseCase {
             }
           }
 
-          // 5. Retornar resultado
           return Outcome.success(
             value: ImportResult(
               tasksImported: tasksImported,
@@ -206,7 +183,6 @@ class ImportDataUseCase {
     }
   }
 
-  /// Valida se o arquivo tem a estrutura básica esperada
   bool _isValidBackupFile(Map<String, dynamic> data) {
     return data.containsKey('app') &&
         data.containsKey('version') &&
@@ -215,7 +191,6 @@ class ImportDataUseCase {
   }
 }
 
-/// Resultado da importação
 class ImportResult {
   final int tasksImported;
   final bool settingsImported;
@@ -228,7 +203,6 @@ class ImportResult {
   int get totalImported => tasksImported + (settingsImported ? 1 : 0);
 }
 
-/// Erros possíveis durante a importação
 enum ImportDataError {
   fileNotFound,
   invalidJsonFormat,
@@ -240,7 +214,6 @@ enum ImportDataError {
   unexpectedError,
 }
 
-/// Extensão para facilitar o uso dos erros
 extension ImportDataErrorExtension on ImportDataError {
   String get message {
     switch (this) {

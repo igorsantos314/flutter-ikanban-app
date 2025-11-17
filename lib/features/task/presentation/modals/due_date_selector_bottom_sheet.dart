@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -27,7 +29,6 @@ class _DueDateSelectorBottomSheetState
     _selectedDate = widget.selectedDueDate;
   }
 
-  // Opções predefinidas de datas
   List<DateOption> get _quickOptions {
     final now = DateTime.now();
     return [
@@ -112,11 +113,9 @@ class _DueDateSelectorBottomSheetState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Opção para remover data
                   _buildRemoveDateOption(theme),
                   const SizedBox(height: 16),
 
-                  // Opções rápidas
                   Text(
                     'Opções Rápidas',
                     style: theme.textTheme.titleSmall?.copyWith(
@@ -129,7 +128,6 @@ class _DueDateSelectorBottomSheetState
 
                   const SizedBox(height: 16),
 
-                  // Seleção personalizada
                   Text(
                     'Data Personalizada',
                     style: theme.textTheme.titleSmall?.copyWith(
@@ -327,7 +325,6 @@ class _DueDateSelectorBottomSheetState
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    // Garante que a data inicial não seja anterior ao dia de hoje
     DateTime initialDate;
     if (_selectedDate != null &&
         _selectedDate!.isAfter(today.subtract(const Duration(days: 1)))) {
@@ -351,8 +348,7 @@ class _DueDateSelectorBottomSheetState
         setState(() => _selectedDate = picked);
       }
     } catch (e) {
-      // Se der erro, não faz nada - apenas não seleciona a data
-      debugPrint('Erro ao abrir DatePicker: $e');
+      log('Erro ao abrir DatePicker: $e');
     }
   }
 
@@ -363,41 +359,12 @@ class _DueDateSelectorBottomSheetState
   }
 
   DateTime _getEndOfWeek(DateTime date) {
-    // Calcula o domingo da semana (considerando domingo como fim de semana)
     final daysUntilSunday = 7 - date.weekday;
     return date.add(Duration(days: daysUntilSunday));
   }
 
   DateTime _getEndOfMonth(DateTime date) {
-    // Calcula o último dia do mês atual
     return DateTime(date.year, date.month + 1, 0);
-  }
-
-  // ignore: unused_element
-  static Future<void> show({
-    required BuildContext context,
-    required DateTime? selectedDueDate,
-    required Function(DateTime?) onDueDateSelected,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
-        ),
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: DueDateSelectorBottomSheet(
-          selectedDueDate: selectedDueDate,
-          onDueDateSelected: onDueDateSelected,
-        ),
-      ),
-    );
   }
 }
 

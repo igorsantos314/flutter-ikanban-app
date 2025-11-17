@@ -13,13 +13,14 @@ import 'package:flutter_ikanban_app/core/ui/widgets/appbar/custom_app_bar.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/snackbars.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
-import 'package:flutter_ikanban_app/features/task/domain/enums/tasks_order_by.dart';
+import 'package:flutter_ikanban_app/features/task/domain/model/sort_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/list_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/update_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_list_bloc.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/enums/task_layout.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/list/task_list_events.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_type_enum_extensions.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/filter_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/sort_selector_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/task_details_bottom_sheet.dart';
@@ -111,7 +112,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
               state.notificationMessage,
               state.notificationType,
             );
-            // Usar Future.microtask para evitar problemas de timing
+
             Future.microtask(() {
               if (context.mounted) {
                 context.read<TaskListBloc>().add(
@@ -184,7 +185,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
               );
             },);
 
-            // Fechar detalhes da tarefa ao voltar
+            // Close task details on return
             context.read<TaskListBloc>().add(
               TaskFormResetEvent(showTaskDetails: false),
             );
@@ -335,7 +336,8 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                     );
                   }
 
-                  // Estado vazio
+
+                  // Empty state
                   if (state.tasks.isEmpty && !state.isLoading) {
                     return Center(
                       child: Column(
@@ -363,7 +365,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                     );
                   }
 
-                  // Lista com scroll infinito
+                  // Infinite scroll list
                   return RefreshIndicator(
                     onRefresh: () async {
                       context.read<TaskListBloc>().add(
@@ -374,7 +376,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          // Layout Toggle
+                          // Layout toggle
                           _buildOptions(theme),
                           const SizedBox(height: 8),
                           Expanded(
@@ -420,7 +422,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
     int index,
   ) {
     {
-      // Item de loading no final (scroll infinito)
+      // Loading item at the end (infinite scroll)
       if (index == state.tasks.length) {
         if (state.isLoadingMore) {
           return const Padding(
@@ -439,7 +441,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         return const SizedBox.shrink();
       }
 
-      // Trigger para load more (quando chegar perto do fim)
+      // Trigger to load more (when nearing the end of the list)
       if (index == state.tasks.length - 3 &&
           state.hasMorePages &&
           !state.isLoadingMore) {

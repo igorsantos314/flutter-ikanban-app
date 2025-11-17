@@ -2,27 +2,19 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 
-/// Serviço multiplataforma para operações de arquivo
-/// Abstrai as diferenças entre Android, iOS, Desktop
 class FileService {
-  /// Obtém o diretório temporário para salvar backups (sem permissões especiais)
-  /// - Android/iOS: Diretório temporário da app
-  /// - Desktop: Diretório temporário do sistema
   Future<Outcome<Directory, FileServiceError>> getBackupDirectory() async {
     try {
       Directory directory;
       
       if (Platform.isAndroid || Platform.isIOS) {
-        // Mobile: usa diretório temporário (sem permissões especiais)
         final tempDir = await getTemporaryDirectory();
         directory = Directory('${tempDir.path}/backups');
       } else {
-        // Desktop: usa diretório temporário do sistema
         final tempDir = await getTemporaryDirectory();
         directory = Directory('${tempDir.path}/iKanban');
       }
       
-      // Cria o diretório se não existir
       if (!await directory.exists()) {
         await directory.create(recursive: true);
       }
@@ -37,7 +29,6 @@ class FileService {
     }
   }
 
-  /// Salva dados em arquivo
   Future<Outcome<File, FileServiceError>> saveFile({
     required String fileName,
     required String content,
@@ -69,7 +60,6 @@ class FileService {
     }
   }
 
-  /// Lê conteúdo de um arquivo
   Future<Outcome<String, FileServiceError>> readFile(String filePath) async {
     try {
       final file = File(filePath);
@@ -92,7 +82,6 @@ class FileService {
     }
   }
 
-  /// Lista arquivos de backup disponíveis
   Future<Outcome<List<File>, FileServiceError>> listBackupFiles() async {
     try {
       final directoryOutcome = await getBackupDirectory();
@@ -105,7 +94,6 @@ class FileService {
               .cast<File>()
               .toList();
           
-          // Ordena por data de modificação (mais recente primeiro)
           files.sort((a, b) => b.lastModifiedSync().compareTo(a.lastModifiedSync()));
           
           return Outcome.success(value: files);
@@ -127,7 +115,6 @@ class FileService {
     }
   }
 
-  /// Obtém informações sobre um arquivo
   Future<Outcome<FileInfo, FileServiceError>> getFileInfo(String filePath) async {
     try {
       final file = File(filePath);
@@ -160,7 +147,6 @@ class FileService {
 
 }
 
-/// Informações sobre um arquivo
 class FileInfo {
   final String path;
   final String name;
@@ -186,7 +172,6 @@ class FileInfo {
   }
 }
 
-/// Erros do serviço de arquivo
 enum FileServiceError {
   platformNotSupported,
   directoryNotFound,

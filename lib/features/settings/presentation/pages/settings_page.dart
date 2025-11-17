@@ -176,7 +176,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                       : ListView(
                           padding: const EdgeInsets.all(16),
                           children: [
-                            // Seção de Tema
+                            // Theme Section
                             Card(
                               elevation: 2,
                               child: Padding(
@@ -270,7 +270,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
 
                             const SizedBox(height: 16),
 
-                            // Seção de Dados
+                            // Data Section
                             Card(
                               elevation: 2,
                               child: Padding(
@@ -337,7 +337,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
 
                             const SizedBox(height: 32),
 
-                            // Rodapé com informações
+                            // Footer
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(20),
