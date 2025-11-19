@@ -18,7 +18,7 @@
 **iKanban** é um aplicativo de produtividade desenvolvido em **Flutter** que implementa o método Kanban para gerenciamento visual de tarefas. O projeto combina uma interface moderna e intuitiva com uma arquitetura robusta baseada em **Clean Architecture**.
 
 ### 🎯 **Características Principais:**
-- 📱 **Multi-plataforma**: Android, iOS, Web, Windows, Linux e macOS
+- 📱 **Multi-plataforma**: Android, iOS, Windows, Linux e macOS
 - 🎨 **Interface moderna** com temas claro/escuro
 - 🔍 **Sistema de busca** expansível e responsivo
 - 📊 **Kanban board** visual para organização de tarefas
