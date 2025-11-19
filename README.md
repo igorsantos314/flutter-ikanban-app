@@ -1,7 +1,7 @@
 # 📋 iKanban - Flutter Task Management App
 
 <div align="center">
-  <img src="assets/images/logo.png" alt="iKanban Logo" width="150"/>
+  <img src="assets/icons/logo.png" alt="iKanban Logo" width="150"/>
   
   **Um aplicativo completo de gerenciamento de tarefas inspirado no método Kanban**
   
