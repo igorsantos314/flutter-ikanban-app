@@ -24,7 +24,6 @@
 - 📊 **Kanban board** visual para organização de tarefas
 - 🏷️ **Sistema completo de categorização** (prioridade, complexidade, status)
 - 💾 **Armazenamento local** com SQLite
-- 🌍 **Internacionalização** (PT-BR e EN-US)
 
 ---
 
@@ -42,7 +41,7 @@ lib/
 │   ├── ui/                # Componentes UI reutilizáveis
 │   └── utils/             # Utilitários e helpers
 ├── features/               # Funcionalidades por domínio
-│   ├── board/             # Funcionalidade do quadro Kanban
+│   ├── board/             # Funcionalidade do quadro Kanban (Em desenvolvimento)
 │   ├── task/              # Gerenciamento de tarefas
 │   └── settings/          # Configurações da aplicação
 └── main.dart              # Ponto de entrada da aplicação
@@ -69,7 +68,6 @@ lib/
 | **DI** | `get_it` | Injeção de dependência |
 | **Serialização** | `freezed` + `json_annotation` | Modelos imutáveis |
 | **Tema** | `provider` | Gerenciamento de temas |
-| **Internacionalização** | `intl` | Suporte multi-idioma |
 
 ### 🛠️ **Ferramentas de Desenvolvimento:**
 
@@ -100,14 +98,11 @@ dev_dependencies:
 - 📱 **AppBar customizada** com busca expansível
 - 🌙 **Modo escuro/claro** com alternância automática
 - 📊 **Visualização em Kanban** para fluxo de trabalho
-- 🧭 **Navegação inferior** intuitiva
 - 📱 **Design responsivo** para todas as telas
 
 ### 🔧 **Configurações**
-- 🎨 **Personalização de temas**
-- 🌍 **Seleção de idioma**
-- 📊 **Preferências de visualização**
-- 🔔 **Configurações de notificação**
+- **Personalização de temas**
+- **Exportar e importar dados**
 
 ---
 
@@ -125,8 +120,6 @@ dev_dependencies:
 
 ### ⚙️ Configurações
 - Toggle para tema escuro/claro
-- Seleção de idioma
-- Preferências de usuário
 
 ---
 
@@ -169,54 +162,6 @@ flutter packages pub run build_runner build --delete-conflicting-outputs
 ```bash
 # Gerar ícones para todas as plataformas
 flutter pub run flutter_launcher_icons
-```
-
----
-
-## 📁 Estrutura Detalhada do Projeto
-
-### 🎯 **Core (Núcleo)**
-```
-core/
-├── database/
-│   ├── app_database.dart          # Configuração principal do banco
-│   └── app_database.g.dart        # Arquivo gerado pelo Drift
-├── di/
-│   └── app_locator.dart           # Configuração da injeção de dependência
-├── navigation/
-│   ├── app_navigation.dart        # Configuração de rotas
-│   └── ui/scaffold_with_nav_bar.dart  # Layout principal
-├── theme/
-│   └── theme_provider.dart        # Gerenciador de temas
-├── ui/widgets/
-│   └── appbar/custom_app_bar.dart # AppBar personalizada
-└── utils/
-    └── mapper/                    # Conversores de tipo SQL
-```
-
-### 🔧 **Features (Funcionalidades)**
-
-#### 📋 **Tasks (Tarefas)**
-```
-features/task/
-├── data/
-│   └── task_repository_impl.dart      # Implementação do repositório
-├── domain/
-│   ├── enums/                         # Enumerações (Status, Prioridade, etc.)
-│   ├── model/task_model.dart          # Modelo da tarefa
-│   └── repository/task_repository.dart # Interface do repositório
-├── infra/local/
-│   └── tables/task_table_entity.dart  # Entidade do banco de dados
-└── presentation/
-    ├── colors/task_colors.dart        # Sistema de cores
-    └── pages/                         # Telas da funcionalidade
-```
-
-#### 🎛️ **Settings (Configurações)**
-```
-features/settings/
-└── presentation/pages/
-    └── settings_page.dart             # Tela de configurações
 ```
 
 ---
@@ -291,12 +236,6 @@ flutter build appbundle --release
 flutter build ios --release
 ```
 
-### 🌐 **Web:**
-```bash
-# Web Build
-flutter build web --release
-```
-
 ### 🖥️ **Desktop:**
 ```bash
 # Windows
@@ -339,7 +278,7 @@ Este projeto está sob a licença **MIT**. Veja o arquivo `LICENSE` para mais de
 
 **Igor Santos**
 - GitHub: [@igorsantos314](https://github.com/igorsantos314)
-- LinkedIn: [Igor Santos](https://linkedin.com/in/igorsantos314)
+- LinkedIn: [Igor Santos](https://www.linkedin.com/in/igor-santos-8383941a6/)
 
 ---
 
@@ -353,13 +292,11 @@ Este projeto está sob a licença **MIT**. Veja o arquivo `LICENSE` para mais de
 - [ ] 🔄 Integração com APIs externas
 - [ ] 📱 Widget para tela inicial
 - [ ] 🎵 Sons e haptic feedback
-- [ ] 🌐 PWA (Progressive Web App)
 
 ### 🛠️ **Melhorias Técnicas:**
 - [ ] 🧪 Aumentar cobertura de testes
 - [ ] 🚀 Otimizações de performance
 - [ ] 🔧 CI/CD com GitHub Actions
-- [ ] 📚 Documentação da API
 - [ ] 🐛 Sistema de crash reporting
 
 ---
