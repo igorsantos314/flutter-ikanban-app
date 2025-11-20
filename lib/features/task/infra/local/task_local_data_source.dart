@@ -94,12 +94,11 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
 
     final column = _getOrderByColumn(orderBy, ascending);
     query.orderBy([(tbl) => column]);
+    
+    // Aplicar paginação na query SQL, não em memória
+    query.limit(limitPerPage, offset: (page - 1) * limitPerPage);
 
-    await for (final items in query.watch().map((rows) {
-      final start = (page - 1) * limitPerPage;
-      final end = start + limitPerPage;
-      return rows.sublist(start, end > rows.length ? rows.length : end);
-    })) {
+    await for (final items in query.watch()) {
       final totalItemsQuery = db.selectOnly(db.taskEntity)
         ..addColumns([db.taskEntity.id.count()]);
 

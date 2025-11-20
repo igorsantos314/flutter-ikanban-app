@@ -307,15 +307,18 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         final newTasks = resultPage.items ?? [];
         log('[TaskListBloc] Stream loaded ${newTasks.length} tasks for page 1');
 
-        final existingTasksFromOtherPages = state.tasks.length > _pageSize
-            ? state.tasks.skip(_pageSize).toList()
-            : <TaskModel>[];
-
-        final updatedTasks = <TaskModel>[
-          ...newTasks,
-          ...existingTasksFromOtherPages,
-        ];
-        final hasMore = newTasks.length >= _pageSize;
+        // Se já temos tarefas carregadas de outras páginas, atualizar apenas a página 1
+        final updatedTasks = <TaskModel>[];
+        if (state.tasks.length > _pageSize) {
+          // Substituir apenas os itens da página 1, manter o resto
+          updatedTasks.addAll(newTasks);
+          updatedTasks.addAll(state.tasks.skip(_pageSize));
+        } else {
+          // Primeira carga ou refresh completo
+          updatedTasks.addAll(newTasks);
+        }
+        
+        final hasMore = resultPage.totalPages > 1;
 
         emit(
           state.copyWith(
@@ -324,7 +327,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
             hasError: false,
             errorMessage: '',
             hasMorePages: hasMore,
-            currentPage: 1,
+            currentPage: state.currentPage > resultPage.totalPages ? 1 : state.currentPage,
           ),
         );
 
@@ -436,13 +439,9 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
 
     outcome.when(
       success: (_) {
-        // Atualiza localmente o estado
-        final updatedTasks = state.tasks
-            .map((t) => t.id == updatedTask.id ? updatedTask : t)
-            .toList();
+        // O stream vai atualizar automaticamente, apenas mostra notificação
         emit(
           state.copyWith(
-            tasks: updatedTasks,
             notificationType: NotificationType.success,
             showNotification: true,
             notificationMessage:
@@ -486,12 +485,9 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     await _updateTaskUseCase.execute(updatedTask).then((outcome) {
       outcome.when(
         success: (_) {
-          final updatedTasks = state.tasks
-              .map((t) => t.id == updatedTask.id ? updatedTask : t)
-              .toList();
+          // O stream vai atualizar automaticamente
           emit(
             state.copyWith(
-              tasks: updatedTasks,
               selectedTask: null,
               showStatusSelector: false,
             ),
