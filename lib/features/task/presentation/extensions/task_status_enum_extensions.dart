@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 
 extension TaskStatusExtension on TaskStatus {
-  // Nome em português
   String get displayName {
     switch (this) {
       case TaskStatus.all:
@@ -28,7 +27,6 @@ extension TaskStatusExtension on TaskStatus {
     }
   }
 
-  // Cor
   Color get color {
     switch (this) {
       case TaskStatus.all:
@@ -54,7 +52,6 @@ extension TaskStatusExtension on TaskStatus {
     }
   }
 
-  // Ícone
   IconData get icon {
     switch (this) {
       case TaskStatus.all:
@@ -80,7 +77,6 @@ extension TaskStatusExtension on TaskStatus {
     }
   }
 
-  // Descrição
   String get description {
     switch (this) {
       case TaskStatus.all:

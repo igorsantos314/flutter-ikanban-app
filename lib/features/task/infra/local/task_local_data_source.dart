@@ -100,11 +100,9 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
       final end = start + limitPerPage;
       return rows.sublist(start, end > rows.length ? rows.length : end);
     })) {
-      // 4. Contagem total
       final totalItemsQuery = db.selectOnly(db.taskEntity)
         ..addColumns([db.taskEntity.id.count()]);
 
-      // reaplica filtros iguais na query de contagem
       if (search != null && search.isNotEmpty) {
         final description = db.taskEntity.description;
         final title = db.taskEntity.title;

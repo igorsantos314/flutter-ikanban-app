@@ -1,35 +1,31 @@
 enum TaskStatus {
-  all,          // Todos os status
-  backlog,      // Backlog (ideias/futuro)
-  todo,         // A Fazer
-  inProgress,   // Em Progresso
-  blocked,      // Bloqueado
-  review,       // Em Revisão
-  testing,      // Em Teste
-  done,         // Concluído
-  cancelled,    // Cancelado
-  archived,    // Arquivado (não usado atualmente)
+  all,
+  backlog,
+  todo,
+  inProgress,
+  blocked,
+  review,
+  testing,
+  done,
+  cancelled,
+  archived,
 }
 
 extension TaskStatusExtension on TaskStatus {
-  // Status está ativo?
   bool get isActive {
     return this != TaskStatus.done && this != TaskStatus.cancelled;
   }
 
-  // Status está finalizado?
   bool get isFinished {
     return this == TaskStatus.done || this == TaskStatus.cancelled;
   }
 
-  // Status está em andamento?
   bool get isInProgress {
-    return this == TaskStatus.inProgress || 
-           this == TaskStatus.review || 
-           this == TaskStatus.testing;
+    return this == TaskStatus.inProgress ||
+        this == TaskStatus.review ||
+        this == TaskStatus.testing;
   }
 
-  // Progresso em percentual
   double get progressPercentage {
     switch (this) {
       case TaskStatus.backlog:
@@ -55,7 +51,6 @@ extension TaskStatusExtension on TaskStatus {
     }
   }
 
-  // Próximo status sugerido
   TaskStatus? get nextStatus {
     switch (this) {
       case TaskStatus.backlog:
@@ -81,7 +76,6 @@ extension TaskStatusExtension on TaskStatus {
     }
   }
 
-  // Status anterior sugerido
   TaskStatus? get previousStatus {
     switch (this) {
       case TaskStatus.backlog:

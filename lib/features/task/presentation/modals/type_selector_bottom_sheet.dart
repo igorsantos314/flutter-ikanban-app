@@ -16,7 +16,6 @@ class TypeSelectorBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Organiza os tipos em categorias
     final technicalTypes = [
       TaskType.feature,
       TaskType.bug,

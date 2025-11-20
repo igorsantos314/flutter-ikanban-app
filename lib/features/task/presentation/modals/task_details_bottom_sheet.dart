@@ -50,11 +50,11 @@ class TaskDetailsBottomSheet extends StatelessWidget {
               ),
             ),
 
-            // Header com título e cor da task
+            // Header with title and color indicator of the task
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Indicador de cor
+                // Color indicator
                 Container(
                   width: 6,
                   height: 60,
@@ -65,7 +65,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                 ),
                 const SizedBox(width: 16),
 
-                // Título e ID
+                // Title and ID
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,7 +128,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // Descrição
+            // Description
             if (task.description != null && task.description!.isNotEmpty) ...[
               Text(
                 'Descrição',
@@ -156,7 +156,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
               const SizedBox(height: 20),
             ],
 
-            // Informações principais em grid
+            // Main information in grid
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -165,7 +165,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  // Primeira linha - Prioridade e Complexidade
+                  // First row - Priority and Complexity
                   Row(
                     children: [
                       Expanded(
@@ -194,7 +194,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // Segunda linha - Tipo e Data de Vencimento
+                  // Second row - Type and Due Date
                   Row(
                     children: [
                       Expanded(
@@ -236,7 +236,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // Informações adicionais
+            // Additional information
             Row(
               children: [
                 Expanded(
@@ -254,10 +254,10 @@ class TaskDetailsBottomSheet extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Botões de ação
+            // Action buttons
             Row(
               children: [
-                // Botão fechar
+                // Close button
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () => Navigator.of(context).pop(),
@@ -271,7 +271,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
 
                 const SizedBox(width: 12),
 
-                // Botão excluir (se disponível)
+                // Delete button (if available)
                 if (onDelete != null)
                   OutlinedButton.icon(
                     onPressed: () {
@@ -294,7 +294,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
 
                 if (onDelete != null) const SizedBox(width: 12),
 
-                // Botão editar (se disponível)
+                // Edit button (if available)
                 if (onEdit != null)
                   Expanded(
                     child: ElevatedButton.icon(
@@ -314,7 +314,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
               ],
             ),
 
-            // Padding bottom para safe area
+            // Padding bottom for safe area
             SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
           ],
         ),

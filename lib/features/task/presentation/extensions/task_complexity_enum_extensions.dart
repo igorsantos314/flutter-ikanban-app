@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 
 extension TaskComplexityExtension on TaskComplexity {
-  // Nome em português
   String get displayName {
     switch (this) {
       case TaskComplexity.trivial:
@@ -18,7 +17,6 @@ extension TaskComplexityExtension on TaskComplexity {
     }
   }
 
-  // Cor
   Color get color {
     switch (this) {
       case TaskComplexity.trivial:
@@ -34,7 +32,6 @@ extension TaskComplexityExtension on TaskComplexity {
     }
   }
 
-  // Ícone
   IconData get icon {
     switch (this) {
       case TaskComplexity.trivial:
@@ -50,7 +47,6 @@ extension TaskComplexityExtension on TaskComplexity {
     }
   }
 
-  // Descrição
   String get description {
     switch (this) {
       case TaskComplexity.trivial:
@@ -66,7 +62,6 @@ extension TaskComplexityExtension on TaskComplexity {
     }
   }
 
-  // Emoji
   String get emoji {
     switch (this) {
       case TaskComplexity.trivial:

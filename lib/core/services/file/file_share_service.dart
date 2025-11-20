@@ -4,9 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 
-/// Serviço multiplataforma para compartilhamento e seleção de arquivos
 class FileShareService {
-  /// Compartilha um arquivo (Android/Desktop)
   Future<Outcome<void, FileShareError>> shareFile({
     required String filePath,
     String? subject,
@@ -28,7 +26,6 @@ class FileShareService {
         );
       }
 
-      // Usa XFile do share_plus para compartilhamento
       final xFile = XFile(filePath);
       
       await Share.shareXFiles(
@@ -47,7 +44,6 @@ class FileShareService {
     }
   }
 
-  /// Permite ao usuário selecionar um arquivo para importar
   Future<Outcome<String, FileShareError>> pickFile({
     List<String>? allowedExtensions,
     String? dialogTitle,
@@ -130,22 +126,18 @@ class FileShareService {
     }
   }
 
-  /// Verifica se a plataforma suporta compartilhamento
   bool get canShare {
     return !kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
   }
 
-  /// Verifica se a plataforma suporta seleção de local para salvar
   bool get canPickSaveLocation {
     return !kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS);
   }
 
-  /// Verifica se a plataforma suporta seleção de arquivos
   bool get canPickFiles {
     return !kIsWeb;
   }
 
-  /// Compartilha texto simples
   Future<Outcome<void, FileShareError>> shareText({
     required String text,
     String? subject,
@@ -166,7 +158,6 @@ class FileShareService {
   }
 }
 
-/// Erros do serviço de compartilhamento
 enum FileShareError {
   platformNotSupported,
   featureNotAvailableOnPlatform,

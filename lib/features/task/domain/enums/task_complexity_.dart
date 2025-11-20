@@ -1,13 +1,12 @@
 enum TaskComplexity {
-  trivial,    // Trivial
-  easy,       // Fácil
-  medium,     // Médio
-  hard,       // Difícil
-  veryHard,   // Muito Difícil
+  trivial,
+  easy,
+  medium,
+  hard,
+  veryHard,
 }
 
 extension TaskComplexityExtension on TaskComplexity {
-  // Valor numérico (1-5)
   int get complexityValue {
     switch (this) {
       case TaskComplexity.trivial:
@@ -23,7 +22,7 @@ extension TaskComplexityExtension on TaskComplexity {
     }
   }
 
-  // Story Points sugerido
+  // Suggested Story Points
   int get suggestedStoryPoints {
     switch (this) {
       case TaskComplexity.trivial:

@@ -1,8 +1,1 @@
-enum TaskPriority {
-  lowest,   // Mínima
-  low,      // Baixa
-  medium,   // Média
-  high,     // Alta
-  highest,  // Máxima
-  critical, // Crítica
-}
+enum TaskPriority { lowest, low, medium, high, highest, critical }

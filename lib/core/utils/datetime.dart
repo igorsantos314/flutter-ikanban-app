@@ -17,7 +17,6 @@ DateTime? parseDateOrNull(String input) {
 
   try {
     final date = DateTime(year, month, day);
-    // validação para evitar "overflow" (ex.: 32/01/2020 vira 01/02/2020)
     if (date.year == year && date.month == month && date.day == day) {
       return date;
     }
