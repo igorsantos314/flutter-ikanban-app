@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/core/utils/result/result_page.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
@@ -74,6 +76,7 @@ class TaskRepositoryImpl implements TaskRepository {
     bool onlyActive = true,
     bool ascending = true,
   }) {
+    log('[TaskRepositoryImpl] Watching tasks: ascending=$ascending, orderBy=$orderBy, page=$page, limitPerPage=$limitPerPage, search=$search'); 
     return _localDataSource
         .watchTasks(
           page: page,

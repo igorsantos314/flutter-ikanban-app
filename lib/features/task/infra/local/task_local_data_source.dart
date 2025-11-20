@@ -164,14 +164,23 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
   }
 
   OrderingTerm _getOrderByColumn(SortField? orderBy, bool ascending) {
-    final orderByColumn = switch (orderBy) {
-      SortField.title => db.taskEntity.title,
+    log('[TaskLocalDataSource] Ordering by: $orderBy, ascending: $ascending');
+
+    // Para campos de texto, usar collate nocase para ordenação case-insensitive
+    if (orderBy == SortField.title) {
+      return ascending
+          ? OrderingTerm(expression: db.taskEntity.title.collate(Collate.noCase))
+          : OrderingTerm(expression: db.taskEntity.title.collate(Collate.noCase), mode: OrderingMode.desc);
+    }
+
+    final Expression<Object> orderByColumn = switch (orderBy) {
       SortField.dueDate => db.taskEntity.dueDate,
       SortField.priority => db.taskEntity.priority,
       SortField.complexity => db.taskEntity.complexity,
       SortField.createdAt => db.taskEntity.createdAt,
       _ => db.taskEntity.id,
     };
+
     return ascending
         ? OrderingTerm.asc(orderByColumn)
         : OrderingTerm.desc(orderByColumn);
