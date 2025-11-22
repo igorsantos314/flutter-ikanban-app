@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/core/utils/result/result_page.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
@@ -74,6 +76,9 @@ class TaskRepositoryImpl implements TaskRepository {
     bool onlyActive = true,
     bool ascending = true,
   }) {
+    log(
+      '[TaskRepositoryImpl] Watching tasks: ascending=$ascending, orderBy=$orderBy, page=$page, limitPerPage=$limitPerPage, search=$search',
+    );
     return _localDataSource
         .watchTasks(
           page: page,
@@ -139,13 +144,15 @@ class TaskRepositoryImpl implements TaskRepository {
       );
     }
   }
-  
+
   @override
-  Future<Outcome<void, TaskRepositoryErrors>> createTasks(List<TaskModel> tasks) async{
+  Future<Outcome<void, TaskRepositoryErrors>> createTasks(
+    List<TaskModel> tasks,
+  ) async {
     try {
       final entities = tasks.map((task) => TaskMapper.toEntity(task)).toList();
       for (var entity in entities) {
-        await _localDataSource.insertTask(entity);        
+        await _localDataSource.insertTask(entity);
       }
       return const Outcome.success();
     } catch (e) {
@@ -155,5 +162,50 @@ class TaskRepositoryImpl implements TaskRepository {
         throwable: e,
       );
     }
+  }
+
+  @override
+  Stream<Outcome<List<TaskModel>, TaskRepositoryErrors>>
+  watchNoPaginationTasks({
+    String? search,
+    DateTime? startDate,
+    DateTime? endDate,
+    SortField? orderBy,
+    TaskStatus? status,
+    TaskPriority? priority,
+    TaskComplexity? complexity,
+    List<TaskType>? type,
+    bool onlyActive = true,
+    bool ascending = true,
+  }) {
+    return _localDataSource
+        .watchTasks(
+          page: 1,
+          limitPerPage: 10000,
+          search: search,
+          startDate: startDate,
+          endDate: endDate,
+          orderBy: orderBy,
+          status: status,
+          priority: priority,
+          complexity: complexity,
+          type: type,
+          onlyActive: onlyActive,
+          ascending: ascending,
+        )
+        .map<Outcome<List<TaskModel>, TaskRepositoryErrors>>((event) {
+          final result = event.items
+              .map((data) => TaskMapper.fromEntity(data))
+              .toList();
+
+          return Outcome<List<TaskModel>, TaskRepositoryErrors>.success(
+            value: result,
+          );
+        })
+        .handleError((error, stack) {
+          return Outcome<List<TaskModel>, TaskRepositoryErrors>.failure(
+            error: TaskRepositoryErrors.databaseError(),
+          );
+        });
   }
 }

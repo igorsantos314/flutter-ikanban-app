@@ -63,7 +63,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     on<SearchTasksEvent>(_onSearchTasks);
 
     // Data handling events
-    on<TasksStreamDataReceived>(_onTasksStreamDataReceived);
     on<TasksPageDataReceived>(_onTasksPageDataReceived);
 
     on<ToggleTaskCompletionEvent>(_onToggleTaskCompletion);
@@ -79,6 +78,9 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     on<SortTasksClickEvent>(_onSortTasksClick);
     on<ApplySortEvent>(_onApplySort);
     on<ShowTaskDetailsEvent>(_onShowTaskDetails);
+
+    on<WatchTaskListEditsEvent>(_globalTaskListObserver);
+    on<WatchTaskListDataReceivedEvent>(_updateTasks);
   }
 
   @override
@@ -110,8 +112,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
 
     await _loadPreferences(emit);
 
-    _taskStreamSubscription?.cancel();
-    _taskStreamSubscription = _listTaskUseCase
+    final tasks = await _listTaskUseCase
         .execute(
           page: 1,
           limitPerPage: _pageSize,
@@ -124,37 +125,119 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
           orderBy: state.sortBy,
           ascending: state.sortOrder == SortOrder.ascending,
         )
-        .listen(
-          (outcome) {
-            log('[TaskListBloc] Stream data received');
-            add(TasksStreamDataReceived(outcome));
-          },
-          onError: (error, stackTrace) {
-            log(
-              '[TaskListBloc] Stream error: $error',
-              error: error,
-              stackTrace: stackTrace,
-            );
+        .first;
 
-            if (!isClosed) {
-              emit(
-                state.copyWith(
-                  isLoading: false,
-                  hasError: true,
-                  errorMessage: 'Erro no stream de dados',
-                  showNotification: true,
-                  notificationMessage: 'Erro de conexão',
-                  notificationType: NotificationType.error,
-                ),
-              );
-              _isLoadingTasks = false;
-            }
-          },
-          onDone: () {
-            log('[TaskListBloc] Stream completed');
-            _isLoadingTasks = false;
-          },
+    tasks.when(
+      success: (resultPage) {
+        if (resultPage == null) {
+          log('[TaskListBloc] Received null result page');
+          emit(
+            state.copyWith(
+              isLoading: false,
+              hasError: false,
+              tasks: [],
+              hasMorePages: false,
+            ),
+          );
+          _isLoadingTasks = false;
+          return;
+        }
+
+        final newTasks = resultPage.items;
+        log('[TaskListBloc] Stream loaded ${newTasks.length} tasks for page 1');
+
+        // Se já temos tarefas carregadas de outras páginas, atualizar apenas a página 1
+        final updatedTasks = <TaskModel>[];
+        if (state.tasks.length > _pageSize) {
+          // Substituir apenas os itens da página 1, manter o resto
+          updatedTasks.addAll(newTasks);
+          updatedTasks.addAll(state.tasks.skip(_pageSize));
+        } else {
+          // Primeira carga ou refresh completo
+          updatedTasks.addAll(newTasks);
+        }
+
+        final hasMore = resultPage.totalPages > 1;
+
+        emit(
+          state.copyWith(
+            tasks: updatedTasks,
+            isLoading: false,
+            hasError: false,
+            errorMessage: '',
+            hasMorePages: hasMore,
+            currentPage: state.currentPage > resultPage.totalPages
+                ? 1
+                : state.currentPage,
+          ),
         );
+
+        _isLoadingTasks = false;
+        add(const WatchTaskListEditsEvent());
+      },
+      failure: (error, message, throwable) {
+        log('[TaskListBloc] Stream error: $error, message: $message');
+
+        emit(
+          state.copyWith(
+            isLoading: false,
+            hasError: true,
+            errorMessage: message ?? 'Erro ao carregar tarefas',
+            showNotification: true,
+            notificationMessage:
+                message ?? 'Não foi possível carregar as tarefas',
+            notificationType: NotificationType.error,
+          ),
+        );
+
+        _isLoadingTasks = false;
+      },
+    );
+  }
+
+  FutureOr<void> _globalTaskListObserver(
+    WatchTaskListEditsEvent event,
+    Emitter<TaskListState> emit,
+  ) {
+    _taskStreamSubscription?.cancel();
+    final stream = _listTaskUseCase.execute(
+      page: 1,
+      limitPerPage: state.currentPage * _pageSize,
+      search: _currentSearch,
+      status: state.statusFilter == TaskStatus.all ? null : state.statusFilter,
+      type: state.typeFilters.isNotEmpty ? state.typeFilters : null,
+      onlyActive: true,
+      orderBy: state.sortBy,
+      ascending: state.sortOrder == SortOrder.ascending,
+    );
+
+    _taskStreamSubscription = stream.listen((event) {
+      add(WatchTaskListDataReceivedEvent(event));
+    });
+  }
+
+  FutureOr<void> _updateTasks(
+    WatchTaskListDataReceivedEvent event,
+    Emitter<TaskListState> emit,
+  ) {
+    final outcome = event.outcome as Outcome;
+    outcome.when(
+      success: (resultPage) {
+        if (resultPage == null) return;
+
+        final newTasks = resultPage.items;
+        emit(state.copyWith(tasks: newTasks));
+
+        log(
+          '[TaskListBloc] [Global Observer] Loaded ${newTasks.length} tasks for page 1',
+        );
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] [Global Observer] Error: $error, message: $message',
+        );
+      },
+    );
   }
 
   FutureOr<void> _loadPreferences(Emitter<TaskListState> emit) async {
@@ -280,76 +363,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     add(const LoadTasksEvent());
   }
 
-  void _onTasksStreamDataReceived(
-    TasksStreamDataReceived event,
-    Emitter<TaskListState> emit,
-  ) {
-    log('[TaskListBloc] Processing stream data...');
-
-    final outcome = event.outcome as Outcome;
-
-    outcome.when(
-      success: (resultPage) {
-        if (resultPage == null) {
-          log('[TaskListBloc] Received null result page');
-          emit(
-            state.copyWith(
-              isLoading: false,
-              hasError: false,
-              tasks: [],
-              hasMorePages: false,
-            ),
-          );
-          _isLoadingTasks = false;
-          return;
-        }
-
-        final newTasks = resultPage.items ?? [];
-        log('[TaskListBloc] Stream loaded ${newTasks.length} tasks for page 1');
-
-        final existingTasksFromOtherPages = state.tasks.length > _pageSize
-            ? state.tasks.skip(_pageSize).toList()
-            : <TaskModel>[];
-
-        final updatedTasks = <TaskModel>[
-          ...newTasks,
-          ...existingTasksFromOtherPages,
-        ];
-        final hasMore = newTasks.length >= _pageSize;
-
-        emit(
-          state.copyWith(
-            tasks: updatedTasks,
-            isLoading: false,
-            hasError: false,
-            errorMessage: '',
-            hasMorePages: hasMore,
-            currentPage: 1,
-          ),
-        );
-
-        _isLoadingTasks = false;
-      },
-      failure: (error, message, throwable) {
-        log('[TaskListBloc] Stream error: $error, message: $message');
-
-        emit(
-          state.copyWith(
-            isLoading: false,
-            hasError: true,
-            errorMessage: message ?? 'Erro ao carregar tarefas',
-            showNotification: true,
-            notificationMessage:
-                message ?? 'Não foi possível carregar as tarefas',
-            notificationType: NotificationType.error,
-          ),
-        );
-
-        _isLoadingTasks = false;
-      },
-    );
-  }
-
   void _onTasksPageDataReceived(
     TasksPageDataReceived event,
     Emitter<TaskListState> emit,
@@ -387,6 +400,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         );
 
         _isLoadingMore = false;
+        add(WatchTaskListEditsEvent());
       },
       failure: (error, message, throwable) {
         log(
@@ -436,13 +450,8 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
 
     outcome.when(
       success: (_) {
-        // Atualiza localmente o estado
-        final updatedTasks = state.tasks
-            .map((t) => t.id == updatedTask.id ? updatedTask : t)
-            .toList();
         emit(
           state.copyWith(
-            tasks: updatedTasks,
             notificationType: NotificationType.success,
             showNotification: true,
             notificationMessage:
@@ -486,16 +495,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     await _updateTaskUseCase.execute(updatedTask).then((outcome) {
       outcome.when(
         success: (_) {
-          final updatedTasks = state.tasks
-              .map((t) => t.id == updatedTask.id ? updatedTask : t)
-              .toList();
-          emit(
-            state.copyWith(
-              tasks: updatedTasks,
-              selectedTask: null,
-              showStatusSelector: false,
-            ),
-          );
+          emit(state.copyWith(selectedTask: null, showStatusSelector: false));
         },
         failure: (error, message, throwable) {
           log(
@@ -611,7 +611,10 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     add(const LoadTasksEvent());
   }
 
-  FutureOr<void> _onShowTaskDetails(ShowTaskDetailsEvent event, Emitter<TaskListState> emit) {
+  FutureOr<void> _onShowTaskDetails(
+    ShowTaskDetailsEvent event,
+    Emitter<TaskListState> emit,
+  ) {
     emit(state.copyWith(selectedTask: event.task, showTaskDetails: true));
   }
 }
