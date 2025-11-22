@@ -78,6 +78,9 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     on<SortTasksClickEvent>(_onSortTasksClick);
     on<ApplySortEvent>(_onApplySort);
     on<ShowTaskDetailsEvent>(_onShowTaskDetails);
+
+    on<WatchTaskListEditsEvent>(_globalTaskListObserver);
+    on<WatchTaskListDataReceivedEvent>(_updateTasks);
   }
 
   @override
@@ -170,6 +173,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         );
 
         _isLoadingTasks = false;
+        add(const WatchTaskListEditsEvent());
       },
       failure: (error, message, throwable) {
         log('[TaskListBloc] Stream error: $error, message: $message');
@@ -191,16 +195,44 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     );
   }
 
-  FutureOr<void> _globalTaskListObserver() {
+  FutureOr<void> _globalTaskListObserver(
+    WatchTaskListEditsEvent event,
+    Emitter<TaskListState> emit,
+  ) {
+    _taskStreamSubscription?.cancel();
     final stream = _listTaskUseCase.execute(
       page: 1,
-      limitPerPage: _pageSize,
+      limitPerPage: state.currentPage * _pageSize,
       onlyActive: true,
     );
 
-    stream.listen((event) {}).onError((error) {
-      log('[TaskListBloc] Global observer error: $error');
+    _taskStreamSubscription = stream.listen((event) {
+      add(WatchTaskListDataReceivedEvent(event));
     });
+  }
+
+  FutureOr<void> _updateTasks(
+    WatchTaskListDataReceivedEvent event,
+    Emitter<TaskListState> emit,
+  ) {
+    final outcome = event.outcome as Outcome;
+    outcome.when(
+      success: (resultPage) {
+        if (resultPage == null) return;
+
+        final newTasks = resultPage.items;
+        emit(state.copyWith(tasks: newTasks));
+
+        log(
+          '[TaskListBloc] [Global Observer] Loaded ${newTasks.length} tasks for page 1',
+        );
+      },
+      failure: (error, message, throwable) {
+        log(
+          '[TaskListBloc] [Global Observer] Error: $error, message: $message',
+        );
+      },
+    );
   }
 
   FutureOr<void> _loadPreferences(Emitter<TaskListState> emit) async {
@@ -363,6 +395,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
         );
 
         _isLoadingMore = false;
+        add(WatchTaskListEditsEvent());
       },
       failure: (error, message, throwable) {
         log(

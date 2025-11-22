@@ -1,3 +1,4 @@
+import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/core/utils/result/result_page.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_sort.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
@@ -141,4 +142,17 @@ class ShowTaskDetailsEvent extends TaskEvent {
 
   @override
   List<Object> get props => [task];
+}
+
+class WatchTaskListEditsEvent extends TaskEvent {
+  const WatchTaskListEditsEvent();
+}
+
+class WatchTaskListDataReceivedEvent extends TaskEvent {
+  final Outcome<ResultPage<TaskModel>, dynamic> outcome;
+
+  const WatchTaskListDataReceivedEvent(this.outcome);
+
+  @override
+  List<Object> get props => [outcome];
 }
