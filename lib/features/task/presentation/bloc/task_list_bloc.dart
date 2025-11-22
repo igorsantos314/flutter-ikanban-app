@@ -203,7 +203,12 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     final stream = _listTaskUseCase.execute(
       page: 1,
       limitPerPage: state.currentPage * _pageSize,
+      search: _currentSearch,
+      status: state.statusFilter == TaskStatus.all ? null : state.statusFilter,
+      type: state.typeFilters.isNotEmpty ? state.typeFilters : null,
       onlyActive: true,
+      orderBy: state.sortBy,
+      ascending: state.sortOrder == SortOrder.ascending,
     );
 
     _taskStreamSubscription = stream.listen((event) {
@@ -445,7 +450,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
 
     outcome.when(
       success: (_) {
-        // O stream vai atualizar automaticamente, apenas mostra notificação
         emit(
           state.copyWith(
             notificationType: NotificationType.success,
@@ -491,7 +495,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     await _updateTaskUseCase.execute(updatedTask).then((outcome) {
       outcome.when(
         success: (_) {
-          // O stream vai atualizar automaticamente
           emit(state.copyWith(selectedTask: null, showStatusSelector: false));
         },
         failure: (error, message, throwable) {
