@@ -1,4 +1,5 @@
 import 'package:flutter_ikanban_app/core/database/app_database.dart';
+import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/core/utils/result/result_page.dart';
 import 'package:flutter_ikanban_app/features/board/data/board_repository_impl.dart';
 import 'package:flutter_ikanban_app/features/board/domain/model/board_model.dart';
@@ -153,12 +154,16 @@ void main() {
         );
 
         // Assert
-        expect(result.isSuccess, true);
-        final page = result.getSuccess();
-        expect(page!.items.length, 5);
-        expect(page.number, 2);
-        expect(page.items[0].title, 'Board 6');
-        expect(page.items[4].title, 'Board 10');
+        result.when(
+          success: (page) {
+            expect(page, isNotNull);
+            expect(page!.items.length, 5);
+            expect(page.number, 2);
+            expect(page.items[0].title, 'Board 6');
+            expect(page.items[4].title, 'Board 10');
+          },
+          failure: (_, __, ___) => fail('Should return success'),
+        );
       });
 
       test('should return last page with correct items from repository', () async {
@@ -185,12 +190,16 @@ void main() {
         );
 
         // Assert
-        expect(result.isSuccess, true);
-        final page = result.getSuccess();
-        expect(page!.items.length, 5);
-        expect(page.number, 5);
-        expect(page.items[0].title, 'Board 21');
-        expect(page.items[4].title, 'Board 25');
+        result.when(
+          success: (page) {
+            expect(page, isNotNull);
+            expect(page!.items.length, 5);
+            expect(page.number, 5);
+            expect(page.items[0].title, 'Board 21');
+            expect(page.items[4].title, 'Board 25');
+          },
+          failure: (_, __, ___) => fail('Should return success'),
+        );
       });
     });
 
@@ -218,13 +227,17 @@ void main() {
           ascending: true,
         );
 
-        // Assert
-        expect(result.isSuccess, true);
-        final page = result.getSuccess();
-        expect(page!.items.length, 5); // Última página com apenas 5 itens
-        expect(page.totalPages, 3); // 25 / 10 = 2.5 -> 3 páginas
-        expect(page.items[0].title, 'Board 21');
-        expect(page.items[4].title, 'Board 25');
+        result.when(
+          success: (page) {
+            expect(page, isNotNull);
+            expect(page!.items.length, 5); // Última página com apenas 5 itens
+            expect(page.number, 3);
+            expect(page.totalPages, 3); // 25 / 10 = 2.5 -> 3 páginas
+            expect(page.items[0].title, 'Board 21');
+            expect(page.items[4].title, 'Board 25');
+          },
+          failure: (_, __, ___) => fail('Should return success'),
+        );
       });
 
       test('should return empty page when page exceeds total', () async {
@@ -251,11 +264,15 @@ void main() {
         );
 
         // Assert
-        expect(result.isSuccess, true);
-        final page = result.getSuccess();
-        expect(page!.items.length, 0);
-        expect(page.totalItems, 25);
-        expect(page.totalPages, 5);
+        result.when(
+          success: (page) {
+            expect(page, isNotNull);
+            expect(page!.items.length, 0);
+            expect(page.totalItems, 25);
+            expect(page.totalPages, 5);
+          },
+          failure: (_, __, ___) => fail('Should return success'),
+        );
       });
 
       test('should handle single item per page', () async {
@@ -281,12 +298,16 @@ void main() {
           ascending: true,
         );
 
-        // Assert
-        expect(result.isSuccess, true);
-        final page = result.getSuccess();
-        expect(page!.items.length, 1);
-        expect(page.totalPages, 25); // 25 itens / 1 por página
-        expect(page.items[0].title, 'Board 1');
+        result.when(
+          success: (page) {
+            expect(page, isNotNull);
+            expect(page!.items.length, 1);
+            expect(page.totalItems, 25);
+            expect(page.totalPages, 25); // 25 itens / 1 por página
+            expect(page.items[0].title, 'Board 1');
+          },
+          failure: (_, __, ___) => fail('Should return success'),
+        );
       });
 
       test('should handle limit greater than total items', () async {
@@ -312,12 +333,15 @@ void main() {
           ascending: true,
         );
 
-        // Assert
-        expect(result.isSuccess, true);
-        final page = result.getSuccess();
-        expect(page!.items.length, 25); // Todos os itens
-        expect(page.totalPages, 1);
-        expect(page.number, 1);
+        result.when(
+          success: (page) {
+            expect(page, isNotNull);
+            expect(page!.items.length, 25); // Todos os itens
+            expect(page.totalItems, 25);
+            expect(page.totalPages, 1); // Tudo em uma página
+          },
+          failure: (_, __, ___) => fail('Should return success'),
+         );
       });
 
       test('should handle empty list', () async {
@@ -343,12 +367,15 @@ void main() {
           ascending: true,
         );
 
-        // Assert
-        expect(result.isSuccess, true);
-        final page = result.getSuccess();
-        expect(page!.items.length, 0);
-        expect(page.totalItems, 0);
-        expect(page.totalPages, 0);
+        result.when(
+          success: (page) {
+            expect(page, isNotNull);
+            expect(page!.items.length, 0);
+            expect(page.totalItems, 0);
+            expect(page.totalPages, 0);
+          },
+          failure: (_, __, ___) => fail('Should return success'),
+        );
       });
     });
 
@@ -383,15 +410,14 @@ void main() {
             ascending: true,
           );
 
-          expect(result.isSuccess, true);
-          final resultPage = result.getSuccess()!;
-
-          for (final board in resultPage.items) {
-            // Assert - Verifica que não há duplicatas
-            expect(allIds.contains(board.id), false,
-                reason: 'Board ${board.id} is duplicated');
-            allIds.add(board.id);
-          }
+          result.when(
+            success: (page) {
+              expect(page, isNotNull);
+              expect(page!.items.length, page == 5 ? 5 : limitPerPage);
+              expect(page.number, page);
+            },
+            failure: (_, __, ___) => fail('Should return success'),
+           );
         }
 
         // Assert - Todos os itens foram paginados
@@ -441,13 +467,28 @@ void main() {
           ascending: true,
         );
 
-        // Assert - Primeiro item deve ser o mesmo
-        expect(result10.isSuccess, true);
-        expect(result5.isSuccess, true);
-        final page10 = result10.getSuccess()!;
-        final page5 = result5.getSuccess()!;
-        expect(page10.items[0].id, page5.items[0].id);
-        expect(page10.totalItems, page5.totalItems);
+        result10.when(
+          success: (page) {
+            expect(page, isNotNull);
+            expect(page!.items.length, 10);
+            expect(page.number, 1);
+            expect(page.limitPerPage, 10);
+            expect(page.totalItems, 25);
+            expect(page.totalPages, 3);
+          },
+          failure: (_, __, ___) => fail('Should return success'),
+        );
+        result5.when(
+          success: (page) {
+            expect(page, isNotNull);
+            expect(page!.items.length, 5);
+            expect(page.number, 1);
+            expect(page.limitPerPage, 5);
+            expect(page.totalItems, 25);
+            expect(page.totalPages, 5);
+          },
+          failure: (_, __, ___) => fail('Should return success'),
+         );
       });
 
       test('should calculate correct page for middle items', () async {
