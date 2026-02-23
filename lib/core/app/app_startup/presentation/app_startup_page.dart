@@ -17,7 +17,6 @@ class AppStartupPage extends StatelessWidget {
       create: (context) =>
           AppStartupBloc(
             checkOnboardingCompletedUseCase: getIt(),
-            getOrCreateDefaultBoardUseCase: getIt(),
           ),
       child: AppStartupPageContent(),
     );

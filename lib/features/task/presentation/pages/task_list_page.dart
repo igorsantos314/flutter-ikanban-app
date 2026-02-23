@@ -199,18 +199,6 @@ class _TaskListPageContentState extends State<TaskListPageContent>
             onPressed: () => AppNavigation.navigateToBoards(context),
           ),
           title: Text(getIt<BoardSelectionService>().selectedBoardName),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () {
-                // TODO: Implement search
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () => AppNavigation.navigateToSettings(context),
-            ),
-          ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {

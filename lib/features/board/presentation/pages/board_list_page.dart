@@ -30,7 +30,6 @@ class BoardListPageContent extends StatefulWidget {
 
 class _BoardListPageContentState extends State<BoardListPageContent> {
   final ScrollController _scrollController = ScrollController();
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -41,7 +40,6 @@ class _BoardListPageContentState extends State<BoardListPageContent> {
   @override
   void dispose() {
     _scrollController.dispose();
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -59,18 +57,12 @@ class _BoardListPageContentState extends State<BoardListPageContent> {
     return Scaffold(
       appBar: CustomAppBar(
         onClose: () {
-          _searchController.clear();
           context.read<BoardListBloc>().add(SearchBoardsEvent(null));
         },
         onSubmit: (query) {
           context.read<BoardListBloc>().add(
             SearchBoardsEvent(query.isEmpty ? null : query),
           );
-        },
-        onChanged: (query) {
-          if (query.isEmpty) {
-            context.read<BoardListBloc>().add(SearchBoardsEvent(null));
-          }
         },
       ),
       body: BlocConsumer<BoardListBloc, BoardListState>(
@@ -218,12 +210,14 @@ class _BoardListPageContentState extends State<BoardListPageContent> {
   }
 
   void _showCreateBoardDialog(BuildContext context) {
-    showDialog(
+    showDialog<bool>(
       context: context,
       builder: (dialogContext) => const BoardCreateDialog(),
-    ).then((_) {
-      // Refresh the boards list after dialog closes
-      context.read<BoardListBloc>().add(RefreshBoardsEvent());
+    ).then((created) {
+      // Only refresh the boards list if a board was created
+      if (created == true) {
+        context.read<BoardListBloc>().add(RefreshBoardsEvent());
+      }
     });
   }
 }

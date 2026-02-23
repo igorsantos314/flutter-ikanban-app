@@ -57,7 +57,7 @@ class _BoardCreateDialogContentState extends State<BoardCreateDialogContent> {
     return BlocConsumer<BoardFormBloc, BoardFormState>(
       listener: (context, state) {
         if (state.closeDialog) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(true);
           if (state.showNotification) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(

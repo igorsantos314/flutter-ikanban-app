@@ -21,7 +21,6 @@ import 'package:flutter_ikanban_app/features/board/data/board_repository_impl.da
 import 'package:flutter_ikanban_app/features/board/domain/repository/board_repository.dart';
 import 'package:flutter_ikanban_app/features/board/domain/services/board_selection_service.dart';
 import 'package:flutter_ikanban_app/features/board/domain/use_cases/create_board_use_case.dart';
-import 'package:flutter_ikanban_app/features/board/domain/use_cases/get_or_create_default_board_use_case.dart';
 import 'package:flutter_ikanban_app/features/board/domain/use_cases/list_board_use_case.dart';
 import 'package:flutter_ikanban_app/features/board/infra/local/board_local_data_source.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/use_cases/load_settings_use_case.dart';
@@ -107,10 +106,6 @@ void _setupAppStartupModule() {
 
   getIt.registerLazySingleton<CompleteOnBoardingUseCase>(
     () => CompleteOnBoardingUseCase(getIt()),
-  );
-
-  getIt.registerLazySingleton<GetOrCreateDefaultBoardUseCase>(
-    () => GetOrCreateDefaultBoardUseCase(getIt()),
   );
 }
 

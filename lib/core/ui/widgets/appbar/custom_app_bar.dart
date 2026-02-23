@@ -96,6 +96,7 @@ class _CustomAppBarState extends State<CustomAppBar>
           ),
           
           // Campo de busca expandido
+          if (widget.onChanged != null || widget.onSubmit != null)
           Expanded(
             child: AnimatedBuilder(
               animation: _widthAnimation,
@@ -149,6 +150,7 @@ class _CustomAppBarState extends State<CustomAppBar>
               color: theme.colorScheme.onSurface,
               onPressed: widget.onFilter,
             ),
+          if (widget.onChanged != null && widget.onSubmit != null)
           // Ícone de busca
           IconButton(
             icon: const Icon(Icons.search),
