@@ -43,6 +43,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
   }
 
   Stream<ResultPage<TaskData>> watchTasks({
+    required int boardId,
     required int page,
     required int limitPerPage,
     String? search,
@@ -56,7 +57,16 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
     bool onlyActive = true,
     bool ascending = true,
   }) async* {
-    final query = select(db.taskEntity);
+    final offset = (page - 1) * limitPerPage;
+
+    final query = select(db.taskEntity)
+      ..limit(limitPerPage, offset: offset);
+
+    // Filtros aplicados à query principal
+    // Se boardId > 0, filtra por board específico; caso contrário, busca de todos os boards
+    if (boardId > 0) {
+      query.where((tbl) => tbl.boardId.equals(boardId));
+    }
 
     if (onlyActive) {
       query.where((tbl) => tbl.isActive.equals(true));
@@ -64,7 +74,7 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
 
     if (search != null && search.isNotEmpty) {
       query.where(
-        (tbl) => tbl.title.contains(search) | tbl.description.contains(search),
+        (tbl) => tbl.title.like('%$search%') | tbl.description.like('%$search%'),
       );
     }
 
@@ -88,68 +98,82 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
       query.where((tbl) => tbl.complexity.equals(complexity.complexityValue));
     }
 
-    if (type != null) {
+    if (type != null && type.isNotEmpty) {
       query.where((tbl) => tbl.type.isIn(type.map((e) => e.typeValue)));
     }
 
-    final column = _getOrderByColumn(orderBy, ascending);
-    query.orderBy([(tbl) => column]);
-    
-    // Aplicar paginação na query SQL, não em memória
-    query.limit(limitPerPage, offset: (page - 1) * limitPerPage);
+    // Ordenação
+    if (orderBy != null) {
+      final column = _getOrderByColumn(orderBy, ascending);
+      query.orderBy([(tbl) => column]);
+    }
 
     await for (final items in query.watch()) {
-      final totalItemsQuery = db.selectOnly(db.taskEntity)
+      // COUNT separado com os mesmos filtros
+      final countQuery = db.selectOnly(db.taskEntity)
         ..addColumns([db.taskEntity.id.count()]);
 
+      // Se boardId > 0, filtra por board específico; caso contrário, busca de todos os boards
+      if (boardId > 0) {
+        countQuery.where(db.taskEntity.boardId.equals(boardId));
+      }
+
+      if (onlyActive) {
+        countQuery.where(db.taskEntity.isActive.equals(true));
+      }
+
       if (search != null && search.isNotEmpty) {
-        final description = db.taskEntity.description;
-        final title = db.taskEntity.title;
-        final searchExpression =
-            description.like('%$search%') | title.like('%$search%');
-        totalItemsQuery.where(searchExpression);
+        countQuery.where(
+          db.taskEntity.title.like('%$search%') |
+              db.taskEntity.description.like('%$search%'),
+        );
       }
 
       if (startDate != null) {
-        totalItemsQuery.where(
+        countQuery.where(
           db.taskEntity.dueDate.isBiggerOrEqualValue(startDate),
         );
       }
 
       if (endDate != null) {
-        totalItemsQuery.where(
+        countQuery.where(
           db.taskEntity.dueDate.isSmallerOrEqualValue(endDate),
         );
       }
 
       if (status != null) {
-        totalItemsQuery.where(db.taskEntity.status.equals(status.name));
+        countQuery.where(db.taskEntity.status.equals(status.name));
       }
+
       if (priority != null) {
-        totalItemsQuery.where(db.taskEntity.priority.equals(priority.priorityValue));
+        countQuery.where(
+          db.taskEntity.priority.equals(priority.priorityValue),
+        );
       }
+
       if (complexity != null) {
-        totalItemsQuery.where(db.taskEntity.complexity.equals(complexity.complexityValue));
+        countQuery.where(
+          db.taskEntity.complexity.equals(complexity.complexityValue),
+        );
       }
-      if (type != null) {
-        totalItemsQuery.where(db.taskEntity.type.isIn(type.map((e) => e.typeValue)));
-      }
-      if (onlyActive) {
-        totalItemsQuery.where(db.taskEntity.isActive.equals(true));
+
+      if (type != null && type.isNotEmpty) {
+        countQuery.where(
+          db.taskEntity.type.isIn(type.map((e) => e.typeValue)),
+        );
       }
 
       final totalItems =
-          (await totalItemsQuery.getSingle()).read(db.taskEntity.id.count()) ??
-          0;
+          (await countQuery.getSingle()).read(db.taskEntity.id.count()) ?? 0;
 
       log("Total items for current filters: $totalItems");
 
       yield ResultPage(
-        items: items,
-        totalItems: totalItems,
         number: page,
-        totalPages: (totalItems / limitPerPage).ceil(),
         limitPerPage: limitPerPage,
+        totalItems: totalItems,
+        totalPages: (totalItems / limitPerPage).ceil(),
+        items: items,
       );
     }
   }

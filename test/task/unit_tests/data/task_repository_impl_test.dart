@@ -238,6 +238,7 @@ void main() {
           totalPages: 1,
         );
         when(() => mockDataSource.watchTasks(
+              boardId: any(named: 'boardId'),
               page: any(named: 'page'),
               limitPerPage: any(named: 'limitPerPage'),
               search: any(named: 'search'),
@@ -254,12 +255,14 @@ void main() {
 
         // Act
         repository.watchTasks(
+          boardId: 1,
           page: 1,
           limitPerPage: 10,
         );
 
         // Assert
         verify(() => mockDataSource.watchTasks(
+              boardId: 1,
               page: 1,
               limitPerPage: 10,
               search: null,

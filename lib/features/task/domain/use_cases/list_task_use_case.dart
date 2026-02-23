@@ -14,6 +14,7 @@ class ListTaskUseCase {
   final TaskRepository taskRepository;
   ListTaskUseCase(this.taskRepository);
   Stream<Outcome<ResultPage<TaskModel>, ListTaskUseCaseError>> execute({
+    required int boardId,
     required int page,
     required int limitPerPage,
     String? search,
@@ -28,6 +29,7 @@ class ListTaskUseCase {
     bool ascending = true,
   }) {
     final streamResult = taskRepository.watchTasks(
+      boardId: boardId,
       page: page,
       limitPerPage: limitPerPage,
       search: search,

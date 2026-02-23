@@ -10,6 +10,7 @@ import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 
 abstract class TaskRepository {
   Stream<Outcome<ResultPage<TaskModel>, TaskRepositoryErrors>> watchTasks({
+    required int boardId,
     required int page,
     required int limitPerPage,
     String? search,
@@ -25,6 +26,7 @@ abstract class TaskRepository {
   });
   Stream<Outcome<List<TaskModel>, TaskRepositoryErrors>>
   watchNoPaginationTasks({
+    required int boardId,
     String? search,
     DateTime? startDate,
     DateTime? endDate,

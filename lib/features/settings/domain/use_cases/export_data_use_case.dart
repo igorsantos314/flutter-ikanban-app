@@ -33,6 +33,7 @@ class ExportDataUseCase {
 
       while (hasMorePages) {
         final tasksStream = _taskRepository.watchTasks(
+          boardId: 0, // 0 = exportar tarefas de todos os boards
           page: currentPage,
           limitPerPage: pageSize,
           onlyActive: false,

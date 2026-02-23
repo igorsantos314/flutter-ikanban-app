@@ -45,15 +45,10 @@ class AppNavigation {
               path: home,
               builder: (context, state) => const BoardListPage(),
             ),
-            
+
             GoRoute(
               path: boards,
               builder: (context, state) => const BoardListPage(),
-            ),
-
-            GoRoute(
-              path: tasks,
-              builder: (context, state) => const TaskListPage(),
             ),
 
             GoRoute(
@@ -62,6 +57,8 @@ class AppNavigation {
             ),
           ],
         ),
+
+        GoRoute(path: tasks, builder: (context, state) => const TaskListPage()),
         GoRoute(
           path: createTask,
           builder: (context, state) => const TaskCreatePage(),
