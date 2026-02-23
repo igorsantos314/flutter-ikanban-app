@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$BoardModel {
 
- String get id; String get title; String? get description; String? get color; DateTime get createdAt; DateTime get updatedAt; bool get isActive;
+ int get id; String get title; String? get description; String? get color; DateTime get createdAt; DateTime get updatedAt; bool get isActive;
 /// Create a copy of BoardModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,7 +45,7 @@ abstract mixin class $BoardModelCopyWith<$Res>  {
   factory $BoardModelCopyWith(BoardModel value, $Res Function(BoardModel) _then) = _$BoardModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String title, String? description, String? color, DateTime createdAt, DateTime updatedAt, bool isActive
+ int id, String title, String? description, String? color, DateTime createdAt, DateTime updatedAt, bool isActive
 });
 
 
@@ -65,7 +65,7 @@ class _$BoardModelCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? description = freezed,Object? color = freezed,Object? createdAt = null,Object? updatedAt = null,Object? isActive = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,color: freezed == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
@@ -156,7 +156,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String? description,  String? color,  DateTime createdAt,  DateTime updatedAt,  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String title,  String? description,  String? color,  DateTime createdAt,  DateTime updatedAt,  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BoardModel() when $default != null:
 return $default(_that.id,_that.title,_that.description,_that.color,_that.createdAt,_that.updatedAt,_that.isActive);case _:
@@ -177,7 +177,7 @@ return $default(_that.id,_that.title,_that.description,_that.color,_that.created
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String? description,  String? color,  DateTime createdAt,  DateTime updatedAt,  bool isActive)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String title,  String? description,  String? color,  DateTime createdAt,  DateTime updatedAt,  bool isActive)  $default,) {final _that = this;
 switch (_that) {
 case _BoardModel():
 return $default(_that.id,_that.title,_that.description,_that.color,_that.createdAt,_that.updatedAt,_that.isActive);case _:
@@ -197,7 +197,7 @@ return $default(_that.id,_that.title,_that.description,_that.color,_that.created
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String? description,  String? color,  DateTime createdAt,  DateTime updatedAt,  bool isActive)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String title,  String? description,  String? color,  DateTime createdAt,  DateTime updatedAt,  bool isActive)?  $default,) {final _that = this;
 switch (_that) {
 case _BoardModel() when $default != null:
 return $default(_that.id,_that.title,_that.description,_that.color,_that.createdAt,_that.updatedAt,_that.isActive);case _:
@@ -215,7 +215,7 @@ class _BoardModel implements BoardModel {
   const _BoardModel({required this.id, required this.title, this.description, this.color, required this.createdAt, required this.updatedAt, this.isActive = true});
   
 
-@override final  String id;
+@override final  int id;
 @override final  String title;
 @override final  String? description;
 @override final  String? color;
@@ -253,7 +253,7 @@ abstract mixin class _$BoardModelCopyWith<$Res> implements $BoardModelCopyWith<$
   factory _$BoardModelCopyWith(_BoardModel value, $Res Function(_BoardModel) _then) = __$BoardModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title, String? description, String? color, DateTime createdAt, DateTime updatedAt, bool isActive
+ int id, String title, String? description, String? color, DateTime createdAt, DateTime updatedAt, bool isActive
 });
 
 
@@ -273,7 +273,7 @@ class __$BoardModelCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? description = freezed,Object? color = freezed,Object? createdAt = null,Object? updatedAt = null,Object? isActive = null,}) {
   return _then(_BoardModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,color: freezed == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable

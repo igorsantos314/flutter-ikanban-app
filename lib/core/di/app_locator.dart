@@ -17,6 +17,13 @@ import 'package:flutter_ikanban_app/core/services/file/file_service.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
 import 'package:flutter_ikanban_app/core/use_cases/theme/get_theme_use_case.dart';
 import 'package:flutter_ikanban_app/core/use_cases/theme/set_theme_use_case.dart';
+import 'package:flutter_ikanban_app/features/board/data/board_repository_impl.dart';
+import 'package:flutter_ikanban_app/features/board/domain/repository/board_repository.dart';
+import 'package:flutter_ikanban_app/features/board/domain/services/board_selection_service.dart';
+import 'package:flutter_ikanban_app/features/board/domain/use_cases/create_board_use_case.dart';
+import 'package:flutter_ikanban_app/features/board/domain/use_cases/get_or_create_default_board_use_case.dart';
+import 'package:flutter_ikanban_app/features/board/domain/use_cases/list_board_use_case.dart';
+import 'package:flutter_ikanban_app/features/board/infra/local/board_local_data_source.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/use_cases/load_settings_use_case.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/use_cases/save_settings_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/create_task_use_case.dart';
@@ -46,6 +53,7 @@ void setupLocator() {
   _setupAppStartupModule();
   _setupThemeModule();
   _setupPreferenceModule();
+  _setupBoardModule();
   _setupTaskModule();
   _setupSettingsModule();
   _setupCoreServices();
@@ -100,6 +108,10 @@ void _setupAppStartupModule() {
   getIt.registerLazySingleton<CompleteOnBoardingUseCase>(
     () => CompleteOnBoardingUseCase(getIt()),
   );
+
+  getIt.registerLazySingleton<GetOrCreateDefaultBoardUseCase>(
+    () => GetOrCreateDefaultBoardUseCase(getIt()),
+  );
 }
 
 void _setupThemeModule() {
@@ -110,6 +122,28 @@ void _setupThemeModule() {
   );
 
   getIt.registerLazySingleton<ThemeProvider>(() => ThemeProvider());
+}
+
+void _setupBoardModule() {
+  getIt.registerLazySingleton<BoardSelectionService>(
+    () => BoardSelectionService(),
+  );
+
+  getIt.registerLazySingleton<BoardLocalDataSource>(
+    () => BoardLocalDataSource(getIt.get<AppDatabase>()),
+  );
+
+  getIt.registerLazySingleton<BoardRepository>(
+    () => BoardRepositoryImpl(getIt()),
+  );
+
+  getIt.registerLazySingleton<CreateBoardUseCase>(
+    () => CreateBoardUseCase(getIt()),
+  );
+
+  getIt.registerLazySingleton<ListBoardUseCase>(
+    () => ListBoardUseCase(getIt()),
+  );
 }
 
 void _setupTaskModule() {

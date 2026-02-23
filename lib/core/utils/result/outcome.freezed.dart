@@ -245,9 +245,7 @@ class _Failure<SuccessResultType,ErrorType> implements Outcome<SuccessResultType
   
 
  final  ErrorType error;
-// O tipo de erro que ocorreu
  final  String? message;
-// Uma mensagem descritiva do erro (opcional)
  final  Object? throwable;
 
 /// Create a copy of Outcome

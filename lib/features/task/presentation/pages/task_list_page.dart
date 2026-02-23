@@ -9,8 +9,8 @@ import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_tas
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
 import 'package:flutter_ikanban_app/core/ui/enums/layout_mode.dart';
-import 'package:flutter_ikanban_app/core/ui/widgets/appbar/custom_app_bar.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/snackbars.dart';
+import 'package:flutter_ikanban_app/features/board/domain/services/board_selection_service.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/sort_model.dart';
@@ -193,13 +193,24 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         ),
       ],
       child: Scaffold(
-        appBar: CustomAppBar(
-          onClose: () {
-            context.read<TaskListBloc>().add(const SearchTasksEvent(query: ''));
-          },
-          onSubmit: (query) {
-            context.read<TaskListBloc>().add(SearchTasksEvent(query: query));
-          },
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => AppNavigation.navigateToBoards(context),
+          ),
+          title: Text(getIt<BoardSelectionService>().selectedBoardName),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () {
+                // TODO: Implement search
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () => AppNavigation.navigateToSettings(context),
+            ),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
