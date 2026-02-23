@@ -5,7 +5,7 @@ import 'package:flutter_ikanban_app/features/board/domain/model/board_model.dart
 class BoardMapper {
   static BoardEntityCompanion toEntity(BoardModel model, {bool isUpdate = false}) {
     return BoardEntityCompanion(
-      id: isUpdate ? Value(int.parse(model.id)) : const Value.absent(),
+      id: isUpdate ? Value(model.id) : const Value.absent(),
       title: Value(model.title),
       description: Value(model.description),
       color: Value(model.color),
@@ -17,7 +17,7 @@ class BoardMapper {
   
   static BoardModel fromEntity(BoardData entity) {
     return BoardModel(
-      id: entity.id.toString(),
+      id: entity.id,
       title: entity.title,
       description: entity.description,
       color: entity.color,

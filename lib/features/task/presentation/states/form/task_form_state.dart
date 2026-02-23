@@ -12,6 +12,7 @@ part 'task_form_state.freezed.dart';
 abstract class TaskFormState with _$TaskFormState {
   const factory TaskFormState({
     int? taskId,
+    int? boardId,
     
     @Default("") String title,
     @Default(null) String? titleError,

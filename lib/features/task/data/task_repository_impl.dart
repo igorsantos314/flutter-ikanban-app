@@ -63,6 +63,7 @@ class TaskRepositoryImpl implements TaskRepository {
 
   @override
   Stream<Outcome<ResultPage<TaskModel>, TaskRepositoryErrors>> watchTasks({
+    required int boardId,
     required int page,
     required int limitPerPage,
     String? search,
@@ -81,6 +82,7 @@ class TaskRepositoryImpl implements TaskRepository {
     );
     return _localDataSource
         .watchTasks(
+          boardId: boardId,
           page: page,
           limitPerPage: limitPerPage,
           search: search,
@@ -167,6 +169,7 @@ class TaskRepositoryImpl implements TaskRepository {
   @override
   Stream<Outcome<List<TaskModel>, TaskRepositoryErrors>>
   watchNoPaginationTasks({
+    required int boardId,
     String? search,
     DateTime? startDate,
     DateTime? endDate,
@@ -180,6 +183,7 @@ class TaskRepositoryImpl implements TaskRepository {
   }) {
     return _localDataSource
         .watchTasks(
+          boardId: boardId,
           page: 1,
           limitPerPage: 10000,
           search: search,

@@ -9,8 +9,9 @@ import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 class AppStartupBloc extends Bloc<AppStartupEvent, AppStartupState> {
   final CheckOnboardingCompletedUseCase checkOnboardingCompletedUseCase;
 
-  AppStartupBloc({required this.checkOnboardingCompletedUseCase})
-    : super(const AppStartupState.initial()) {
+  AppStartupBloc({
+    required this.checkOnboardingCompletedUseCase,
+  }) : super(const AppStartupState.initial()) {
     on<InitializeApp>(_onInitializeApp);
   }
 
@@ -21,8 +22,8 @@ class AppStartupBloc extends Bloc<AppStartupEvent, AppStartupState> {
     emit(const AppStartupState.loading());
 
     final result = await checkOnboardingCompletedUseCase.execute();
-    result.when(
-      success: (isOnboardingComplete) {
+    await result.when(
+      success: (isOnboardingComplete) async {
         if (isOnboardingComplete == null) {
           emit(
             const AppStartupState.error(
@@ -31,7 +32,9 @@ class AppStartupBloc extends Bloc<AppStartupEvent, AppStartupState> {
           );
           return;
         }
+        
         log('[AppStatupBloc] App initialized. Onboarding complete: $isOnboardingComplete');
+        
         emit(
           AppStartupState.loaded(isOnboardingComplete: isOnboardingComplete),
         );

@@ -16,6 +16,7 @@ class TaskMapper {
       color: Value(model.color),
       isActive: Value(model.isActive),
       createdAt: Value(model.createdAt),
+      boardId: model.boardId != null ? Value(model.boardId!) : const Value.absent(),
     );
   }
   
@@ -32,6 +33,7 @@ class TaskMapper {
       color: entity.color,
       isActive: entity.isActive,
       createdAt: entity.createdAt,
+      boardId: entity.boardId,
     );
   }
 }

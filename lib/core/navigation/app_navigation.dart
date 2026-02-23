@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/presentation/app_startup_page.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/ui/scaffold_with_nav_bar.dart';
+import 'package:flutter_ikanban_app/features/board/presentation/pages/board_list_page.dart';
 import 'package:flutter_ikanban_app/features/onboarding/presentation/pages/on_boarding_page.dart';
 import 'package:flutter_ikanban_app/features/settings/presentation/pages/settings_page.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/pages/task_create_page.dart';
@@ -14,6 +15,8 @@ class AppNavigation {
   static const String initialRoute = '/';
   static const String onBoarding = '/onboarding';
   static const String home = '/home';
+  static const String boards = '/boards';
+  static const String tasks = '/tasks';
   static const String createTask = '/create-task';
   static const String editTask = '/edit-task/:id';
   static const String settings = '/settings';
@@ -40,7 +43,12 @@ class AppNavigation {
           routes: [
             GoRoute(
               path: home,
-              builder: (context, state) => const TaskListPage(),
+              builder: (context, state) => const BoardListPage(),
+            ),
+
+            GoRoute(
+              path: boards,
+              builder: (context, state) => const BoardListPage(),
             ),
 
             GoRoute(
@@ -49,6 +57,8 @@ class AppNavigation {
             ),
           ],
         ),
+
+        GoRoute(path: tasks, builder: (context, state) => const TaskListPage()),
         GoRoute(
           path: createTask,
           builder: (context, state) => const TaskCreatePage(),
@@ -77,6 +87,14 @@ class AppNavigation {
 
   static void navigateToHome(BuildContext context) {
     context.go(home);
+  }
+
+  static void navigateToBoards(BuildContext context) {
+    context.go(boards);
+  }
+
+  static void navigateToTasks(BuildContext context) {
+    context.go(tasks);
   }
 
   static void navigateToTask(BuildContext context, {int? taskId}) {

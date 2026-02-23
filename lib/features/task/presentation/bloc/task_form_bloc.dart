@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
+import 'package:flutter_ikanban_app/features/board/domain/services/board_selection_service.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/create_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/delete_task_use_case.dart';
@@ -77,6 +79,9 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     }
 
     try {
+      // Get the selected board ID from the service
+      final boardId = getIt<BoardSelectionService>().selectedBoard?.id;
+      
       final task = TaskModel(
         id: state.taskId,
         title: state.title,
@@ -88,6 +93,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         dueDate: state.dueDate,
         color: state.color,
         createdAt: DateTime.now(),
+        boardId: boardId,
       );
       Outcome<void, dynamic> outcome;
 
@@ -139,6 +145,9 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     }
 
     try {
+      // Get the selected board ID from the service (use existing boardId if updating)
+      final boardId = state.boardId ?? getIt<BoardSelectionService>().selectedBoard?.id;
+      
       final task = TaskModel(
         id: state.taskId,
         title: state.title,
@@ -150,6 +159,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         dueDate: state.dueDate,
         color: state.color,
         createdAt: DateTime.now(),
+        boardId: boardId,
       );
 
       final outcome = await _updateTaskUseCase.execute(task);
@@ -255,6 +265,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
             state.copyWith(
               isLoading: false,
               taskId: task.id,
+              boardId: task.boardId,
               title: task.title,
               description: task.description ?? "",
               status: task.status,
