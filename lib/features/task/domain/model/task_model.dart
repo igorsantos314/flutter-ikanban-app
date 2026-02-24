@@ -21,5 +21,6 @@ abstract class TaskModel with _$TaskModel {
     @Default(TaskColors.defaultColor) TaskColors color,
     @Default(true) bool isActive,
     required DateTime createdAt,
+    int? boardId,
   }) = _TaskModel;
 }

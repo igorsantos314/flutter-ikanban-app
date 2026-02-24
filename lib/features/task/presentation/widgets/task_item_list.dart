@@ -40,7 +40,6 @@ class TaskItemList extends StatelessWidget {
     Color borderColor;
     Color cardColor;
     Color priorityColor;
-    bool showAllDetails = true;
     Color textColor = theme.colorScheme.onSurface;
 
     if (task.status == TaskStatus.done) {
@@ -48,20 +47,15 @@ class TaskItemList extends StatelessWidget {
       borderColor = TaskColors.green.color;
       cardColor = TaskColors.green.color;
       textColor = Colors.black;
-      showAllDetails = false;
     } else if (task.status == TaskStatus.cancelled) {
       priorityColor = Colors.grey;
       borderColor = Colors.grey;
       cardColor = Colors.grey;
-      showAllDetails = false;
+      textColor = Colors.black87;
     } else {
       priorityColor = task.priority.color;
       borderColor = task.color.color;
       cardColor = theme.colorScheme.surface;
-    }
-
-    if (layoutMode == LayoutMode.compact) {
-      showAllDetails = false;
     }
 
     return Card(
@@ -76,274 +70,128 @@ class TaskItemList extends StatelessWidget {
         onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(12),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: 35,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: priorityColor.withAlpha(150),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
+            // Header com prioridade e ícones
+            Container(
+              decoration: BoxDecoration(
+                color: priorityColor.withAlpha(150),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Icon(task.priority.icon, size: 20, color: textColor),
-                      SizedBox(width: 4),
-                      Text(
-                        task.priority.displayName,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: textColor,
-                        ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 6.0,
+                ),
+                child: Row(
+                  children: [
+                    Icon(task.priority.icon, size: 18, color: textColor),
+                    const SizedBox(width: 4),
+                    Text(
+                      task.priority.displayName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        color: textColor,
                       ),
-                    ],
-                  ),
+                    ),
+                    const Spacer(),
+                    // Ícones do lado direito
+                    Icon(task.type.icon, size: 18, color: textColor),
+                    const SizedBox(width: 6),
+                    Icon(task.complexity.icon, size: 18, color: textColor),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${task.complexity.index + 1}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Icon(task.status.icon, size: 18, color: textColor),
+                  ],
                 ),
               ),
             ),
+            // Conteúdo compacto (máximo 3 linhas)
             Padding(
-              padding: const EdgeInsets.all(16),
-              child: layoutMode == LayoutMode.compact
-                  ? _buildCompactContent(theme, showAllDetails, textColor)
-                  : _buildFullWidgetContent(theme, showAllDetails, textColor),
+              padding: const EdgeInsets.all(12),
+              child: SizedBox(
+                height: taskSize == TaskSize.comfortable ? 70 : 50,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Linha 1: Título
+                    Text(
+                      task.title,
+                      maxLines: 1,
+                      textAlign: TextAlign.start,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: textColor,
+                      ),
+                    ),
+
+                    // Linha 2: Descrição (se houver)
+                    if (task.description != null &&
+                        task.description!.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        task.description!,
+                        maxLines: 1,
+                        textAlign: TextAlign.start,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: textColor.withAlpha(180),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+
+                    // Linha 3: Data de entrega (se houver)
+                    if (task.dueDate != null) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.schedule,
+                            size: 12,
+                            color: task.dueDate!.isBefore(DateTime.now())
+                                ? theme.colorScheme.error
+                                : textColor.withAlpha(180),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${task.dueDate!.day}/${task.dueDate!.month}/${task.dueDate!.year}',
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: task.dueDate!.isBefore(DateTime.now())
+                                  ? theme.colorScheme.error
+                                  : textColor.withAlpha(180),
+                              fontWeight: task.dueDate!.isBefore(DateTime.now())
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildFullWidgetContent(ThemeData theme, bool showAllDetails, Color textColor) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Conteúdo principal
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title and completion button
-              _buildTitleRow(theme, textColor),
-
-              // Description
-              _buildDescription(theme, showAllDetails),
-
-              // Due date
-              _buildDueDate(theme, showAllDetails),
-
-              const SizedBox(height: 12),
-
-              // Type and Complexity
-              _buildTypeAndComplexity(theme, showAllDetails),
-            ],
-          ),
-        ),
-
-        const SizedBox(width: 12),
-
-        // Status and Priority
-        _buildStatusAndPriority(theme, showAllDetails),
-      ],
-    );
-  }
-
-  Widget _buildCompactContent(ThemeData theme, bool showAllDetails, Color textColor) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        // Main content
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title and completion button
-            _buildTitleRow(theme, textColor),
-
-            // Description
-            _buildDescription(theme, showAllDetails),
-
-            // Due date
-            _buildDueDate(theme, showAllDetails),
-
-            const SizedBox(height: 12),
-
-            // Type and Complexity
-            _buildTypeAndComplexity(theme, showAllDetails),
-          ],
-        ),
-
-        const SizedBox(width: 12),
-
-        // Status and Priority
-        _buildStatusAndPriority(theme, showAllDetails),
-      ],
-    );
-  }
-
-  Widget _buildTitleRow(ThemeData theme, Color textColor) {
-    return Row(
-      children: [
-        // Mark as completed
-        if (onToggleCompletion != null) ...[
-          const SizedBox(height: 8),
-          IconButton(
-            onPressed: onToggleCompletion,
-            icon: Icon(
-              task.status == TaskStatus.done
-                  ? Icons.check_circle
-                  : Icons.radio_button_unchecked,
-              color: task.status == TaskStatus.done
-                  ? Colors.green
-                  : theme.colorScheme.onSurface,
-            ),
-            visualDensity: VisualDensity.compact,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-          ),
-        ],
-
-        // Title
-        Expanded(
-          child: Text(
-            task.title,
-            maxLines: 2,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: layoutMode == LayoutMode.compact ? 14 : 16,
-              overflow: TextOverflow.ellipsis,
-              color: textColor,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDescription(ThemeData theme, bool showAllDetails) {
-    return Column(
-      children: [
-        if (task.description != null &&
-            task.description!.isNotEmpty &&
-            showAllDetails) ...[
-          const SizedBox(height: 8),
-          Text(
-            task.description!,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: theme.colorScheme.onSurface.withAlpha(150),
-              fontSize: layoutMode == LayoutMode.compact ? 12 : 14,
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildDueDate(ThemeData theme, bool showAllDetails) {
-    return Column(
-      children: [
-        if (task.dueDate != null) ...[
-          const SizedBox(height: 8),
-          if (showAllDetails)
-            Row(
-              children: [
-                Icon(
-                  Icons.schedule,
-                  size: 14,
-                  color: task.dueDate!.isBefore(DateTime.now())
-                      ? theme.colorScheme.error
-                      : theme.colorScheme.onSurface.withAlpha(150),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'Vence em ${task.dueDate!.day}/${task.dueDate!.month}/${task.dueDate!.year}',
-                  style: TextStyle(
-                    fontSize: layoutMode == LayoutMode.compact ? 10 : 12,
-                    color: task.dueDate!.isBefore(DateTime.now())
-                        ? theme.colorScheme.error
-                        : theme.colorScheme.onSurface.withAlpha(150),
-                    fontWeight: task.dueDate!.isBefore(DateTime.now())
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
-                ),
-              ],
-            ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildStatusAndPriority(ThemeData theme, bool showAllDetails) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withAlpha(100),
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: theme.colorScheme.onSurface.withAlpha(20),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Icon(task.status.icon, size: 18, color: task.status.color),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTypeAndComplexity(ThemeData theme, bool showAllDetails) {
-    return Column(
-      children: [
-        // Tipo e Complexidade
-        if (showAllDetails)
-          Container(
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface.withAlpha(100),
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.onSurface.withAlpha(20),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 4,
-              children: [
-                Icon(task.type.icon, size: 24, color: task.type.color),
-                Icon(
-                  task.complexity.icon,
-                  size: 24,
-                  color: task.complexity.color,
-                ),
-                Text(
-                  '${task.complexity.index + 1} pts',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
     );
   }
 }

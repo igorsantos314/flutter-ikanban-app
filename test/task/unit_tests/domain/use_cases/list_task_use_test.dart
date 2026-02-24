@@ -48,6 +48,7 @@ void main() {
           totalPages: 1,
         );
         when(() => mockRepository.watchTasks(
+              boardId: any(named: 'boardId'),
               page: any(named: 'page'),
               limitPerPage: any(named: 'limitPerPage'),
               search: any(named: 'search'),
@@ -66,6 +67,7 @@ void main() {
 
         // Act
         final stream = useCase.execute(
+          boardId: 1,
           page: 1,
           limitPerPage: 10,
         );
@@ -94,6 +96,7 @@ void main() {
       test('should return stream with genericError when repository returns error', () async {
         // Arrange
         when(() => mockRepository.watchTasks(
+              boardId: any(named: 'boardId'),
               page: any(named: 'page'),
               limitPerPage: any(named: 'limitPerPage'),
               search: any(named: 'search'),
@@ -114,6 +117,7 @@ void main() {
 
         // Act
         final stream = useCase.execute(
+          boardId: 1,
           page: 1,
           limitPerPage: 10,
         );
@@ -147,6 +151,7 @@ void main() {
           totalPages: 1,
         );
         when(() => mockRepository.watchTasks(
+              boardId: any(named: 'boardId'),
               page: any(named: 'page'),
               limitPerPage: any(named: 'limitPerPage'),
               search: any(named: 'search'),
@@ -165,6 +170,7 @@ void main() {
 
         // Act
         final stream = useCase.execute(
+          boardId: 1,
           page: 2,
           limitPerPage: 20,
           search: 'test',
@@ -173,6 +179,7 @@ void main() {
 
         // Assert
         verify(() => mockRepository.watchTasks(
+              boardId: 1,
               page: 2,
               limitPerPage: 20,
               search: 'test',

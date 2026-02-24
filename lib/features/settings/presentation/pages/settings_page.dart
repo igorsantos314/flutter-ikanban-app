@@ -9,6 +9,7 @@ import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
 import 'package:flutter_ikanban_app/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:flutter_ikanban_app/features/settings/presentation/events/settings_events.dart';
 import 'package:flutter_ikanban_app/features/settings/presentation/modals/about_developer_modal.dart';
+import 'package:flutter_ikanban_app/features/settings/presentation/modals/import_data_confirmation_dialog.dart';
 import 'package:flutter_ikanban_app/features/settings/presentation/states/settings_state.dart';
 import 'package:provider/provider.dart';
 
@@ -326,9 +327,17 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                                       trailing: const Icon(
                                         Icons.arrow_forward_ios,
                                       ),
-                                      onTap: () => context
-                                          .read<SettingsBloc>()
-                                          .add(ImportDataEvent(filePath: "")),
+                                      onTap: () async {
+                                        // Mostra dialog de confirmação
+                                        final confirmed = await showImportDataConfirmationDialog(context);
+                                        
+                                        // Só importa se o usuário confirmar
+                                        if (confirmed && context.mounted) {
+                                          context
+                                              .read<SettingsBloc>()
+                                              .add(ImportDataEvent(filePath: ""));
+                                        }
+                                      },
                                     ),
                                   ],
                                 ),

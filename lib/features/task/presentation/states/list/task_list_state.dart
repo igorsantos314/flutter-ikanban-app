@@ -12,6 +12,8 @@ part 'task_list_state.freezed.dart';
 @freezed
 abstract class TaskListState with _$TaskListState {
   const factory TaskListState({
+    int? boardId,
+    
     TaskModel? selectedTask,
     @Default("") String searchQuery,
     @Default([]) List<TaskModel> tasks,

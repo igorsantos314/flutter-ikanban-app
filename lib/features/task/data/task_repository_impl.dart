@@ -47,6 +47,21 @@ class TaskRepositoryImpl implements TaskRepository {
   }
 
   @override
+  Future<Outcome<void, TaskRepositoryErrors>> deleteAllTasks() async {
+    try {
+      await _localDataSource.deleteAllTasks();
+      await _localDataSource.resetAutoIncrement();
+      return const Outcome.success();
+    } catch (e) {
+      return Outcome.failure(
+        error: GenericError(),
+        message: 'Failed to delete all tasks',
+        throwable: e,
+      );
+    }
+  }
+
+  @override
   Future<Outcome<void, TaskRepositoryErrors>> updateTask(TaskModel task) async {
     try {
       final entity = TaskMapper.toEntity(task);
@@ -63,6 +78,7 @@ class TaskRepositoryImpl implements TaskRepository {
 
   @override
   Stream<Outcome<ResultPage<TaskModel>, TaskRepositoryErrors>> watchTasks({
+    required int boardId,
     required int page,
     required int limitPerPage,
     String? search,
@@ -81,6 +97,7 @@ class TaskRepositoryImpl implements TaskRepository {
     );
     return _localDataSource
         .watchTasks(
+          boardId: boardId,
           page: page,
           limitPerPage: limitPerPage,
           search: search,
@@ -167,6 +184,7 @@ class TaskRepositoryImpl implements TaskRepository {
   @override
   Stream<Outcome<List<TaskModel>, TaskRepositoryErrors>>
   watchNoPaginationTasks({
+    required int boardId,
     String? search,
     DateTime? startDate,
     DateTime? endDate,
@@ -180,6 +198,7 @@ class TaskRepositoryImpl implements TaskRepository {
   }) {
     return _localDataSource
         .watchTasks(
+          boardId: boardId,
           page: 1,
           limitPerPage: 10000,
           search: search,
@@ -207,5 +226,20 @@ class TaskRepositoryImpl implements TaskRepository {
             error: TaskRepositoryErrors.databaseError(),
           );
         });
+  }
+
+  @override
+  Future<Outcome<List<TaskModel>, TaskRepositoryErrors>> getAllTasks() async {
+    try {
+      final entities = await _localDataSource.getAllTasks();
+      final tasks = entities.map((entity) => TaskMapper.fromEntity(entity)).toList();
+      return Outcome.success(value: tasks);
+    } catch (e) {
+      return Outcome.failure(
+        error: GenericError(),
+        message: 'Failed to get all tasks',
+        throwable: e,
+      );
+    }
   }
 }

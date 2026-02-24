@@ -8,8 +8,10 @@ import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/get_tas
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_layout_mode_preferences.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_status_preferences_use_case.dart';
 import 'package:flutter_ikanban_app/core/app/app_startup/domain/usecases/set_task_list_type_filter_preferences.dart';
+import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/utils/messages.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
+import 'package:flutter_ikanban_app/features/board/domain/services/board_selection_service.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_sort.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
@@ -112,8 +114,11 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
 
     await _loadPreferences(emit);
 
+    final int boardId = state.boardId ?? getIt<BoardSelectionService>().selectedBoard?.id ?? -1;
+
     final tasks = await _listTaskUseCase
         .execute(
+          boardId: boardId,
           page: 1,
           limitPerPage: _pageSize,
           search: _currentSearch,
@@ -133,6 +138,7 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
           log('[TaskListBloc] Received null result page');
           emit(
             state.copyWith(
+              boardId: boardId,
               isLoading: false,
               hasError: false,
               tasks: [],
@@ -199,8 +205,11 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     WatchTaskListEditsEvent event,
     Emitter<TaskListState> emit,
   ) {
+    final int boardId = state.boardId ?? getIt<BoardSelectionService>().selectedBoard?.id ?? -1;
+
     _taskStreamSubscription?.cancel();
     final stream = _listTaskUseCase.execute(
+      boardId: boardId,
       page: 1,
       limitPerPage: state.currentPage * _pageSize,
       search: _currentSearch,
@@ -304,9 +313,11 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     final nextPage = state.currentPage + 1;
 
     emit(state.copyWith(isLoadingMore: true));
-
+    
     try {
+      int boardId = state.boardId ?? getIt<BoardSelectionService>().selectedBoard?.id ?? -1;
       final stream = _listTaskUseCase.execute(
+        boardId: boardId,
         page: nextPage,
         limitPerPage: _pageSize,
         search: _currentSearch,

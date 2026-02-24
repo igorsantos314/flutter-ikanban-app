@@ -15,7 +15,9 @@ class AppStartupPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          AppStartupBloc(checkOnboardingCompletedUseCase: getIt()),
+          AppStartupBloc(
+            checkOnboardingCompletedUseCase: getIt(),
+          ),
       child: AppStartupPageContent(),
     );
   }

@@ -3,6 +3,9 @@ import 'dart:developer';
 import 'package:flutter_ikanban_app/core/services/file/file_service.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
+import 'package:flutter_ikanban_app/features/board/domain/model/board_model.dart';
+import 'package:flutter_ikanban_app/features/board/domain/repository/board_repository.dart';
+import 'package:flutter_ikanban_app/features/settings/domain/model/settings_model.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/repository/settings_repository.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
@@ -11,18 +14,24 @@ import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
+import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
 
 class ImportDataUseCase {
   final TaskRepository _taskRepository;
+  final BoardRepository _boardRepository;
+  final SettingsRepository _settingsRepository;
   final FileService _fileService;
   final FileShareService _fileShareService;
 
   const ImportDataUseCase({
     required SettingsRepository settingsRepository,
     required TaskRepository taskRepository,
+    required BoardRepository boardRepository,
     required FileService fileService,
     required FileShareService fileShareService,
   }) : _taskRepository = taskRepository,
+       _boardRepository = boardRepository,
+       _settingsRepository = settingsRepository,
        _fileService = fileService,
        _fileShareService = fileShareService;
 
@@ -94,9 +103,76 @@ class ImportDataUseCase {
             );
           }
 
+          // Clear all existing data before importing
+          log('Clearing all existing data...');
+          
+          // Delete all tasks
+          final deleteTasksResult = await _taskRepository.deleteAllTasks();
+          deleteTasksResult.when(
+            success: (_) {
+              log('All tasks deleted successfully');
+            },
+            failure: (error, message, throwable) {
+              log('Warning: Failed to delete all tasks: $message');
+            },
+          );
+
+          // Delete all boards
+          final deleteBoardsResult = await _boardRepository.deleteAllBoards();
+          deleteBoardsResult.when(
+            success: (_) {
+              log('All boards deleted successfully');
+            },
+            failure: (error, message, throwable) {
+              log('Warning: Failed to delete all boards: $message');
+            },
+          );
+
+          log('Data cleared. Starting import...');
+
           int tasksImported = 0;
+          int boardsImported = 0;
           bool settingsImported = false;
 
+          // Import Boards first (since tasks may reference boards)
+          if (data.containsKey('boards')) {
+            try {
+              final boardsData = data['boards'] as List<dynamic>;
+              log("Importing ${boardsData.length} boards");
+
+              for (var boardJson in boardsData) {
+                final boardMap = boardJson as Map<String, dynamic>;
+                final board = BoardModel(
+                  id: boardMap['id'] as int,
+                  title: boardMap['title'] as String,
+                  description: boardMap['description'] as String?,
+                  color: boardMap['color'] as String?,
+                  createdAt: boardMap['createdAt'] != null
+                      ? DateTime.parse(boardMap['createdAt'] as String)
+                      : DateTime.now(),
+                  updatedAt: boardMap['updatedAt'] != null
+                      ? DateTime.parse(boardMap['updatedAt'] as String)
+                      : DateTime.now(),
+                  isActive: boardMap['isActive'] as bool? ?? true,
+                );
+
+                final result = await _boardRepository.createBoard(board);
+                result.when(
+                  success: (value) {
+                    boardsImported++;
+                  },
+                  failure: (error, message, throwable) {
+                    log('Error importing board ${board.title}: $message');
+                  },
+                );
+              }
+              log("Boards imported: $boardsImported");
+            } catch (e) {
+              log('Error importing boards: ${e.toString()}');
+            }
+          }
+
+          // Import Tasks
           if (data.containsKey('tasks')) {
             try {
               final tasksData = data['tasks'] as List<dynamic>;
@@ -138,6 +214,7 @@ class ImportDataUseCase {
                     createdAt: taskMap['createdAt'] != null
                         ? DateTime.parse(taskMap['createdAt'] as String)
                         : DateTime.now(),
+                    boardId: taskMap['boardId'] as int?,
                   );
                 }).toList();
 
@@ -150,6 +227,7 @@ class ImportDataUseCase {
               }, failure: (error, message, throwable) {
                 log('Error importing tasks: $message throwable: $throwable');
               },);
+              log("Tasks imported: $tasksImported");
             } catch (e) {
               return Outcome.failure(
                 error: ImportDataError.tasksImportFailed,
@@ -159,9 +237,40 @@ class ImportDataUseCase {
             }
           }
 
+          // Import Settings
+          if (data.containsKey('settings')) {
+            try {
+              final settingsData = data['settings'] as Map<String, dynamic>;
+              log("Importing settings");
+
+              final settings = SettingsModel(
+                appTheme: AppTheme.values.firstWhere(
+                  (e) => e.toString() == 'AppTheme.${settingsData['appTheme']}',
+                  orElse: () => AppTheme.system,
+                ),
+                language: settingsData['language'] as String? ?? 'pt',
+                appVersion: settingsData['appVersion'] as String? ?? '1.0.0',
+              );
+
+              final result = await _settingsRepository.saveSettings(settings);
+              result.when(
+                success: (value) {
+                  settingsImported = true;
+                  log("Settings imported");
+                },
+                failure: (error, message, throwable) {
+                  log('Error importing settings: $message');
+                },
+              );
+            } catch (e) {
+              log('Error importing settings: ${e.toString()}');
+            }
+          }
+
           return Outcome.success(
             value: ImportResult(
               tasksImported: tasksImported,
+              boardsImported: boardsImported,
               settingsImported: settingsImported,
             ),
           );
@@ -187,20 +296,22 @@ class ImportDataUseCase {
     return data.containsKey('app') &&
         data.containsKey('version') &&
         data.containsKey('exportDate') &&
-        (data.containsKey('settings') || data.containsKey('tasks'));
+        (data.containsKey('settings') || data.containsKey('tasks') || data.containsKey('boards'));
   }
 }
 
 class ImportResult {
   final int tasksImported;
+  final int boardsImported;
   final bool settingsImported;
 
   const ImportResult({
     required this.tasksImported,
+    required this.boardsImported,
     required this.settingsImported,
   });
 
-  int get totalImported => tasksImported + (settingsImported ? 1 : 0);
+  int get totalImported => tasksImported + boardsImported + (settingsImported ? 1 : 0);
 }
 
 enum ImportDataError {
@@ -209,6 +320,7 @@ enum ImportDataError {
   invalidBackupFormat,
   settingsImportFailed,
   tasksImportFailed,
+  boardsImportFailed,
   userCancelled,
   fileSelectionFailed,
   unexpectedError,
@@ -227,6 +339,8 @@ extension ImportDataErrorExtension on ImportDataError {
         return 'Falha ao importar configurações';
       case ImportDataError.tasksImportFailed:
         return 'Falha ao importar tarefas';
+      case ImportDataError.boardsImportFailed:
+        return 'Falha ao importar quadros';
       case ImportDataError.userCancelled:
         return 'Operação cancelada pelo usuário';
       case ImportDataError.fileSelectionFailed:
