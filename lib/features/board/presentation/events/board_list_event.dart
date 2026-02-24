@@ -25,3 +25,8 @@ class BoardSelectedEvent extends BoardListEvent {
 }
 
 class ShowCreateBoardDialogEvent extends BoardListEvent {}
+
+class DeleteBoardEvent extends BoardListEvent {
+  final String boardId;
+  DeleteBoardEvent(this.boardId);
+}

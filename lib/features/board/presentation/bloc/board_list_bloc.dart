@@ -3,12 +3,14 @@ import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
+import 'package:flutter_ikanban_app/features/board/domain/use_cases/delete_board_use_case.dart';
 import 'package:flutter_ikanban_app/features/board/domain/use_cases/list_board_use_case.dart';
 import 'package:flutter_ikanban_app/features/board/presentation/events/board_list_event.dart';
 import 'package:flutter_ikanban_app/features/board/presentation/states/board_list_state.dart';
 
 class BoardListBloc extends Bloc<BoardListEvent, BoardListState> {
   final ListBoardUseCase _listBoardUseCase;
+  final DeleteBoardUseCase _deleteBoardUseCase;
 
   StreamSubscription? _boardStreamSubscription;
 
@@ -18,7 +20,7 @@ class BoardListBloc extends Bloc<BoardListEvent, BoardListState> {
 
   String? _currentSearch;
 
-  BoardListBloc(this._listBoardUseCase) : super(BoardListState.initial()) {
+  BoardListBloc(this._listBoardUseCase, this._deleteBoardUseCase) : super(BoardListState.initial()) {
     on<LoadBoardsEvent>(_onLoadBoards);
     on<LoadMoreBoardsEvent>(_onLoadMoreBoards);
     on<RefreshBoardsEvent>(_onRefreshBoards);
@@ -26,6 +28,7 @@ class BoardListBloc extends Bloc<BoardListEvent, BoardListState> {
     on<BoardsPageDataReceived>(_onBoardsPageDataReceived);
     on<BoardSelectedEvent>(_onBoardSelected);
     on<ShowCreateBoardDialogEvent>(_onShowCreateBoardDialog);
+    on<DeleteBoardEvent>(_onDeleteBoard);
   }
 
   @override
@@ -182,5 +185,31 @@ class BoardListBloc extends Bloc<BoardListEvent, BoardListState> {
     Emitter<BoardListState> emit,
   ) {
     emit(state.copyWith(showCreateDialog: true));
+  }
+
+  FutureOr<void> _onDeleteBoard(
+    DeleteBoardEvent event,
+    Emitter<BoardListState> emit,
+  ) async {
+    log('[BoardListBloc] Deleting board: ${event.boardId}');
+    
+    emit(state.copyWith(isLoading: true));
+    
+    final result = await _deleteBoardUseCase.execute(event.boardId);
+    
+    result.when(
+      success: (_) {
+        log('[BoardListBloc] Board deleted successfully');
+        // Refresh the list after deletion
+        add(RefreshBoardsEvent());
+      },
+      failure: (error, message, throwable) {
+        log('[BoardListBloc] Error deleting board: $message');
+        emit(state.copyWith(
+          isLoading: false,
+          errorMessage: 'Erro ao excluir quadro',
+        ));
+      },
+    );
   }
 }

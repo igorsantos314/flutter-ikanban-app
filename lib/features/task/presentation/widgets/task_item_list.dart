@@ -70,6 +70,7 @@ class TaskItemList extends StatelessWidget {
         onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(12),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header com prioridade e ícones
             Container(
