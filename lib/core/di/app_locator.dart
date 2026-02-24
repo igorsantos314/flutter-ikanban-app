@@ -201,6 +201,7 @@ void _setupCoreServices() {
       fileShareService: getIt(),
       settingsRepository: getIt(),
       taskRepository: getIt(),
+      boardRepository: getIt(),
     ),
   );
 
@@ -208,6 +209,7 @@ void _setupCoreServices() {
     () => ImportDataUseCase(
       settingsRepository: getIt(),
       taskRepository: getIt(),
+      boardRepository: getIt(),
       fileService: getIt(),
       fileShareService: getIt(),
     ),

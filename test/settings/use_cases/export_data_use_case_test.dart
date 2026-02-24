@@ -10,6 +10,8 @@ void main() {
     group('ExportResult', () {
       test('should format file size correctly for bytes', () {
         final result = ExportResult(
+          boardsCount: 5,
+          hasSettings: true,
           filePath: '/path/to/file',
           fileName: 'backup.json',
           fileSize: 512,
@@ -21,6 +23,8 @@ void main() {
 
       test('should format file size correctly for KB', () {
         final result = ExportResult(
+          boardsCount: 5,
+          hasSettings: true,
           filePath: '/path/to/file',
           fileName: 'backup.json',
           fileSize: 2048,
@@ -32,6 +36,8 @@ void main() {
 
       test('should format file size correctly for MB', () {
         final result = ExportResult(
+          boardsCount: 5,
+          hasSettings: true,
           filePath: '/path/to/file',
           fileName: 'backup.json',
           fileSize: 2097152,
@@ -43,17 +49,21 @@ void main() {
 
       test('should create correct summary', () {
         final result = ExportResult(
+          boardsCount: 5,
+          hasSettings: true,
           filePath: '/path/to/file',
           fileName: 'backup.json',
           fileSize: 1024,
           tasksCount: 42,
           shareAttempted: false,
         );
-        expect(result.summary, '42 tarefas exportadas • 1.0KB');
+        expect(result.summary, '42 tasks, 5 boards • 1.0KB');
       });
 
       test('should have correct file path', () {
         final result = ExportResult(
+          boardsCount: 5,
+          hasSettings: true,
           filePath: '/storage/backups/backup.json',
           fileName: 'backup.json',
           fileSize: 1024,
@@ -66,6 +76,8 @@ void main() {
 
       test('should track share attempted status', () {
         final resultWithShare = ExportResult(
+          boardsCount: 5,
+          hasSettings: true,
           filePath: '/path/to/file',
           fileName: 'backup.json',
           fileSize: 1024,
@@ -77,6 +89,8 @@ void main() {
         final resultWithoutShare = ExportResult(
           filePath: '/path/to/file',
           fileName: 'backup.json',
+          boardsCount: 5,
+          hasSettings: true,
           fileSize: 1024,
           tasksCount: 10,
           shareAttempted: false,

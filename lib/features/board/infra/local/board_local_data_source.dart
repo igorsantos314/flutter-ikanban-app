@@ -13,7 +13,10 @@ class BoardLocalDataSource extends DatabaseAccessor<AppDatabase> with _$BoardLoc
   BoardLocalDataSource(this.db) : super(db);
 
   Future<int> insertBoard(BoardEntityCompanion board) {
-    return into(db.boardEntity).insert(board);
+    return into(db.boardEntity).insert(
+      board,
+      mode: InsertMode.insertOrReplace,
+    );
   }
 
   Future<List<BoardData>> getAllBoards() {
@@ -30,6 +33,16 @@ class BoardLocalDataSource extends DatabaseAccessor<AppDatabase> with _$BoardLoc
 
   Future<int> deleteBoard(int id) {
     return (delete(db.boardEntity)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  Future<int> deleteAllBoards() {
+    return delete(db.boardEntity).go();
+  }
+
+  Future<void> resetAutoIncrement() async {
+    await db.customStatement(
+      "DELETE FROM sqlite_sequence WHERE name='board_entity'",
+    );
   }
 
   Future<List<BoardData>> getBoardsList({

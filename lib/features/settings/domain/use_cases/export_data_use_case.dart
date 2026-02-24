@@ -4,20 +4,26 @@ import 'package:flutter/services.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_service.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
+import 'package:flutter_ikanban_app/features/board/domain/repository/board_repository.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/repository/settings_repository.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 
 class ExportDataUseCase {
   final TaskRepository _taskRepository;
+  final BoardRepository _boardRepository;
+  final SettingsRepository _settingsRepository;
   final FileService _fileService;
   final FileShareService _fileShareService;
 
   const ExportDataUseCase({
     required SettingsRepository settingsRepository,
     required TaskRepository taskRepository,
+    required BoardRepository boardRepository,
     required FileService fileService,
     required FileShareService fileShareService,
   }) : _taskRepository = taskRepository,
+       _boardRepository = boardRepository,
+       _settingsRepository = settingsRepository,
        _fileService = fileService,
        _fileShareService = fileShareService;
 
@@ -25,85 +31,88 @@ class ExportDataUseCase {
     bool shareAfterExport = false,
   }) async {
     try {
+      // Export Tasks
+      log('Starting tasks export...');
+      final tasksOutcome = await _taskRepository.getAllTasks();
+      
       List<Map<String, dynamic>> tasksData = [];
-      int totalTasks = 0;
-      int currentPage = 1;
-      const int pageSize = 100;
-      bool hasMorePages = true;
+      tasksOutcome.when(
+        success: (tasks) {
+          if (tasks != null) {
+            tasksData = tasks
+                .map(
+                  (task) => {
+                    'id': task.id,
+                    'title': task.title,
+                    'description': task.description,
+                    'status': task.status.name,
+                    'priority': task.priority.name,
+                    'complexity': task.complexity.name,
+                    'type': task.type.name,
+                    'dueDate': task.dueDate?.toIso8601String(),
+                    'isActive': task.isActive,
+                    'createdAt': task.createdAt.toIso8601String(),
+                    'color': task.color.name,
+                    'boardId': task.boardId,
+                  },
+                )
+                .toList();
+            log('Tasks exported: ${tasksData.length}');
+          }
+        },
+        failure: (error, message, throwable) {
+          log('Error loading tasks: $message');
+        },
+      );
 
-      while (hasMorePages) {
-        final tasksStream = _taskRepository.watchTasks(
-          boardId: 0, // 0 = exportar tarefas de todos os boards
-          page: currentPage,
-          limitPerPage: pageSize,
-          onlyActive: false,
-        );
+      // Export Boards
+      log('Starting boards export...');
+      final boardsOutcome = await _boardRepository.getAllBoards();
+      
+      List<Map<String, dynamic>> boardsData = [];
+      boardsOutcome.when(
+        success: (boards) {
+          if (boards != null) {
+            boardsData = boards
+                .map(
+                  (board) => {
+                    'id': board.id,
+                    'title': board.title,
+                    'description': board.description,
+                    'color': board.color,
+                    'createdAt': board.createdAt.toIso8601String(),
+                    'updatedAt': board.updatedAt.toIso8601String(),
+                    'isActive': board.isActive,
+                  },
+                )
+                .toList();
+            log('Boards exported: ${boardsData.length}');
+          }
+        },
+        failure: (error, message, throwable) {
+          log('Error loading boards: $message');
+        },
+      );
 
-        final tasksOutcome = await tasksStream.first;
-
-        final success = tasksOutcome.when(
-          success: (resultPage) {
-            if (resultPage != null) {
-              // Adds the tasks from the current page to the complete list
-              final pageTasksData = resultPage.items
-                  .map(
-                    (task) => {
-                      'id': task.id,
-                      'title': task.title,
-                      'description': task.description,
-                      'status': task.status.name,
-                      'priority': task.priority.name,
-                      'complexity': task.complexity.name,
-                      'type': task.type.name,
-                      'dueDate': task.dueDate?.toIso8601String(),
-                      'isActive': task.isActive,
-                      'createdAt': task.createdAt
-                          .toIso8601String(), // Adds creation timestamp
-                      'color': task.color.name, // Adds task color
-                    },
-                  )
-                  .toList();
-
-              tasksData.addAll(pageTasksData);
-              totalTasks = resultPage.totalItems;
-
-              // Check if there are more pages
-              final totalPages = (totalTasks / pageSize).ceil();
-              hasMorePages =
-                  currentPage < totalPages && resultPage.items.isNotEmpty;
-
-              log(
-                'Page $currentPage of $totalPages loaded - ${resultPage.items.length} tasks',
-              );
-
-              return true;
-            }
-            return false;
-          },
-          failure: (error, message, throwable) {
-            log('Error loading page $currentPage: $message');
-            return false;
-          },
-        );
-
-        if (!success) {
-          return Outcome.failure(
-            error: ExportDataError.tasksLoadFailed,
-            message: 'Erro ao carregar tarefas na página $currentPage',
-          );
-        }
-
-        currentPage++;
-
-        // Proteção contra loop infinito
-        if (currentPage > 1000) {
-          log('Limite de páginas atingido (1000) - interrompendo busca');
-          break;
-        }
-      }
-
-      log(
-        'Exportação completa: ${tasksData.length} de $totalTasks tarefas carregadas',
+      // Export Settings
+      log('Starting settings export...');
+      final settingsOutcome = await _settingsRepository.loadSettings();
+      
+      Map<String, dynamic>? settingsData;
+      settingsOutcome.when(
+        success: (settings) {
+          if (settings != null) {
+            settingsData = {
+              'appTheme': settings.appTheme.name,
+              'language': settings.language,
+              'appVersion': settings.appVersion,
+            };
+            log('Settings exported');
+          }
+        },
+        failure: (error, message, throwable) {
+          log('Error loading settings: $message');
+        },
       );
 
       final exportData = {
@@ -111,17 +120,15 @@ class ExportDataUseCase {
         'version': '1.0.0+1',
         'exportDate': DateTime.now().toIso8601String(),
         'tasks': tasksData,
-        'totalTasks': totalTasks,
-        'exportedTasks': tasksData.length,
+        'boards': boardsData,
+        'settings': settingsData,
         'metadata': {
           'exportedBy': 'iKanban Flutter App',
           'platform': 'mobile/desktop',
           'dataVersion': '1.0',
-          'paginationInfo': {
-            'pageSize': pageSize,
-            'totalPages': currentPage - 1,
-            'isComplete': tasksData.length == totalTasks,
-          },
+          'totalTasks': tasksData.length,
+          'totalBoards': boardsData.length,
+          'hasSettings': settingsData != null,
         },
       };
 
@@ -160,6 +167,8 @@ class ExportDataUseCase {
             fileName: fileName,
             fileSize: jsonData.length,
             tasksCount: tasksData.length,
+            boardsCount: boardsData.length,
+            hasSettings: settingsData != null,
             shareAttempted: shareAfterExport,
           );
 
@@ -189,6 +198,8 @@ class ExportResult {
   final String fileName;
   final int fileSize;
   final int tasksCount;
+  final int boardsCount;
+  final bool hasSettings;
   final bool shareAttempted;
 
   const ExportResult({
@@ -196,6 +207,8 @@ class ExportResult {
     required this.fileName,
     required this.fileSize,
     required this.tasksCount,
+    required this.boardsCount,
+    required this.hasSettings,
     required this.shareAttempted,
   });
 
@@ -207,7 +220,7 @@ class ExportResult {
     return '${(fileSize / (1024 * 1024)).toStringAsFixed(1)}MB';
   }
   
-  String get summary => '$tasksCount tasks exported • $formattedSize';
+  String get summary => '$tasksCount tasks, $boardsCount boards • $formattedSize';
 }
 
 enum ExportDataError {

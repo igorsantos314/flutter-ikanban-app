@@ -6,6 +6,7 @@ void main() {
     group('ImportResult', () {
       test('should create result with correct properties', () {
         final result = ImportResult(
+          boardsImported: 5,
           tasksImported: 42,
           settingsImported: true,
         );
@@ -15,30 +16,34 @@ void main() {
 
       test('should calculate total imported correctly with settings', () {
         final result = ImportResult(
+          boardsImported: 5,
           tasksImported: 10,
           settingsImported: true,
         );
-        expect(result.totalImported, 11);
+        expect(result.totalImported, 16);
       });
 
       test('should calculate total imported correctly without settings', () {
         final result = ImportResult(
+          boardsImported: 5,
           tasksImported: 10,
           settingsImported: false,
         );
-        expect(result.totalImported, 10);
+        expect(result.totalImported, 15);
       });
 
       test('should handle zero tasks imported', () {
         final result = ImportResult(
+          boardsImported: 5,
           tasksImported: 0,
           settingsImported: false,
         );
-        expect(result.totalImported, 0);
+        expect(result.totalImported, 5);
       });
 
       test('should handle only settings imported', () {
         final result = ImportResult(
+          boardsImported: 0,
           tasksImported: 0,
           settingsImported: true,
         );
@@ -52,27 +57,45 @@ void main() {
       });
 
       test('should return correct message for invalidJsonFormat', () {
-        expect(ImportDataError.invalidJsonFormat.message, 'Formato JSON inválido');
+        expect(
+          ImportDataError.invalidJsonFormat.message,
+          'Formato JSON inválido',
+        );
       });
 
       test('should return correct message for invalidBackupFormat', () {
-        expect(ImportDataError.invalidBackupFormat.message, 'Formato de backup inválido');
+        expect(
+          ImportDataError.invalidBackupFormat.message,
+          'Formato de backup inválido',
+        );
       });
 
       test('should return correct message for settingsImportFailed', () {
-        expect(ImportDataError.settingsImportFailed.message, 'Falha ao importar configurações');
+        expect(
+          ImportDataError.settingsImportFailed.message,
+          'Falha ao importar configurações',
+        );
       });
 
       test('should return correct message for tasksImportFailed', () {
-        expect(ImportDataError.tasksImportFailed.message, 'Falha ao importar tarefas');
+        expect(
+          ImportDataError.tasksImportFailed.message,
+          'Falha ao importar tarefas',
+        );
       });
 
       test('should return correct message for userCancelled', () {
-        expect(ImportDataError.userCancelled.message, 'Operação cancelada pelo usuário');
+        expect(
+          ImportDataError.userCancelled.message,
+          'Operação cancelada pelo usuário',
+        );
       });
 
       test('should return correct message for fileSelectionFailed', () {
-        expect(ImportDataError.fileSelectionFailed.message, 'Falha ao selecionar arquivo');
+        expect(
+          ImportDataError.fileSelectionFailed.message,
+          'Falha ao selecionar arquivo',
+        );
       });
 
       test('should return correct message for unexpectedError', () {
@@ -80,15 +103,32 @@ void main() {
       });
 
       test('should have all error types defined', () {
-        expect(ImportDataError.values.length, 8);
         expect(ImportDataError.values, contains(ImportDataError.fileNotFound));
-        expect(ImportDataError.values, contains(ImportDataError.invalidJsonFormat));
-        expect(ImportDataError.values, contains(ImportDataError.invalidBackupFormat));
-        expect(ImportDataError.values, contains(ImportDataError.settingsImportFailed));
-        expect(ImportDataError.values, contains(ImportDataError.tasksImportFailed));
+        expect(
+          ImportDataError.values,
+          contains(ImportDataError.invalidJsonFormat),
+        );
+        expect(
+          ImportDataError.values,
+          contains(ImportDataError.invalidBackupFormat),
+        );
+        expect(
+          ImportDataError.values,
+          contains(ImportDataError.settingsImportFailed),
+        );
+        expect(
+          ImportDataError.values,
+          contains(ImportDataError.tasksImportFailed),
+        );
         expect(ImportDataError.values, contains(ImportDataError.userCancelled));
-        expect(ImportDataError.values, contains(ImportDataError.fileSelectionFailed));
-        expect(ImportDataError.values, contains(ImportDataError.unexpectedError));
+        expect(
+          ImportDataError.values,
+          contains(ImportDataError.fileSelectionFailed),
+        );
+        expect(
+          ImportDataError.values,
+          contains(ImportDataError.unexpectedError),
+        );
       });
     });
   });

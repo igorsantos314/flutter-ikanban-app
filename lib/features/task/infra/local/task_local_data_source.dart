@@ -21,7 +21,10 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
   TaskLocalDataSource(this.db) : super(db);
 
   Future<int> insertTask(TaskEntityCompanion task) {
-    return into(db.taskEntity).insert(task);
+    return into(db.taskEntity).insert(
+      task,
+      mode: InsertMode.insertOrReplace,
+    );
   }
 
   Future<List<TaskData>> getAllTasks() {
@@ -40,6 +43,16 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
 
   Future<int> deleteTask(int id) {
     return (delete(db.taskEntity)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  Future<int> deleteAllTasks() {
+    return delete(db.taskEntity).go();
+  }
+
+  Future<void> resetAutoIncrement() async {
+    await db.customStatement(
+      "DELETE FROM sqlite_sequence WHERE name='task_entity'",
+    );
   }
 
   Stream<ResultPage<TaskData>> watchTasks({
@@ -181,7 +194,10 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
   Future<void> insertTasks(List<TaskEntityCompanion> entities) async {
     await db.transaction(() async {
       for (final entity in entities) {
-        await into(db.taskEntity).insert(entity);
+        await into(db.taskEntity).insert(
+          entity,
+          mode: InsertMode.insertOrReplace,
+        );
       }
     });
   }

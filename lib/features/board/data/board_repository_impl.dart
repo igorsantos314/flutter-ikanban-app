@@ -41,6 +41,21 @@ class BoardRepositoryImpl implements BoardRepository {
   }
 
   @override
+  Future<Outcome<void, BoardRepositoryErrors>> deleteAllBoards() async {
+    try {
+      await _localDataSource.deleteAllBoards();
+      await _localDataSource.resetAutoIncrement();
+      return const Outcome.success();
+    } catch (e) {
+      return Outcome.failure(
+        error: const BoardRepositoryErrors.genericError(),
+        message: 'Failed to delete all boards',
+        throwable: e,
+      );
+    }
+  }
+
+  @override
   Future<Outcome<BoardModel, BoardRepositoryErrors>> getBoardById(String boardId) async {
     try {
       final entity = await _localDataSource.getBoardById(int.parse(boardId));
@@ -140,6 +155,21 @@ class BoardRepositoryImpl implements BoardRepository {
       return Outcome.failure(
         error: const BoardRepositoryErrors.genericError(),
         message: 'Failed to get boards',
+        throwable: e,
+      );
+    }
+  }
+
+  @override
+  Future<Outcome<List<BoardModel>, BoardRepositoryErrors>> getAllBoards() async {
+    try {
+      final entities = await _localDataSource.getAllBoards();
+      final boards = entities.map((entity) => BoardMapper.fromEntity(entity)).toList();
+      return Outcome.success(value: boards);
+    } catch (e) {
+      return Outcome.failure(
+        error: const BoardRepositoryErrors.genericError(),
+        message: 'Failed to get all boards',
         throwable: e,
       );
     }

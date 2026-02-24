@@ -27,5 +27,7 @@ abstract class BoardRepository {
   Future<Outcome<void, BoardRepositoryErrors>> createBoard(BoardModel board);
   Future<Outcome<void, BoardRepositoryErrors>> updateBoard(BoardModel board);
   Future<Outcome<void, BoardRepositoryErrors>> deleteBoard(String id);
+  Future<Outcome<void, BoardRepositoryErrors>> deleteAllBoards();
   Future<Outcome<BoardModel, BoardRepositoryErrors>> getBoardById(String boardId);
+  Future<Outcome<List<BoardModel>, BoardRepositoryErrors>> getAllBoards();
 }
