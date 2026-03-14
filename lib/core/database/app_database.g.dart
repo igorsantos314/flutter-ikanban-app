@@ -537,6 +537,17 @@ class $TaskEntityTable extends TaskEntity
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _dueTimeMeta = const VerificationMeta(
+    'dueTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dueTime = GeneratedColumn<DateTime>(
+    'due_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   late final GeneratedColumnWithTypeConverter<TaskComplexity, int> complexity =
       GeneratedColumn<int>(
@@ -613,6 +624,7 @@ class $TaskEntityTable extends TaskEntity
     status,
     priority,
     dueDate,
+    dueTime,
     complexity,
     color,
     type,
@@ -656,6 +668,12 @@ class $TaskEntityTable extends TaskEntity
       context.handle(
         _dueDateMeta,
         dueDate.isAcceptableOrUnknown(data['due_date']!, _dueDateMeta),
+      );
+    }
+    if (data.containsKey('due_time')) {
+      context.handle(
+        _dueTimeMeta,
+        dueTime.isAcceptableOrUnknown(data['due_time']!, _dueTimeMeta),
       );
     }
     if (data.containsKey('is_active')) {
@@ -712,6 +730,10 @@ class $TaskEntityTable extends TaskEntity
       dueDate: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}due_date'],
+      ),
+      dueTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}due_time'],
       ),
       complexity: $TaskEntityTable.$convertercomplexity.fromSql(
         attachedDatabase.typeMapping.read(
@@ -771,6 +793,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
   final TaskStatus status;
   final TaskPriority priority;
   final DateTime? dueDate;
+  final DateTime? dueTime;
   final TaskComplexity complexity;
   final TaskColors color;
   final TaskType type;
@@ -784,6 +807,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     required this.status,
     required this.priority,
     this.dueDate,
+    this.dueTime,
     required this.complexity,
     required this.color,
     required this.type,
@@ -811,6 +835,9 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     }
     if (!nullToAbsent || dueDate != null) {
       map['due_date'] = Variable<DateTime>(dueDate);
+    }
+    if (!nullToAbsent || dueTime != null) {
+      map['due_time'] = Variable<DateTime>(dueTime);
     }
     {
       map['complexity'] = Variable<int>(
@@ -845,6 +872,9 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       dueDate: dueDate == null && nullToAbsent
           ? const Value.absent()
           : Value(dueDate),
+      dueTime: dueTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dueTime),
       complexity: Value(complexity),
       color: Value(color),
       type: Value(type),
@@ -868,6 +898,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       status: serializer.fromJson<TaskStatus>(json['status']),
       priority: serializer.fromJson<TaskPriority>(json['priority']),
       dueDate: serializer.fromJson<DateTime?>(json['dueDate']),
+      dueTime: serializer.fromJson<DateTime?>(json['dueTime']),
       complexity: serializer.fromJson<TaskComplexity>(json['complexity']),
       color: serializer.fromJson<TaskColors>(json['color']),
       type: serializer.fromJson<TaskType>(json['type']),
@@ -886,6 +917,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       'status': serializer.toJson<TaskStatus>(status),
       'priority': serializer.toJson<TaskPriority>(priority),
       'dueDate': serializer.toJson<DateTime?>(dueDate),
+      'dueTime': serializer.toJson<DateTime?>(dueTime),
       'complexity': serializer.toJson<TaskComplexity>(complexity),
       'color': serializer.toJson<TaskColors>(color),
       'type': serializer.toJson<TaskType>(type),
@@ -902,6 +934,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     TaskStatus? status,
     TaskPriority? priority,
     Value<DateTime?> dueDate = const Value.absent(),
+    Value<DateTime?> dueTime = const Value.absent(),
     TaskComplexity? complexity,
     TaskColors? color,
     TaskType? type,
@@ -915,6 +948,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     status: status ?? this.status,
     priority: priority ?? this.priority,
     dueDate: dueDate.present ? dueDate.value : this.dueDate,
+    dueTime: dueTime.present ? dueTime.value : this.dueTime,
     complexity: complexity ?? this.complexity,
     color: color ?? this.color,
     type: type ?? this.type,
@@ -932,6 +966,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       status: data.status.present ? data.status.value : this.status,
       priority: data.priority.present ? data.priority.value : this.priority,
       dueDate: data.dueDate.present ? data.dueDate.value : this.dueDate,
+      dueTime: data.dueTime.present ? data.dueTime.value : this.dueTime,
       complexity: data.complexity.present
           ? data.complexity.value
           : this.complexity,
@@ -952,6 +987,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           ..write('status: $status, ')
           ..write('priority: $priority, ')
           ..write('dueDate: $dueDate, ')
+          ..write('dueTime: $dueTime, ')
           ..write('complexity: $complexity, ')
           ..write('color: $color, ')
           ..write('type: $type, ')
@@ -970,6 +1006,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     status,
     priority,
     dueDate,
+    dueTime,
     complexity,
     color,
     type,
@@ -987,6 +1024,7 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           other.status == this.status &&
           other.priority == this.priority &&
           other.dueDate == this.dueDate &&
+          other.dueTime == this.dueTime &&
           other.complexity == this.complexity &&
           other.color == this.color &&
           other.type == this.type &&
@@ -1002,6 +1040,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
   final Value<TaskStatus> status;
   final Value<TaskPriority> priority;
   final Value<DateTime?> dueDate;
+  final Value<DateTime?> dueTime;
   final Value<TaskComplexity> complexity;
   final Value<TaskColors> color;
   final Value<TaskType> type;
@@ -1015,6 +1054,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     this.status = const Value.absent(),
     this.priority = const Value.absent(),
     this.dueDate = const Value.absent(),
+    this.dueTime = const Value.absent(),
     this.complexity = const Value.absent(),
     this.color = const Value.absent(),
     this.type = const Value.absent(),
@@ -1029,6 +1069,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     required TaskStatus status,
     required TaskPriority priority,
     this.dueDate = const Value.absent(),
+    this.dueTime = const Value.absent(),
     required TaskComplexity complexity,
     required TaskColors color,
     required TaskType type,
@@ -1048,6 +1089,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Expression<String>? status,
     Expression<int>? priority,
     Expression<DateTime>? dueDate,
+    Expression<DateTime>? dueTime,
     Expression<int>? complexity,
     Expression<String>? color,
     Expression<int>? type,
@@ -1062,6 +1104,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       if (status != null) 'status': status,
       if (priority != null) 'priority': priority,
       if (dueDate != null) 'due_date': dueDate,
+      if (dueTime != null) 'due_time': dueTime,
       if (complexity != null) 'complexity': complexity,
       if (color != null) 'color': color,
       if (type != null) 'type': type,
@@ -1078,6 +1121,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Value<TaskStatus>? status,
     Value<TaskPriority>? priority,
     Value<DateTime?>? dueDate,
+    Value<DateTime?>? dueTime,
     Value<TaskComplexity>? complexity,
     Value<TaskColors>? color,
     Value<TaskType>? type,
@@ -1092,6 +1136,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       status: status ?? this.status,
       priority: priority ?? this.priority,
       dueDate: dueDate ?? this.dueDate,
+      dueTime: dueTime ?? this.dueTime,
       complexity: complexity ?? this.complexity,
       color: color ?? this.color,
       type: type ?? this.type,
@@ -1125,6 +1170,9 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     }
     if (dueDate.present) {
       map['due_date'] = Variable<DateTime>(dueDate.value);
+    }
+    if (dueTime.present) {
+      map['due_time'] = Variable<DateTime>(dueTime.value);
     }
     if (complexity.present) {
       map['complexity'] = Variable<int>(
@@ -1162,6 +1210,7 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
           ..write('status: $status, ')
           ..write('priority: $priority, ')
           ..write('dueDate: $dueDate, ')
+          ..write('dueTime: $dueTime, ')
           ..write('complexity: $complexity, ')
           ..write('color: $color, ')
           ..write('type: $type, ')
@@ -1528,6 +1577,7 @@ typedef $$TaskEntityTableCreateCompanionBuilder =
       required TaskStatus status,
       required TaskPriority priority,
       Value<DateTime?> dueDate,
+      Value<DateTime?> dueTime,
       required TaskComplexity complexity,
       required TaskColors color,
       required TaskType type,
@@ -1543,6 +1593,7 @@ typedef $$TaskEntityTableUpdateCompanionBuilder =
       Value<TaskStatus> status,
       Value<TaskPriority> priority,
       Value<DateTime?> dueDate,
+      Value<DateTime?> dueTime,
       Value<TaskComplexity> complexity,
       Value<TaskColors> color,
       Value<TaskType> type,
@@ -1613,6 +1664,11 @@ class $$TaskEntityTableFilterComposer
 
   ColumnFilters<DateTime> get dueDate => $composableBuilder(
     column: $table.dueDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dueTime => $composableBuilder(
+    column: $table.dueTime,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1707,6 +1763,11 @@ class $$TaskEntityTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get dueTime => $composableBuilder(
+    column: $table.dueTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get complexity => $composableBuilder(
     column: $table.complexity,
     builder: (column) => ColumnOrderings(column),
@@ -1785,6 +1846,9 @@ class $$TaskEntityTableAnnotationComposer
   GeneratedColumn<DateTime> get dueDate =>
       $composableBuilder(column: $table.dueDate, builder: (column) => column);
 
+  GeneratedColumn<DateTime> get dueTime =>
+      $composableBuilder(column: $table.dueTime, builder: (column) => column);
+
   GeneratedColumnWithTypeConverter<TaskComplexity, int> get complexity =>
       $composableBuilder(
         column: $table.complexity,
@@ -1861,6 +1925,7 @@ class $$TaskEntityTableTableManager
                 Value<TaskStatus> status = const Value.absent(),
                 Value<TaskPriority> priority = const Value.absent(),
                 Value<DateTime?> dueDate = const Value.absent(),
+                Value<DateTime?> dueTime = const Value.absent(),
                 Value<TaskComplexity> complexity = const Value.absent(),
                 Value<TaskColors> color = const Value.absent(),
                 Value<TaskType> type = const Value.absent(),
@@ -1874,6 +1939,7 @@ class $$TaskEntityTableTableManager
                 status: status,
                 priority: priority,
                 dueDate: dueDate,
+                dueTime: dueTime,
                 complexity: complexity,
                 color: color,
                 type: type,
@@ -1889,6 +1955,7 @@ class $$TaskEntityTableTableManager
                 required TaskStatus status,
                 required TaskPriority priority,
                 Value<DateTime?> dueDate = const Value.absent(),
+                Value<DateTime?> dueTime = const Value.absent(),
                 required TaskComplexity complexity,
                 required TaskColors color,
                 required TaskType type,
@@ -1902,6 +1969,7 @@ class $$TaskEntityTableTableManager
                 status: status,
                 priority: priority,
                 dueDate: dueDate,
+                dueTime: dueTime,
                 complexity: complexity,
                 color: color,
                 type: type,

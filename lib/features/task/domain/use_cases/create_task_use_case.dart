@@ -1,3 +1,4 @@
+import 'package:flutter_ikanban_app/core/services/notification/task_notification_service.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/errors/task_repository_errors.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
@@ -7,11 +8,20 @@ enum CreateTaskUseCaseError { invalidDataError, genericError }
 
 class CreateTaskUseCase {
   final TaskRepository taskRepository;
-  CreateTaskUseCase(this.taskRepository);
+  final TaskNotificationService notificationService;
+  
+  CreateTaskUseCase(this.taskRepository, this.notificationService);
+  
   Future<Outcome<void, CreateTaskUseCaseError>> execute(TaskModel task) async {
     final result = await taskRepository.createTask(task);
     return result.when(
-      success: (_) => const Outcome.success(),
+      success: (_) async {
+        // Schedule notification if task has dueDate and dueTime
+        if (task.id != null && task.dueDate != null && task.dueTime != null) {
+          await notificationService.scheduleTaskNotification(task);
+        }
+        return const Outcome.success();
+      },
       failure: (error, message, throwable) {
         switch (error) {
           case TaskRepositoryErrors.validationError:

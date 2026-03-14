@@ -16,6 +16,7 @@ class TaskEntity extends Table {
   TextColumn get status => text().map(GenericSqlTypeConverter(TaskStatus.values))();
   IntColumn get priority => integer().map(PrioritySqlConverter())();
   DateTimeColumn get dueDate => dateTime().named('due_date').nullable()();
+  DateTimeColumn get dueTime => dateTime().named('due_time').nullable()();
   IntColumn get complexity => integer().map(ComplexitySqlConverter())();
 
   TextColumn get color => text().map(GenericSqlTypeConverter(TaskColors.values))();

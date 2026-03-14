@@ -1,3 +1,4 @@
+import 'package:flutter_ikanban_app/core/services/notification/task_notification_service.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/errors/task_repository_errors.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockTaskRepository extends Mock implements TaskRepository {}
+class MockTaskNotificationService extends Mock implements TaskNotificationService {}
 
 class FakeTaskModel extends Fake implements TaskModel {}
 
@@ -27,9 +29,18 @@ void main() {
     registerFallbackValue(FakeTaskModel());
   });
 
+  late MockTaskNotificationService mockNotificationService;
+
   setUp(() {
     mockRepository = MockTaskRepository();
-    useCase = UpdateTaskUseCase(mockRepository);
+    mockNotificationService = MockTaskNotificationService();
+    useCase = UpdateTaskUseCase(mockRepository, mockNotificationService);
+
+    // Set up default mocks for notification service
+    when(() => mockNotificationService.scheduleTaskNotification(any()))
+        .thenAnswer((_) async => {});
+    when(() => mockNotificationService.cancelTaskNotification(any()))
+        .thenAnswer((_) async => {});
   });
 
   group('UpdateTaskUseCase', () {

@@ -12,6 +12,7 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
   final TaskStatus? status;
   final TaskPriority? priority;
   final DateTime? dueDate;
+  final DateTime? dueTime;
   final TaskComplexity? complexity;
   final TaskType? type;
   final TaskColors? color;
@@ -22,6 +23,7 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
     this.status,
     this.priority,
     this.dueDate,
+    this.dueTime,
     this.complexity,
     this.type,
     this.color,
@@ -34,6 +36,7 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
     ?status,
     ?priority,
     ?dueDate,
+    ?dueTime,
     ?complexity,
     ?type,
     ?color,

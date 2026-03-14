@@ -1,3 +1,4 @@
+import 'package:flutter_ikanban_app/core/services/notification/task_notification_service.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/errors/task_repository_errors.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
@@ -6,14 +7,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockTaskRepository extends Mock implements TaskRepository {}
+class MockTaskNotificationService extends Mock implements TaskNotificationService {}
 
 void main() {
   late MockTaskRepository mockRepository;
   late DeleteTaskUseCase useCase;
 
+  late MockTaskNotificationService mockNotificationService;
+
   setUp(() {
     mockRepository = MockTaskRepository();
-    useCase = DeleteTaskUseCase(mockRepository);
+    mockNotificationService = MockTaskNotificationService();
+    useCase = DeleteTaskUseCase(mockRepository, mockNotificationService);
+
+    // Set up default mock for notification service
+    when(() => mockNotificationService.cancelTaskNotification(any()))
+        .thenAnswer((_) async => {});
   });
 
   group('DeleteTaskUseCase', () {

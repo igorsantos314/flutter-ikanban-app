@@ -15,6 +15,7 @@ import 'package:flutter_ikanban_app/core/app/app_startup/infra/local/task_list_p
 import 'package:flutter_ikanban_app/core/database/app_database.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_service.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
+import 'package:flutter_ikanban_app/core/services/notification/task_notification_service.dart';
 import 'package:flutter_ikanban_app/core/use_cases/theme/get_theme_use_case.dart';
 import 'package:flutter_ikanban_app/core/use_cases/theme/set_theme_use_case.dart';
 import 'package:flutter_ikanban_app/features/board/data/board_repository_impl.dart';
@@ -156,11 +157,11 @@ void _setupTaskModule() {
   );
 
   getIt.registerLazySingleton<CreateTaskUseCase>(
-    () => CreateTaskUseCase(getIt()),
+    () => CreateTaskUseCase(getIt(), getIt()),
   );
 
   getIt.registerLazySingleton<UpdateTaskUseCase>(
-    () => UpdateTaskUseCase(getIt()),
+    () => UpdateTaskUseCase(getIt(), getIt()),
   );
 
   getIt.registerLazySingleton<GetTaskByIdUseCase>(
@@ -170,7 +171,7 @@ void _setupTaskModule() {
   getIt.registerLazySingleton<ListTaskUseCase>(() => ListTaskUseCase(getIt()));
 
   getIt.registerLazySingleton<DeleteTaskUseCase>(
-    () => DeleteTaskUseCase(getIt()),
+    () => DeleteTaskUseCase(getIt(), getIt()),
   );
 }
 
@@ -189,6 +190,11 @@ void _setupSettingsModule() {
 }
 
 void _setupCoreServices() {
+  // Notification Service
+  getIt.registerLazySingleton<TaskNotificationService>(
+    () => TaskNotificationService(),
+  );
+
   // Backup/Restore Service
   getIt.registerLazySingleton<FileService>(() => FileService());
 

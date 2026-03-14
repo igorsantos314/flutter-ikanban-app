@@ -1,3 +1,4 @@
+import 'package:flutter_ikanban_app/core/services/notification/task_notification_service.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/errors/task_repository_errors.dart';
@@ -8,12 +9,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockTaskRepository extends Mock implements TaskRepository {}
+class MockTaskNotificationService extends Mock implements TaskNotificationService {}
 
 class FakeTaskModel extends Fake implements TaskModel {}
 
 void main() {
   late CreateTaskUseCase useCase;
   late MockTaskRepository mockRepository;
+  late MockTaskNotificationService mockNotificationService;
   late TaskModel testTask;
 
   setUpAll(() {
@@ -22,13 +25,18 @@ void main() {
 
   setUp(() {
     mockRepository = MockTaskRepository();
-    useCase = CreateTaskUseCase(mockRepository);
+    mockNotificationService = MockTaskNotificationService();
+    useCase = CreateTaskUseCase(mockRepository, mockNotificationService);
     testTask = TaskModel(
       title: 'Test Task',
       description: 'Test Description',
       status: TaskStatus.todo,
       createdAt: DateTime(2024, 1, 1),
     );
+
+    // Set up default mock for notification service
+    when(() => mockNotificationService.scheduleTaskNotification(any()))
+        .thenAnswer((_) async => {});
   });
 
   group('CreateTaskUseCase', () {

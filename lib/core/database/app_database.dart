@@ -25,7 +25,17 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection(dbName));
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (migrator, from, to) async {
+      if (from < 3) {
+        // Add dueTime column to TaskEntity
+        await migrator.addColumn(taskEntity, taskEntity.dueTime);
+      }
+    },
+  );
 }
 
 LazyDatabase _openConnection(String dbName) {

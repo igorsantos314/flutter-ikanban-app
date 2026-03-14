@@ -85,8 +85,12 @@ mixin TaskFormSelectorsMixin {
         ),
         child: DueDateSelectorBottomSheet(
           selectedDueDate: state.dueDate,
+          selectedDueTime: state.dueTime,
           onDueDateSelected: (dueDate) {
             bloc.add(TaskFormUpdateFieldsEvent(dueDate: dueDate));
+          },
+          onDueTimeSelected: (dueTime) {
+            bloc.add(TaskFormUpdateFieldsEvent(dueTime: dueTime));
           },
         ),
       ),
