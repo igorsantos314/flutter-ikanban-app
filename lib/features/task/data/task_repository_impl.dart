@@ -18,11 +18,11 @@ class TaskRepositoryImpl implements TaskRepository {
   TaskRepositoryImpl(this._localDataSource);
 
   @override
-  Future<Outcome<void, TaskRepositoryErrors>> createTask(TaskModel task) async {
+  Future<Outcome<int, TaskRepositoryErrors>> createTask(TaskModel task) async {
     try {
       final entity = TaskMapper.toEntity(task);
-      await _localDataSource.insertTask(entity);
-      return const Outcome.success();
+      final generatedId = await _localDataSource.insertTask(entity);
+      return Outcome.success(value: generatedId);
     } catch (e) {
       return Outcome.failure(
         error: GenericError(),

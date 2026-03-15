@@ -15,14 +15,16 @@ class CreateTaskUseCase {
   Future<Outcome<void, CreateTaskUseCaseError>> execute(TaskModel task) async {
     final result = await taskRepository.createTask(task);
     return result.when(
-      success: (_) async {
+      success: (generatedId) async {
+        // Update task with generated ID
+        final taskWithId = task.copyWith(id: generatedId);
+        
         // Schedule notification only if user requested it and task has dueDate and dueTime
         // Permissions were already requested when user enabled the notification toggle
-        if (task.shouldNotify && 
-            task.id != null && 
-            task.dueDate != null && 
-            task.dueTime != null) {
-          await notificationService.scheduleTaskNotification(task);
+        if (taskWithId.shouldNotify && 
+            taskWithId.dueDate != null && 
+            taskWithId.dueTime != null) {
+          await notificationService.scheduleTaskNotification(taskWithId);
         }
         return const Outcome.success();
       },

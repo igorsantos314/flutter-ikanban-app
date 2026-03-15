@@ -5,6 +5,8 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/core/services/permission/permission_service.dart';
+import 'package:flutter_ikanban_app/core/services/notification/notification_navigation_service.dart';
+import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 
 class TaskNotificationService {
   static final TaskNotificationService _instance = TaskNotificationService._internal();
@@ -188,7 +190,10 @@ class TaskNotificationService {
   /// Handle notification tap
   void _onNotificationTapped(NotificationResponse response) {
     log('[TaskNotificationService] Notification tapped: ${response.payload}');
-    // You can navigate to specific screen here if needed
+    
+    // Use navigation service to handle the tap
+    final navigationService = getIt<NotificationNavigationService>();
+    navigationService.handleNotificationTap(response.payload);
   }
 
   /// Schedule a notification for a task
@@ -210,9 +215,18 @@ class TaskNotificationService {
     }
 
     if (task.id == null || task.dueDate == null || task.dueTime == null) {
-      log('[TaskNotificationService] Cannot schedule notification: missing id, dueDate or dueTime');
+      log('[TaskNotificationService] ❌ Cannot schedule notification:');
+      log('[TaskNotificationService]    - Task ID: ${task.id}');
+      log('[TaskNotificationService]    - Due Date: ${task.dueDate}');
+      log('[TaskNotificationService]    - Due Time: ${task.dueTime}');
+      log('[TaskNotificationService]    - Task Title: ${task.title}');
       return;
     }
+    
+    log('[TaskNotificationService] 📋 Task validation passed:');
+    log('[TaskNotificationService]    - Task ID: ${task.id}');
+    log('[TaskNotificationService]    - Task Title: ${task.title}');
+    log('[TaskNotificationService]    - Should Notify: ${task.shouldNotify}');
 
     // Verify permissions before scheduling
     final hasNotificationPermission = await hasPermissions();
@@ -290,8 +304,18 @@ class TaskNotificationService {
         notificationBody = task.description ?? 'Você tem uma tarefa pendente';
       }
 
+      final notificationId = task.id!;
+      
+      log('[TaskNotificationService] 🔔 Preparing to schedule notification:');
+      log('[TaskNotificationService]    - Notification ID: $notificationId');
+      log('[TaskNotificationService]    - Task ID: ${task.id}');
+      log('[TaskNotificationService]    - Task Title: ${task.title}');
+      log('[TaskNotificationService]    - Scheduled Time: $scheduledDate');
+      log('[TaskNotificationService]    - Task Due Time: $taskDateTime');
+      log('[TaskNotificationService]    - Minutes Before: $minutesBefore');
+      
       await _notificationsPlugin.zonedSchedule(
-        task.id!, // Use task ID as notification ID
+        notificationId, // Use task ID as notification ID
         'Lembrete: ${task.title}',
         notificationBody,
         tz.TZDateTime.from(scheduledDate, tz.local),
@@ -299,14 +323,21 @@ class TaskNotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        payload: task.id.toString(),
+        payload: NotificationNavigationService.createPayload(
+          taskId: task.id!,
+          boardId: task.boardId,
+        ),
       );
 
-      log('[TaskNotificationService] ✅ SUCCESS! Notification scheduled for task ${task.id} at $scheduledDate');
-      log('[TaskNotificationService]    - Task title: ${task.title}');
-      log('[TaskNotificationService]    - Scheduled for: $scheduledDate');
-      log('[TaskNotificationService]    - Minutes before: $minutesBefore');
-      log('[TaskNotificationService]    - Task due: $taskDateTime');
+      log('[TaskNotificationService] ✅ SUCCESS! Notification scheduled!');
+      log('[TaskNotificationService]    - Notification ID returned: $notificationId');
+      log('[TaskNotificationService]    - Will trigger at: $scheduledDate');
+      
+      // Verify the notification was actually scheduled
+      final pendingNotifications = await _notificationsPlugin.pendingNotificationRequests();
+      final isScheduled = pendingNotifications.any((n) => n.id == notificationId);
+      log('[TaskNotificationService]    - Verified in pending: $isScheduled');
+      log('[TaskNotificationService]    - Total pending notifications: ${pendingNotifications.length}');
     } catch (e, stackTrace) {
       log(
         '[TaskNotificationService] ❌ ERROR scheduling notification: $e',
@@ -432,12 +463,28 @@ class TaskNotificationService {
 
   /// Get all pending notifications info (for debugging)
   Future<List<PendingNotificationRequest>> getPendingNotifications() async {
-    if (!_isInitialized) return [];
+    if (!_isInitialized) {
+      log('[TaskNotificationService] Service not initialized');
+      return [];
+    }
 
     try {
-      return await _notificationsPlugin.pendingNotificationRequests();
-    } catch (e) {
-      log('[TaskNotificationService] Error getting pending notifications: $e');
+      final pendingNotifications = await _notificationsPlugin.pendingNotificationRequests();
+      
+      log('[TaskNotificationService] 📋 Listing all pending notifications:');
+      log('[TaskNotificationService]    - Total count: ${pendingNotifications.length}');
+      
+      for (var notification in pendingNotifications) {
+        log('[TaskNotificationService]    - ID: ${notification.id}, Title: ${notification.title}');
+      }
+      
+      return pendingNotifications;
+    } catch (e, stackTrace) {
+      log(
+        '[TaskNotificationService] Error getting pending notifications: $e',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return [];
     }
   }

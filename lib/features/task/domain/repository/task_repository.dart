@@ -38,7 +38,7 @@ abstract class TaskRepository {
     bool onlyActive = true,
     bool ascending = true,
   });
-  Future<Outcome<void, TaskRepositoryErrors>> createTask(TaskModel task);
+  Future<Outcome<int, TaskRepositoryErrors>> createTask(TaskModel task);
   Future<Outcome<void, TaskRepositoryErrors>> createTasks(
     List<TaskModel> tasks,
   );

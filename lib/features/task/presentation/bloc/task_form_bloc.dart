@@ -48,9 +48,6 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     TaskFormUpdateFieldsEvent event,
     Emitter<TaskFormState> emit,
   ) {
-    log(
-      'Updating fields: title=${event.title}, description=${event.description}, status=${event.status}, priority=${event.priority}, complexity=${event.complexity}, type=${event.type}, dueDate=${event.dueDate}, dueTime=${event.dueTime}, shouldNotify=${event.shouldNotify}, notifyMinutesBefore=${event.notifyMinutesBefore}',
-    );
     emit(
       state.copyWith(
         title: event.title ?? state.title,
