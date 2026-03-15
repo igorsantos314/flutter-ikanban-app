@@ -26,15 +26,38 @@ class TaskNotificationService {
 
   /// Initialize the notification service (without requesting permissions)
   Future<void> initialize() async {
-    if (_isInitialized) return;
+    print('[🔔 SERVICE] ========================================');
+    print('[🔔 SERVICE] INITIALIZING NOTIFICATION SERVICE');
+    print('[🔔 SERVICE] ========================================');
+    
+    if (_isInitialized) {
+      print('[🔔 SERVICE] Already initialized - skipping');
+      return;
+    }
 
     try {
+      print('[🔔 SERVICE] Step 1: Initializing timezone database...');
       // Initialize timezone database
       tz.initializeTimeZones();
+      
+      // Set local timezone
+      final locationName = 'America/Sao_Paulo'; // or get from system
+      try {
+        tz.setLocalLocation(tz.getLocation(locationName));
+        print('[🔔 SERVICE] Timezone set to: $locationName');
+      } catch (e) {
+        print('[🔔 SERVICE] Could not set timezone to $locationName, using default');
+        // Use UTC as fallback
+        tz.setLocalLocation(tz.getLocation('UTC'));
+      }
+      print('[🔔 SERVICE] Current timezone: ${tz.local}');
+      print('[🔔 SERVICE] Current TZDateTime: ${tz.TZDateTime.now(tz.local)}');
 
+      print('[🔔 SERVICE] Step 2: Setting up Android notification settings...');
       // Android initialization settings
       const androidSettings = AndroidInitializationSettings('@mipmap/launcher_icon');
 
+      print('[🔔 SERVICE] Step 3: Setting up iOS notification settings...');
       // iOS initialization settings (don't request permissions automatically)
       const iosSettings = DarwinInitializationSettings(
         requestAlertPermission: false,
@@ -47,14 +70,23 @@ class TaskNotificationService {
         iOS: iosSettings,
       );
 
+      print('[🔔 SERVICE] Step 4: Initializing flutter_local_notifications plugin...');
       await _notificationsPlugin.initialize(
         initSettings,
         onDidReceiveNotificationResponse: _onNotificationTapped,
       );
 
       _isInitialized = true;
+      print('[🔔 SERVICE] ========================================');
+      print('[🔔 SERVICE] ✅ INITIALIZATION COMPLETE');
+      print('[🔔 SERVICE] ========================================');
       log('[TaskNotificationService] Initialized successfully (permissions not requested yet)');
     } catch (e, stackTrace) {
+      print('[🔔 SERVICE] ========================================');
+      print('[🔔 SERVICE] ❌ INITIALIZATION FAILED');
+      print('[🔔 SERVICE] ========================================');
+      print('[🔔 SERVICE] Error: $e');
+      print('[🔔 SERVICE] Stack trace: $stackTrace');
       log(
         '[TaskNotificationService] Error initializing: $e',
         error: e,
@@ -66,10 +98,13 @@ class TaskNotificationService {
   /// Request notification permissions with rationale support
   /// Returns true if permission was granted
   Future<bool> requestPermissions({BuildContext? context}) async {
+    print('[🔔 SERVICE] requestPermissions called (context: ${context != null})');
     if (!_isInitialized) {
+      print('[🔔 SERVICE] Service not initialized - initializing now');
       await initialize();
     }
 
+    print('[🔔 SERVICE] Requesting notification permission from PermissionService...');
     final result = await _permissionService.requestPermission(
       PermissionType.notification,
       context: context,
@@ -80,6 +115,7 @@ class TaskNotificationService {
     );
 
     final granted = result == PermissionRequestResult.granted;
+    print('[🔔 SERVICE] Permission request result: $granted (raw: $result)');
     log('[TaskNotificationService] Permission request result: $granted');
     return granted;
   }
@@ -96,7 +132,9 @@ class TaskNotificationService {
   /// Check if the app can schedule exact alarms (Android 12+)
   /// Returns true on iOS or if the permission is granted on Android
   Future<bool> canScheduleExactAlarms() async {
+    print('[🔔 SERVICE] canScheduleExactAlarms called');
     if (!_isInitialized) {
+      print('[🔔 SERVICE] Service not initialized - initializing now');
       await initialize();
     }
 
@@ -107,10 +145,13 @@ class TaskNotificationService {
 
       if (androidImplementation == null) {
         // iOS or other platform
+        print('[🔔 SERVICE] Not Android - returning true');
         return true;
       }
 
+      print('[🔔 SERVICE] Checking canScheduleExactNotifications on Android...');
       final canSchedule = await androidImplementation.canScheduleExactNotifications();
+      print('[🔔 SERVICE] canScheduleExactNotifications result: $canSchedule');
       log('[TaskNotificationService] Can schedule exact alarms: $canSchedule');
       return canSchedule ?? false;
     } catch (e) {
@@ -169,21 +210,31 @@ class TaskNotificationService {
   /// Request all required permissions for notifications
   /// Returns true if all permissions are granted
   Future<bool> requestAllPermissions({BuildContext? context}) async {
+    print('[🔔 SERVICE] requestAllPermissions called');
     // First request notification permission
+    print('[🔔 SERVICE] Step 1: Requesting notification permission...');
     final notificationGranted = await requestPermissions(context: context);
+    print('[🔔 SERVICE] Step 1 result: notificationGranted = $notificationGranted');
+    
     if (!notificationGranted) {
+      print('[🔔 SERVICE] ❌ Notification permission denied - returning false');
       log('[TaskNotificationService] Notification permission denied');
       return false;
     }
 
     // Then check/request exact alarm permission (Android 12+)
+    print('[🔔 SERVICE] Step 2: Requesting exact alarm permission...');
     final exactAlarmGranted = await requestExactAlarmPermission();
+    print('[🔔 SERVICE] Step 2 result: exactAlarmGranted = $exactAlarmGranted');
+    
     if (!exactAlarmGranted) {
+      print('[🔔 SERVICE] ⚠️ Exact alarm permission denied (but continuing)');
       log('[TaskNotificationService] Exact alarm permission denied');
       // Still return true as notifications might work, just not precisely
       // Log warning for debugging
     }
 
+    print('[🔔 SERVICE] ✅ requestAllPermissions returning: $notificationGranted');
     return notificationGranted;
   }
 
@@ -203,13 +254,25 @@ class TaskNotificationService {
   /// - Android has a limit of 500 scheduled notifications per app
   /// - Use scheduleTaskNotificationSafe() to check limit before scheduling
   Future<void> scheduleTaskNotification(TaskModel task) async {
+    print('[🔔 SERVICE] ========================================');
+    print('[🔔 SERVICE] scheduleTaskNotification called');
+    print('[🔔 SERVICE] Task ID: ${task.id}');
+    print('[🔔 SERVICE] Task Title: ${task.title}');
+    print('[🔔 SERVICE] shouldNotify: ${task.shouldNotify}');
+    print('[🔔 SERVICE] dueDate: ${task.dueDate}');
+    print('[🔔 SERVICE] dueTime: ${task.dueTime}');
+    print('[🔔 SERVICE] notifyMinutesBefore: ${task.notifyMinutesBefore}');
+    print('[🔔 SERVICE] ========================================');
+    
     if (!_isInitialized) {
+      print('[🔔 SERVICE] Service not initialized - initializing now');
       log('[TaskNotificationService] Service not initialized, initializing now...');
       await initialize();
     }
 
     // Only schedule if shouldNotify is true and task has both dueDate and dueTime
     if (!task.shouldNotify) {
+      print('[🔔 SERVICE] ⏭️ Task notification disabled by user - skipping');
       log('[TaskNotificationService] Task notification disabled by user');
       return;
     }
@@ -229,20 +292,29 @@ class TaskNotificationService {
     log('[TaskNotificationService]    - Should Notify: ${task.shouldNotify}');
 
     // Verify permissions before scheduling
+    print('[🔔 SERVICE] Checking notification permission...');
     final hasNotificationPermission = await hasPermissions();
+    print('[🔔 SERVICE] hasNotificationPermission: $hasNotificationPermission');
+    
     if (!hasNotificationPermission) {
+      print('[🔔 SERVICE] ❌ CRITICAL: Notification permission NOT granted - cannot schedule!');
       log('[TaskNotificationService] ⚠️ WARNING: Notification permission not granted! Skipping scheduling.');
       return;
     }
 
     // Check if can schedule exact alarms (Android 12+)
+    print('[🔔 SERVICE] Checking exact alarm permission...');
     final canScheduleExact = await canScheduleExactAlarms();
+    print('[🔔 SERVICE] canScheduleExact: $canScheduleExact');
+    
     if (!canScheduleExact) {
+      print('[🔔 SERVICE] ⚠️ WARNING: Exact alarm permission not granted - notification may be delayed');
       log('[TaskNotificationService] ⚠️ WARNING: Exact alarm permission not granted! Notification may be delayed.');
       // Continue anyway - notification will be scheduled but may be delayed by Doze mode
     }
 
     try {
+      print('[🔔 SERVICE] Calculating notification schedule time...');
       // Combine dueDate and dueTime
       final taskDateTime = DateTime(
         task.dueDate!.year,
@@ -251,16 +323,29 @@ class TaskNotificationService {
         task.dueTime!.hour,
         task.dueTime!.minute,
       );
+      print('[🔔 SERVICE] Task DateTime: $taskDateTime');
 
       // Calculate notification time based on notifyMinutesBefore
       final minutesBefore = task.notifyMinutesBefore ?? 0;
       final scheduledDate = taskDateTime.subtract(Duration(minutes: minutesBefore));
+      print('[🔔 SERVICE] Scheduled notification time: $scheduledDate');
+      print('[🔔 SERVICE] Minutes before task: $minutesBefore');
 
       // Don't schedule if the time has already passed
-      if (scheduledDate.isBefore(DateTime.now())) {
+      final now = DateTime.now();
+      print('[🔔 SERVICE] Current time: $now');
+      
+      if (scheduledDate.isBefore(now)) {
+        print('[🔔 SERVICE] ❌ Cannot schedule: time has already passed!');
+        print('[🔔 SERVICE]    Scheduled: $scheduledDate');
+        print('[🔔 SERVICE]    Now: $now');
+        print('[🔔 SERVICE]    Difference: ${now.difference(scheduledDate).inMinutes} minutes ago');
         log('[TaskNotificationService] Cannot schedule notification: time has passed');
         return;
       }
+      
+      print('[🔔 SERVICE] ✅ Time is in the future - proceeding with scheduling');
+      print('[🔔 SERVICE] Will trigger in: ${scheduledDate.difference(now).inMinutes} minutes');
 
       log('[TaskNotificationService] ✅ Scheduling notification for task ${task.id} at $scheduledDate ($minutesBefore minutes before task time)');
 
@@ -318,7 +403,7 @@ class TaskNotificationService {
         notificationId, // Use task ID as notification ID
         'Lembrete: ${task.title}',
         notificationBody,
-        tz.TZDateTime.from(scheduledDate, tz.local),
+        tzScheduledDate,
         notificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
@@ -328,6 +413,10 @@ class TaskNotificationService {
           boardId: task.boardId,
         ),
       );
+      
+      print('[🔔 SERVICE] ========================================');
+      print('[🔔 SERVICE] ✅✅✅ SUCCESS! zonedSchedule completed ✅✅✅');
+      print('[🔔 SERVICE] ========================================');
 
       log('[TaskNotificationService] ✅ SUCCESS! Notification scheduled!');
       log('[TaskNotificationService]    - Notification ID returned: $notificationId');
@@ -339,6 +428,12 @@ class TaskNotificationService {
       log('[TaskNotificationService]    - Verified in pending: $isScheduled');
       log('[TaskNotificationService]    - Total pending notifications: ${pendingNotifications.length}');
     } catch (e, stackTrace) {
+      print('[🔔 SERVICE] ========================================');
+      print('[🔔 SERVICE] ❌❌❌ ERROR during scheduling! ❌❌❌');
+      print('[🔔 SERVICE] ========================================');
+      print('[🔔 SERVICE] Error: $e');
+      print('[🔔 SERVICE] Stack trace: $stackTrace');
+      print('[🔔 SERVICE] ========================================');
       log(
         '[TaskNotificationService] ❌ ERROR scheduling notification: $e',
         error: e,

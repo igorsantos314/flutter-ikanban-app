@@ -13,6 +13,11 @@ class CreateTaskUseCase {
   CreateTaskUseCase(this.taskRepository, this.notificationService);
   
   Future<Outcome<void, CreateTaskUseCaseError>> execute(TaskModel task) async {
+    print('[💾 CREATE USE CASE] Creating task: ${task.title}');
+    print('[💾 CREATE USE CASE] shouldNotify: ${task.shouldNotify}');
+    print('[💾 CREATE USE CASE] dueDate: ${task.dueDate}');
+    print('[💾 CREATE USE CASE] dueTime: ${task.dueTime}');
+    
     final result = await taskRepository.createTask(task);
     return result.when(
       success: (generatedId) async {

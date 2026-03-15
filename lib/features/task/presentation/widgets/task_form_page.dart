@@ -46,21 +46,29 @@ class _TaskFormPageState extends State<TaskFormPage>
 
   /// Handle notification toggle with permission requests
   Future<void> _handleNotificationToggle(bool value, TaskFormBloc bloc) async {
+    print('[🔔 TOGGLE] User toggled notification switch to: $value');
+    
     // Se o usuário está tentando DESATIVAR a notificação, apenas desative
     if (!value) {
+      print('[🔔 TOGGLE] Disabling notification (user turned off)');
       bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: false));
       return;
     }
+    
+    print('[🔔 TOGGLE] Attempting to enable notification - requesting permissions...');
 
     // Se o usuário está tentando ATIVAR a notificação, solicite permissões
     try {
       // Solicita todas as permissões necessárias (notificação + exact alarm)
+      print('[🔔 TOGGLE] Calling requestAllPermissions...');
       final allPermissionsGranted = await _notificationService.requestAllPermissions(
         context: mounted ? context : null,
       );
+      print('[🔔 TOGGLE] requestAllPermissions result: $allPermissionsGranted');
 
       if (!allPermissionsGranted) {
         // Permissão de notificação negada - NÃO ativa o switch
+        print('[🔔 TOGGLE] ❌ Notification permission DENIED - reverting switch to false');
         if (mounted) {
           _showPermissionDeniedDialog();
         }
@@ -68,36 +76,48 @@ class _TaskFormPageState extends State<TaskFormPage>
         bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: false));
         return;
       }
+      
+      print('[🔔 TOGGLE] ✅ Notification permission GRANTED');
 
       // Permissão de notificação concedida, agora verifica exact alarm
+      print('[🔔 TOGGLE] Checking exact alarm permission...');
       final canScheduleExact = await _notificationService.canScheduleExactAlarms();
+      print('[🔔 TOGGLE] Can schedule exact alarms: $canScheduleExact');
       
       if (!canScheduleExact) {
+        print('[🔔 TOGGLE] ⚠️ Exact alarm permission not granted - showing dialog');
         // Mostra diálogo explicando a importância da permissão de alarmes exatos
         if (!mounted) {
+          print('[🔔 TOGGLE] Widget not mounted - reverting to false');
           bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: false));
           return;
         }
 
         final shouldProceed = await _showExactAlarmPermissionDialog();
+        print('[🔔 TOGGLE] User response to exact alarm dialog: $shouldProceed');
         
         if (!shouldProceed) {
           // Usuário cancelou, NÃO ativa
+          print('[🔔 TOGGLE] User cancelled exact alarm - reverting to false');
           bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: false));
           return;
         }
 
         // Tenta solicitar permissão de exact alarm
+        print('[🔔 TOGGLE] Requesting exact alarm permission (opening settings)...');
         await _notificationService.requestExactAlarmPermission();
         
         // Verifica novamente se foi concedida
         final nowCanSchedule = await _notificationService.canScheduleExactAlarms();
+        print('[🔔 TOGGLE] After settings, can schedule exact: $nowCanSchedule');
         
         if (nowCanSchedule) {
           // Tudo certo, ativa a notificação
+          print('[🔔 TOGGLE] ✅ ALL PERMISSIONS OK - Setting shouldNotify = true');
           bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: true));
         } else {
           // Permissão negada, mas permite ativar com aviso
+          print('[🔔 TOGGLE] ⚠️ Exact alarm still denied - activating with warning');
           if (mounted) {
             _showWarningDialog(
               'Aviso',
@@ -106,14 +126,18 @@ class _TaskFormPageState extends State<TaskFormPage>
               'Para garantir que as notificações funcionem, vá em Configurações > Apps > iKanban > Alarmes e lembretes e ative a permissão.',
             );
           }
+          print('[🔔 TOGGLE] Setting shouldNotify = true (with warning)');
           bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: true));
         }
       } else {
         // Todas as permissões OK, ativa normalmente
+        print('[🔔 TOGGLE] ✅ ALL PERMISSIONS OK (exact alarm granted) - Setting shouldNotify = true');
         bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: true));
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       // Erro ao solicitar permissões - NÃO ativa
+      print('[🔔 TOGGLE] ❌ ERROR during permission request: $e');
+      print('[🔔 TOGGLE] Stack trace: $stackTrace');
       if (mounted) {
         _showErrorDialog('Erro ao solicitar permissões: $e');
       }

@@ -17,21 +17,30 @@ class UpdateTaskUseCase {
   UpdateTaskUseCase(this.taskRepository, this.notificationService);
   
   Future<Outcome<void, UpdateTaskUseCaseError>> execute(TaskModel task) async {
+    print('[📝 UPDATE USE CASE] Updating task: ${task.title}');
+    print('[📝 UPDATE USE CASE] shouldNotify: ${task.shouldNotify}');
+    print('[📝 UPDATE USE CASE] status: ${task.status}');
+    
     final result = await taskRepository.updateTask(task);
     return result.when(
       success: (_) async {
+        print('[📝 UPDATE USE CASE] ✅ Task updated successfully');
         if (task.id == null) {
+          print('[📝 UPDATE USE CASE] No task ID - skipping notification handling');
           return const Outcome.success();
         }
         
         // Cancel notification if task is done or cancelled
         if (task.status == TaskStatus.done || task.status == TaskStatus.cancelled) {
+          print('[📝 UPDATE USE CASE] 🔕 Task done/cancelled - canceling notification');
           await notificationService.cancelTaskNotification(task.id!);
         } else if (task.shouldNotify && task.dueDate != null && task.dueTime != null) {
           // Reschedule notification with updated data
           // Permissions were already requested when user enabled the notification toggle
+          print('[📝 UPDATE USE CASE] 🔔 Rescheduling notification for task ${task.id}');
           await notificationService.cancelTaskNotification(task.id!);
           await notificationService.scheduleTaskNotification(task);
+          print('[📝 UPDATE USE CASE] 🔔 Notification rescheduling completed');
         } else {
           // If notification was disabled or dueDate/dueTime was removed, cancel notification
           await notificationService.cancelTaskNotification(task.id!);
