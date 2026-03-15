@@ -75,9 +75,15 @@ class _DueDateSelectorBottomSheetState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.fromLTRB(
+        16.0,
+        16.0,
+        16.0,
+        16.0 + bottomPadding,
+      ),
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
