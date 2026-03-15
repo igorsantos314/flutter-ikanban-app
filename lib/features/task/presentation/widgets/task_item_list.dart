@@ -15,6 +15,7 @@ class TaskItemList extends StatelessWidget {
   final VoidCallback? onLongPress;
   final VoidCallback? onToggleCompletion;
   final VoidCallback? onStatusTap;
+  final Function(bool)? onToggleNotification;
   final Color? cardColor;
   final Color? borderColor;
   final LayoutMode layoutMode;
@@ -27,6 +28,7 @@ class TaskItemList extends StatelessWidget {
     this.onLongPress,
     this.onToggleCompletion,
     this.onStatusTap,
+    this.onToggleNotification,
     this.cardColor,
     this.borderColor,
     this.layoutMode = LayoutMode.fullWidth,
@@ -114,6 +116,28 @@ class TaskItemList extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Icon(task.status.icon, size: 18, color: textColor),
+                    // Notification icon (only if task has dueDate and dueTime)
+                    if (task.dueDate != null && task.dueTime != null) ...[
+                      const SizedBox(width: 6),
+                      InkWell(
+                        onTap: onToggleNotification != null
+                            ? () => onToggleNotification!(!task.shouldNotify)
+                            : null,
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Icon(
+                            task.shouldNotify
+                                ? Icons.notifications_active
+                                : Icons.notifications_off_outlined,
+                            size: 18,
+                            color: task.shouldNotify
+                                ? Colors.amber
+                                : textColor.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

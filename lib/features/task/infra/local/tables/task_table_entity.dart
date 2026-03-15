@@ -26,4 +26,8 @@ class TaskEntity extends Table {
   DateTimeColumn get createdAt => dateTime().named('created_at').withDefault(currentDateAndTime)();
   
   IntColumn get boardId => integer().named('board_id').nullable().references(BoardEntity, #id)();
+  
+  // Notification columns
+  BoolColumn get shouldNotify => boolean().named('should_notify').withDefault(const Constant(false))();
+  IntColumn get notifyMinutesBefore => integer().named('notify_minutes_before').nullable()();
 }

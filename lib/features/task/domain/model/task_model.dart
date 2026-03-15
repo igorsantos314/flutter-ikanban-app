@@ -23,5 +23,8 @@ abstract class TaskModel with _$TaskModel {
     @Default(true) bool isActive,
     required DateTime createdAt,
     int? boardId,
+    // Notification fields
+    @Default(false) bool shouldNotify,
+    int? notifyMinutesBefore,
   }) = _TaskModel;
 }

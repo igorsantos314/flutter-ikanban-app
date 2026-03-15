@@ -49,7 +49,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     Emitter<TaskFormState> emit,
   ) {
     log(
-      'Updating fields: title=${event.title}, description=${event.description}, status=${event.status}, priority=${event.priority}, complexity=${event.complexity}, type=${event.type}, dueDate=${event.dueDate}, dueTime=${event.dueTime}',
+      'Updating fields: title=${event.title}, description=${event.description}, status=${event.status}, priority=${event.priority}, complexity=${event.complexity}, type=${event.type}, dueDate=${event.dueDate}, dueTime=${event.dueTime}, shouldNotify=${event.shouldNotify}, notifyMinutesBefore=${event.notifyMinutesBefore}',
     );
     emit(
       state.copyWith(
@@ -62,6 +62,8 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         dueDate: event.dueDate ?? state.dueDate,
         dueTime: event.dueTime ?? state.dueTime,
         color: event.color ?? state.color,
+        shouldNotify: event.shouldNotify ?? state.shouldNotify,
+        notifyMinutesBefore: event.notifyMinutesBefore ?? state.notifyMinutesBefore,
       ),
     );
   }
@@ -96,6 +98,8 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         color: state.color,
         createdAt: DateTime.now(),
         boardId: boardId,
+        shouldNotify: state.shouldNotify,
+        notifyMinutesBefore: state.notifyMinutesBefore,
       );
       Outcome<void, dynamic> outcome;
 
@@ -163,6 +167,8 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         color: state.color,
         createdAt: DateTime.now(),
         boardId: boardId,
+        shouldNotify: state.shouldNotify,
+        notifyMinutesBefore: state.notifyMinutesBefore,
       );
 
       final outcome = await _updateTaskUseCase.execute(task);
@@ -278,6 +284,8 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
               type: task.type,
               dueDate: task.dueDate,
               dueTime: task.dueTime,
+              shouldNotify: task.shouldNotify,
+              notifyMinutesBefore: task.notifyMinutesBefore,
             ),
           );
         },

@@ -213,6 +213,106 @@ class _TaskFormPageState extends State<TaskFormPage>
                         showDueDateSelector(context, state);
                       },
                     ),
+                    
+                    // Notification settings (only show if dueDate and dueTime are set)
+                    if (state.dueDate != null && state.dueTime != null) ...[
+                      const SizedBox(height: 24),
+                      const Divider(),
+                      const SizedBox(height: 16),
+                      
+                      // Notification header
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.notifications_active,
+                            color: theme.colorScheme.primary,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Notificação',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Enable notification switch
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: state.shouldNotify
+                                ? theme.colorScheme.primary.withValues(alpha: 0.3)
+                                : theme.colorScheme.outline.withValues(alpha: 0.2),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              state.shouldNotify
+                                  ? Icons.notifications_active
+                                  : Icons.notifications_off,
+                              color: state.shouldNotify
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Ativar notificação',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Receba um lembrete sobre esta tarefa',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Switch(
+                              value: state.shouldNotify,
+                              onChanged: (value) {
+                                bloc.add(
+                                  TaskFormUpdateFieldsEvent(
+                                    shouldNotify: value,
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      // Notify minutes before selector
+                      if (state.shouldNotify) ...[
+                        const SizedBox(height: 16),
+                        FormSelectorField(
+                          title: 'Notificar antes',
+                          displayText: _getNotifyBeforeText(state.notifyMinutesBefore ?? 0),
+                          icon: Icons.schedule,
+                          iconColor: theme.colorScheme.primary,
+                          onTap: () {
+                            _removeFocus();
+                            _showNotifyBeforeSelector(context, state);
+                          },
+                        ),
+                      ],
+                    ],
+                    
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -226,5 +326,97 @@ class _TaskFormPageState extends State<TaskFormPage>
 
   void _removeFocus() {
     FocusScope.of(context).requestFocus(FocusNode());
+  }
+
+  String _getNotifyBeforeText(int minutes) {
+    if (minutes == 0) {
+      return 'No horário da tarefa';
+    }
+
+    final hours = minutes ~/ 60;
+    final mins = minutes % 60;
+
+    if (hours > 0 && mins > 0) {
+      return '$hours hora${hours > 1 ? 's' : ''} e $mins minuto${mins > 1 ? 's' : ''} antes';
+    } else if (hours > 0) {
+      return '$hours hora${hours > 1 ? 's' : ''} antes';
+    } else {
+      return '$mins minuto${mins > 1 ? 's' : ''} antes';
+    }
+  }
+
+  void _showNotifyBeforeSelector(BuildContext context, TaskFormState state) {
+    final options = [
+      {'label': 'No horário da tarefa', 'value': 0},
+      {'label': '5 minutos antes', 'value': 5},
+      {'label': '10 minutos antes', 'value': 10},
+      {'label': '15 minutos antes', 'value': 15},
+      {'label': '30 minutos antes', 'value': 30},
+      {'label': '1 hora antes', 'value': 60},
+      {'label': '2 horas antes', 'value': 120},
+      {'label': '1 dia antes', 'value': 1440},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.4,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (context, scrollController) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Notificar antes',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      itemCount: options.length,
+                      itemBuilder: (context, index) {
+                        final option = options[index];
+                        final isSelected =
+                            (state.notifyMinutesBefore ?? 0) == option['value'];
+                        return ListTile(
+                          leading: Icon(
+                            isSelected
+                                ? Icons.radio_button_checked
+                                : Icons.radio_button_unchecked,
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                          title: Text(option['label'] as String),
+                          selected: isSelected,
+                          onTap: () {
+                            context.read<TaskFormBloc>().add(
+                                  TaskFormUpdateFieldsEvent(
+                                    notifyMinutesBefore: option['value'] as int,
+                                  ),
+                                );
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }

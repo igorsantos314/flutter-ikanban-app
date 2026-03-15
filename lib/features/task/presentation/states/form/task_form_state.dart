@@ -30,6 +30,10 @@ abstract class TaskFormState with _$TaskFormState {
 
     @Default(TaskColors.defaultColor) TaskColors color,
 
+    // Notification fields
+    @Default(false) bool shouldNotify,
+    int? notifyMinutesBefore,
+
     @Default(false) bool showNotification,
     @Default(NotificationType.info) NotificationType notificationType,
     @Default("") String notificationMessage,

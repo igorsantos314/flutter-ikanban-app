@@ -616,6 +616,31 @@ class $TaskEntityTable extends TaskEntity
       'REFERENCES board_entity (id)',
     ),
   );
+  static const VerificationMeta _shouldNotifyMeta = const VerificationMeta(
+    'shouldNotify',
+  );
+  @override
+  late final GeneratedColumn<bool> shouldNotify = GeneratedColumn<bool>(
+    'should_notify',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("should_notify" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _notifyMinutesBeforeMeta =
+      const VerificationMeta('notifyMinutesBefore');
+  @override
+  late final GeneratedColumn<int> notifyMinutesBefore = GeneratedColumn<int>(
+    'notify_minutes_before',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -631,6 +656,8 @@ class $TaskEntityTable extends TaskEntity
     isActive,
     createdAt,
     boardId,
+    shouldNotify,
+    notifyMinutesBefore,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -692,6 +719,24 @@ class $TaskEntityTable extends TaskEntity
       context.handle(
         _boardIdMeta,
         boardId.isAcceptableOrUnknown(data['board_id']!, _boardIdMeta),
+      );
+    }
+    if (data.containsKey('should_notify')) {
+      context.handle(
+        _shouldNotifyMeta,
+        shouldNotify.isAcceptableOrUnknown(
+          data['should_notify']!,
+          _shouldNotifyMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notify_minutes_before')) {
+      context.handle(
+        _notifyMinutesBeforeMeta,
+        notifyMinutesBefore.isAcceptableOrUnknown(
+          data['notify_minutes_before']!,
+          _notifyMinutesBeforeMeta,
+        ),
       );
     }
     return context;
@@ -765,6 +810,14 @@ class $TaskEntityTable extends TaskEntity
         DriftSqlType.int,
         data['${effectivePrefix}board_id'],
       ),
+      shouldNotify: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}should_notify'],
+      )!,
+      notifyMinutesBefore: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}notify_minutes_before'],
+      ),
     );
   }
 
@@ -800,6 +853,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
   final bool isActive;
   final DateTime createdAt;
   final int? boardId;
+  final bool shouldNotify;
+  final int? notifyMinutesBefore;
   const TaskData({
     required this.id,
     required this.title,
@@ -814,6 +869,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     required this.isActive,
     required this.createdAt,
     this.boardId,
+    required this.shouldNotify,
+    this.notifyMinutesBefore,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -857,6 +914,10 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     if (!nullToAbsent || boardId != null) {
       map['board_id'] = Variable<int>(boardId);
     }
+    map['should_notify'] = Variable<bool>(shouldNotify);
+    if (!nullToAbsent || notifyMinutesBefore != null) {
+      map['notify_minutes_before'] = Variable<int>(notifyMinutesBefore);
+    }
     return map;
   }
 
@@ -883,6 +944,10 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       boardId: boardId == null && nullToAbsent
           ? const Value.absent()
           : Value(boardId),
+      shouldNotify: Value(shouldNotify),
+      notifyMinutesBefore: notifyMinutesBefore == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notifyMinutesBefore),
     );
   }
 
@@ -905,6 +970,10 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       isActive: serializer.fromJson<bool>(json['isActive']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       boardId: serializer.fromJson<int?>(json['boardId']),
+      shouldNotify: serializer.fromJson<bool>(json['shouldNotify']),
+      notifyMinutesBefore: serializer.fromJson<int?>(
+        json['notifyMinutesBefore'],
+      ),
     );
   }
   @override
@@ -924,6 +993,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       'isActive': serializer.toJson<bool>(isActive),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'boardId': serializer.toJson<int?>(boardId),
+      'shouldNotify': serializer.toJson<bool>(shouldNotify),
+      'notifyMinutesBefore': serializer.toJson<int?>(notifyMinutesBefore),
     };
   }
 
@@ -941,6 +1012,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     bool? isActive,
     DateTime? createdAt,
     Value<int?> boardId = const Value.absent(),
+    bool? shouldNotify,
+    Value<int?> notifyMinutesBefore = const Value.absent(),
   }) => TaskData(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -955,6 +1028,10 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     isActive: isActive ?? this.isActive,
     createdAt: createdAt ?? this.createdAt,
     boardId: boardId.present ? boardId.value : this.boardId,
+    shouldNotify: shouldNotify ?? this.shouldNotify,
+    notifyMinutesBefore: notifyMinutesBefore.present
+        ? notifyMinutesBefore.value
+        : this.notifyMinutesBefore,
   );
   TaskData copyWithCompanion(TaskEntityCompanion data) {
     return TaskData(
@@ -975,6 +1052,12 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       boardId: data.boardId.present ? data.boardId.value : this.boardId,
+      shouldNotify: data.shouldNotify.present
+          ? data.shouldNotify.value
+          : this.shouldNotify,
+      notifyMinutesBefore: data.notifyMinutesBefore.present
+          ? data.notifyMinutesBefore.value
+          : this.notifyMinutesBefore,
     );
   }
 
@@ -993,7 +1076,9 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           ..write('type: $type, ')
           ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
-          ..write('boardId: $boardId')
+          ..write('boardId: $boardId, ')
+          ..write('shouldNotify: $shouldNotify, ')
+          ..write('notifyMinutesBefore: $notifyMinutesBefore')
           ..write(')'))
         .toString();
   }
@@ -1013,6 +1098,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     isActive,
     createdAt,
     boardId,
+    shouldNotify,
+    notifyMinutesBefore,
   );
   @override
   bool operator ==(Object other) =>
@@ -1030,7 +1117,9 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           other.type == this.type &&
           other.isActive == this.isActive &&
           other.createdAt == this.createdAt &&
-          other.boardId == this.boardId);
+          other.boardId == this.boardId &&
+          other.shouldNotify == this.shouldNotify &&
+          other.notifyMinutesBefore == this.notifyMinutesBefore);
 }
 
 class TaskEntityCompanion extends UpdateCompanion<TaskData> {
@@ -1047,6 +1136,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
   final Value<bool> isActive;
   final Value<DateTime> createdAt;
   final Value<int?> boardId;
+  final Value<bool> shouldNotify;
+  final Value<int?> notifyMinutesBefore;
   const TaskEntityCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -1061,6 +1152,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.boardId = const Value.absent(),
+    this.shouldNotify = const Value.absent(),
+    this.notifyMinutesBefore = const Value.absent(),
   });
   TaskEntityCompanion.insert({
     this.id = const Value.absent(),
@@ -1076,6 +1169,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.boardId = const Value.absent(),
+    this.shouldNotify = const Value.absent(),
+    this.notifyMinutesBefore = const Value.absent(),
   }) : title = Value(title),
        status = Value(status),
        priority = Value(priority),
@@ -1096,6 +1191,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Expression<bool>? isActive,
     Expression<DateTime>? createdAt,
     Expression<int>? boardId,
+    Expression<bool>? shouldNotify,
+    Expression<int>? notifyMinutesBefore,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1111,6 +1208,9 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       if (isActive != null) 'is_active': isActive,
       if (createdAt != null) 'created_at': createdAt,
       if (boardId != null) 'board_id': boardId,
+      if (shouldNotify != null) 'should_notify': shouldNotify,
+      if (notifyMinutesBefore != null)
+        'notify_minutes_before': notifyMinutesBefore,
     });
   }
 
@@ -1128,6 +1228,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Value<bool>? isActive,
     Value<DateTime>? createdAt,
     Value<int?>? boardId,
+    Value<bool>? shouldNotify,
+    Value<int?>? notifyMinutesBefore,
   }) {
     return TaskEntityCompanion(
       id: id ?? this.id,
@@ -1143,6 +1245,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       boardId: boardId ?? this.boardId,
+      shouldNotify: shouldNotify ?? this.shouldNotify,
+      notifyMinutesBefore: notifyMinutesBefore ?? this.notifyMinutesBefore,
     );
   }
 
@@ -1198,6 +1302,12 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     if (boardId.present) {
       map['board_id'] = Variable<int>(boardId.value);
     }
+    if (shouldNotify.present) {
+      map['should_notify'] = Variable<bool>(shouldNotify.value);
+    }
+    if (notifyMinutesBefore.present) {
+      map['notify_minutes_before'] = Variable<int>(notifyMinutesBefore.value);
+    }
     return map;
   }
 
@@ -1216,7 +1326,9 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
           ..write('type: $type, ')
           ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
-          ..write('boardId: $boardId')
+          ..write('boardId: $boardId, ')
+          ..write('shouldNotify: $shouldNotify, ')
+          ..write('notifyMinutesBefore: $notifyMinutesBefore')
           ..write(')'))
         .toString();
   }
@@ -1584,6 +1696,8 @@ typedef $$TaskEntityTableCreateCompanionBuilder =
       Value<bool> isActive,
       Value<DateTime> createdAt,
       Value<int?> boardId,
+      Value<bool> shouldNotify,
+      Value<int?> notifyMinutesBefore,
     });
 typedef $$TaskEntityTableUpdateCompanionBuilder =
     TaskEntityCompanion Function({
@@ -1600,6 +1714,8 @@ typedef $$TaskEntityTableUpdateCompanionBuilder =
       Value<bool> isActive,
       Value<DateTime> createdAt,
       Value<int?> boardId,
+      Value<bool> shouldNotify,
+      Value<int?> notifyMinutesBefore,
     });
 
 final class $$TaskEntityTableReferences
@@ -1700,6 +1816,16 @@ class $$TaskEntityTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<bool> get shouldNotify => $composableBuilder(
+    column: $table.shouldNotify,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get notifyMinutesBefore => $composableBuilder(
+    column: $table.notifyMinutesBefore,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$BoardEntityTableFilterComposer get boardId {
     final $$BoardEntityTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -1793,6 +1919,16 @@ class $$TaskEntityTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get shouldNotify => $composableBuilder(
+    column: $table.shouldNotify,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get notifyMinutesBefore => $composableBuilder(
+    column: $table.notifyMinutesBefore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$BoardEntityTableOrderingComposer get boardId {
     final $$BoardEntityTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -1867,6 +2003,16 @@ class $$TaskEntityTableAnnotationComposer
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
+  GeneratedColumn<bool> get shouldNotify => $composableBuilder(
+    column: $table.shouldNotify,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get notifyMinutesBefore => $composableBuilder(
+    column: $table.notifyMinutesBefore,
+    builder: (column) => column,
+  );
+
   $$BoardEntityTableAnnotationComposer get boardId {
     final $$BoardEntityTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -1932,6 +2078,8 @@ class $$TaskEntityTableTableManager
                 Value<bool> isActive = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int?> boardId = const Value.absent(),
+                Value<bool> shouldNotify = const Value.absent(),
+                Value<int?> notifyMinutesBefore = const Value.absent(),
               }) => TaskEntityCompanion(
                 id: id,
                 title: title,
@@ -1946,6 +2094,8 @@ class $$TaskEntityTableTableManager
                 isActive: isActive,
                 createdAt: createdAt,
                 boardId: boardId,
+                shouldNotify: shouldNotify,
+                notifyMinutesBefore: notifyMinutesBefore,
               ),
           createCompanionCallback:
               ({
@@ -1962,6 +2112,8 @@ class $$TaskEntityTableTableManager
                 Value<bool> isActive = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int?> boardId = const Value.absent(),
+                Value<bool> shouldNotify = const Value.absent(),
+                Value<int?> notifyMinutesBefore = const Value.absent(),
               }) => TaskEntityCompanion.insert(
                 id: id,
                 title: title,
@@ -1976,6 +2128,8 @@ class $$TaskEntityTableTableManager
                 isActive: isActive,
                 createdAt: createdAt,
                 boardId: boardId,
+                shouldNotify: shouldNotify,
+                notifyMinutesBefore: notifyMinutesBefore,
               ),
           withReferenceMapper: (p0) => p0
               .map(

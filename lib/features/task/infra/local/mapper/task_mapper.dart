@@ -18,6 +18,8 @@ class TaskMapper {
       isActive: Value(model.isActive),
       createdAt: Value(model.createdAt),
       boardId: model.boardId != null ? Value(model.boardId!) : const Value.absent(),
+      shouldNotify: Value(model.shouldNotify),
+      notifyMinutesBefore: model.notifyMinutesBefore != null ? Value(model.notifyMinutesBefore!) : const Value.absent(),
     );
   }
   
@@ -36,6 +38,8 @@ class TaskMapper {
       isActive: entity.isActive,
       createdAt: entity.createdAt,
       boardId: entity.boardId,
+      shouldNotify: entity.shouldNotify,
+      notifyMinutesBefore: entity.notifyMinutesBefore,
     );
   }
 }

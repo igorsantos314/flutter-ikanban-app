@@ -16,6 +16,7 @@ import 'package:flutter_ikanban_app/core/database/app_database.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_service.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
 import 'package:flutter_ikanban_app/core/services/notification/task_notification_service.dart';
+import 'package:flutter_ikanban_app/core/services/permission/permission_service.dart';
 import 'package:flutter_ikanban_app/core/use_cases/theme/get_theme_use_case.dart';
 import 'package:flutter_ikanban_app/core/use_cases/theme/set_theme_use_case.dart';
 import 'package:flutter_ikanban_app/features/board/data/board_repository_impl.dart';
@@ -190,6 +191,11 @@ void _setupSettingsModule() {
 }
 
 void _setupCoreServices() {
+  // Permission Service
+  getIt.registerLazySingleton<PermissionService>(
+    () => PermissionService(),
+  );
+
   // Notification Service
   getIt.registerLazySingleton<TaskNotificationService>(
     () => TaskNotificationService(),
