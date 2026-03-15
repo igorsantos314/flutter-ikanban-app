@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/bloc_text_field.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/multi_line_bloc_text_field.dart';
+import 'package:flutter_ikanban_app/core/services/notification/task_notification_service.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_form_bloc.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_complexity_enum_extensions.dart';
@@ -34,12 +35,199 @@ class _TaskFormPageState extends State<TaskFormPage>
     with TaskFormSelectorsMixin {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TaskNotificationService _notificationService = TaskNotificationService();
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  /// Handle notification toggle with permission requests
+  Future<void> _handleNotificationToggle(bool value, TaskFormBloc bloc) async {
+    // Se o usuário está tentando DESATIVAR a notificação, apenas desative
+    if (!value) {
+      bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: false));
+      return;
+    }
+
+    // Se o usuário está tentando ATIVAR a notificação, solicite permissões
+    try {
+      // Solicita todas as permissões necessárias (notificação + exact alarm)
+      final allPermissionsGranted = await _notificationService.requestAllPermissions(
+        context: mounted ? context : null,
+      );
+
+      if (!allPermissionsGranted) {
+        // Permissão de notificação negada - NÃO ativa o switch
+        if (mounted) {
+          _showPermissionDeniedDialog();
+        }
+        // Garante que o switch permaneça desativado
+        bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: false));
+        return;
+      }
+
+      // Permissão de notificação concedida, agora verifica exact alarm
+      final canScheduleExact = await _notificationService.canScheduleExactAlarms();
+      
+      if (!canScheduleExact) {
+        // Mostra diálogo explicando a importância da permissão de alarmes exatos
+        if (!mounted) {
+          bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: false));
+          return;
+        }
+
+        final shouldProceed = await _showExactAlarmPermissionDialog();
+        
+        if (!shouldProceed) {
+          // Usuário cancelou, NÃO ativa
+          bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: false));
+          return;
+        }
+
+        // Tenta solicitar permissão de exact alarm
+        await _notificationService.requestExactAlarmPermission();
+        
+        // Verifica novamente se foi concedida
+        final nowCanSchedule = await _notificationService.canScheduleExactAlarms();
+        
+        if (nowCanSchedule) {
+          // Tudo certo, ativa a notificação
+          bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: true));
+        } else {
+          // Permissão negada, mas permite ativar com aviso
+          if (mounted) {
+            _showWarningDialog(
+              'Aviso',
+              'As notificações foram ativadas, mas sem a permissão de "Alarmes e lembretes", '
+              'elas podem não funcionar corretamente quando o dispositivo estiver em modo de economia de energia.\n\n'
+              'Para garantir que as notificações funcionem, vá em Configurações > Apps > iKanban > Alarmes e lembretes e ative a permissão.',
+            );
+          }
+          bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: true));
+        }
+      } else {
+        // Todas as permissões OK, ativa normalmente
+        bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: true));
+      }
+    } catch (e) {
+      // Erro ao solicitar permissões - NÃO ativa
+      if (mounted) {
+        _showErrorDialog('Erro ao solicitar permissões: $e');
+      }
+      bloc.add(TaskFormUpdateFieldsEvent(shouldNotify: false));
+    }
+  }
+
+  /// Show dialog explaining the importance of exact alarm permission
+  Future<bool> _showExactAlarmPermissionDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.alarm, color: Colors.orange),
+            SizedBox(width: 12),
+            Expanded(child: Text('Permissão Adicional')),
+          ],
+        ),
+        content: const Text(
+          'Para que as notificações funcionem de forma precisa e confiável, '
+          'é necessário ativar a permissão de "Alarmes e lembretes".\n\n'
+          'Sem essa permissão, as notificações podem ser atrasadas ou não serem exibidas '
+          'quando o dispositivo estiver em modo de economia de energia.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Agora não'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            ),
+            child: const Text('Ativar'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
+  /// Show permission denied dialog
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.warning, color: Theme.of(context).colorScheme.error),
+            const SizedBox(width: 12),
+            const Expanded(child: Text('Permissão Negada')),
+          ],
+        ),
+        content: const Text(
+          'A permissão de notificações é necessária para enviar lembretes sobre suas tarefas.\n\n'
+          'Para ativar notificações, você precisa conceder a permissão de notificações nas configurações do app.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Show warning dialog
+  void _showWarningDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.warning, color: Colors.orange),
+            const SizedBox(width: 12),
+            Expanded(child: Text(title)),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Entendi'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Show error dialog
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.error, color: Theme.of(context).colorScheme.error),
+            const SizedBox(width: 12),
+            const Expanded(child: Text('Erro')),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _onRequestDeleteTask({required VoidCallback onDeleteEvent}) {
@@ -285,12 +473,8 @@ class _TaskFormPageState extends State<TaskFormPage>
                             ),
                             Switch(
                               value: state.shouldNotify,
-                              onChanged: (value) {
-                                bloc.add(
-                                  TaskFormUpdateFieldsEvent(
-                                    shouldNotify: value,
-                                  ),
-                                );
+                              onChanged: (value) async {
+                                await _handleNotificationToggle(value, bloc);
                               },
                             ),
                           ],
@@ -313,7 +497,8 @@ class _TaskFormPageState extends State<TaskFormPage>
                       ],
                     ],
                     
-                    const SizedBox(height: 32),
+                    // Space for floating action buttons
+                    const SizedBox(height: 128),
                   ],
                 ),
               ),

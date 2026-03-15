@@ -91,6 +91,100 @@ class TaskNotificationService {
     );
   }
 
+  /// Check if the app can schedule exact alarms (Android 12+)
+  /// Returns true on iOS or if the permission is granted on Android
+  Future<bool> canScheduleExactAlarms() async {
+    if (!_isInitialized) {
+      await initialize();
+    }
+
+    try {
+      final androidImplementation = _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+
+      if (androidImplementation == null) {
+        // iOS or other platform
+        return true;
+      }
+
+      final canSchedule = await androidImplementation.canScheduleExactNotifications();
+      log('[TaskNotificationService] Can schedule exact alarms: $canSchedule');
+      return canSchedule ?? false;
+    } catch (e) {
+      log('[TaskNotificationService] Error checking exact alarm permission: $e');
+      return false;
+    }
+  }
+
+  /// Request exact alarm permission (Android 12+)
+  /// Opens system settings for the user to grant the permission
+  Future<bool> requestExactAlarmPermission() async {
+    if (!_isInitialized) {
+      await initialize();
+    }
+
+    try {
+      final androidImplementation = _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+
+      if (androidImplementation == null) {
+        // iOS or other platform - no need to request
+        return true;
+      }
+
+      // Check if already granted
+      final canSchedule = await androidImplementation.canScheduleExactNotifications();
+      if (canSchedule == true) {
+        return true;
+      }
+
+      // Request the permission - this opens system settings
+      await androidImplementation.requestExactAlarmsPermission();
+      
+      // Check again after user returns
+      final newStatus = await androidImplementation.canScheduleExactNotifications();
+      log('[TaskNotificationService] Exact alarm permission after request: $newStatus');
+      return newStatus ?? false;
+    } catch (e) {
+      log('[TaskNotificationService] Error requesting exact alarm permission: $e');
+      return false;
+    }
+  }
+
+  /// Check all required permissions for notifications to work properly
+  Future<NotificationPermissionStatus> checkAllPermissions() async {
+    final hasNotificationPermission = await hasPermissions();
+    final canScheduleExact = await canScheduleExactAlarms();
+
+    return NotificationPermissionStatus(
+      hasNotificationPermission: hasNotificationPermission,
+      canScheduleExactAlarms: canScheduleExact,
+    );
+  }
+
+  /// Request all required permissions for notifications
+  /// Returns true if all permissions are granted
+  Future<bool> requestAllPermissions({BuildContext? context}) async {
+    // First request notification permission
+    final notificationGranted = await requestPermissions(context: context);
+    if (!notificationGranted) {
+      log('[TaskNotificationService] Notification permission denied');
+      return false;
+    }
+
+    // Then check/request exact alarm permission (Android 12+)
+    final exactAlarmGranted = await requestExactAlarmPermission();
+    if (!exactAlarmGranted) {
+      log('[TaskNotificationService] Exact alarm permission denied');
+      // Still return true as notifications might work, just not precisely
+      // Log warning for debugging
+    }
+
+    return notificationGranted;
+  }
+
   /// Handle notification tap
   void _onNotificationTapped(NotificationResponse response) {
     log('[TaskNotificationService] Notification tapped: ${response.payload}');
@@ -120,6 +214,20 @@ class TaskNotificationService {
       return;
     }
 
+    // Verify permissions before scheduling
+    final hasNotificationPermission = await hasPermissions();
+    if (!hasNotificationPermission) {
+      log('[TaskNotificationService] ⚠️ WARNING: Notification permission not granted! Skipping scheduling.');
+      return;
+    }
+
+    // Check if can schedule exact alarms (Android 12+)
+    final canScheduleExact = await canScheduleExactAlarms();
+    if (!canScheduleExact) {
+      log('[TaskNotificationService] ⚠️ WARNING: Exact alarm permission not granted! Notification may be delayed.');
+      // Continue anyway - notification will be scheduled but may be delayed by Doze mode
+    }
+
     try {
       // Combine dueDate and dueTime
       final taskDateTime = DateTime(
@@ -139,6 +247,8 @@ class TaskNotificationService {
         log('[TaskNotificationService] Cannot schedule notification: time has passed');
         return;
       }
+
+      log('[TaskNotificationService] ✅ Scheduling notification for task ${task.id} at $scheduledDate ($minutesBefore minutes before task time)');
 
       const androidDetails = AndroidNotificationDetails(
         'task_reminders',
@@ -192,10 +302,14 @@ class TaskNotificationService {
         payload: task.id.toString(),
       );
 
-      log('[TaskNotificationService] Notification scheduled for task ${task.id} at $scheduledDate ($minutesBefore minutes before task time)');
+      log('[TaskNotificationService] ✅ SUCCESS! Notification scheduled for task ${task.id} at $scheduledDate');
+      log('[TaskNotificationService]    - Task title: ${task.title}');
+      log('[TaskNotificationService]    - Scheduled for: $scheduledDate');
+      log('[TaskNotificationService]    - Minutes before: $minutesBefore');
+      log('[TaskNotificationService]    - Task due: $taskDateTime');
     } catch (e, stackTrace) {
       log(
-        '[TaskNotificationService] Error scheduling notification: $e',
+        '[TaskNotificationService] ❌ ERROR scheduling notification: $e',
         error: e,
         stackTrace: stackTrace,
       );
@@ -356,4 +470,29 @@ enum NotificationScheduleResult {
   limitReached,
   permissionDenied,
   error,
+}
+
+/// Status of all notification-related permissions
+class NotificationPermissionStatus {
+  final bool hasNotificationPermission;
+  final bool canScheduleExactAlarms;
+
+  NotificationPermissionStatus({
+    required this.hasNotificationPermission,
+    required this.canScheduleExactAlarms,
+  });
+
+  /// Returns true if all permissions are granted for reliable notifications
+  bool get allGranted => hasNotificationPermission && canScheduleExactAlarms;
+
+  /// Returns true if at least notification permission is granted
+  /// (notifications might still work but may be delayed by Doze mode)
+  bool get canShowNotifications => hasNotificationPermission;
+
+  @override
+  String toString() {
+    return 'NotificationPermissionStatus('
+        'hasNotificationPermission: $hasNotificationPermission, '
+        'canScheduleExactAlarms: $canScheduleExactAlarms)';
+  }
 }

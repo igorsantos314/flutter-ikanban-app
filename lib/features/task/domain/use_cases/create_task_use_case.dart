@@ -17,15 +17,11 @@ class CreateTaskUseCase {
     return result.when(
       success: (_) async {
         // Schedule notification only if user requested it and task has dueDate and dueTime
+        // Permissions were already requested when user enabled the notification toggle
         if (task.shouldNotify && 
             task.id != null && 
             task.dueDate != null && 
             task.dueTime != null) {
-          // Request permission if needed before scheduling
-          final hasPermission = await notificationService.hasPermissions();
-          if (!hasPermission) {
-            await notificationService.requestPermissions();
-          }
           await notificationService.scheduleTaskNotification(task);
         }
         return const Outcome.success();

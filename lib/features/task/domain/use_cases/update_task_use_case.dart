@@ -28,12 +28,8 @@ class UpdateTaskUseCase {
         if (task.status == TaskStatus.done || task.status == TaskStatus.cancelled) {
           await notificationService.cancelTaskNotification(task.id!);
         } else if (task.shouldNotify && task.dueDate != null && task.dueTime != null) {
-          // Request permission if needed before scheduling
-          final hasPermission = await notificationService.hasPermissions();
-          if (!hasPermission) {
-            await notificationService.requestPermissions();
-          }
           // Reschedule notification with updated data
+          // Permissions were already requested when user enabled the notification toggle
           await notificationService.cancelTaskNotification(task.id!);
           await notificationService.scheduleTaskNotification(task);
         } else {

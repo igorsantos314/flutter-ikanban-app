@@ -221,7 +221,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                               : Colors.grey,
                           label: 'Vencimento',
                           value: task.dueDate != null
-                              ? DateFormat('dd/MM/yyyy').format(task.dueDate!)
+                              ? "${DateFormat('dd/MM/yyyy').format(task.dueDate!)} ${task.dueTime != null ? DateFormat('HH:mm').format(task.dueTime!) : ''}"
                               : 'Sem data',
                           description: task.dueDate != null
                               ? _getDateDescription(task.dueDate!)
@@ -311,7 +311,9 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                           child: Text(
                             task.shouldNotify ? 'Ativada' : 'Desativada',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: task.shouldNotify ? Colors.green : Colors.grey,
+                              color: task.shouldNotify
+                                  ? Colors.green
+                                  : Colors.grey,
                               fontWeight: FontWeight.w600,
                               fontSize: 11,
                             ),
@@ -338,15 +340,17 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                                 Text(
                                   'Notificar antes:',
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color:
-                                        colorScheme.onSurface.withValues(alpha: 0.6),
+                                    color: colorScheme.onSurface.withValues(
+                                      alpha: 0.6,
+                                    ),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   _getNotificationTimeText(
-                                      task.notifyMinutesBefore ?? 0),
+                                    task.notifyMinutesBefore ?? 0,
+                                  ),
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: colorScheme.onSurface,
                                     fontWeight: FontWeight.w600,
@@ -605,7 +609,9 @@ class TaskDetailsBottomSheet extends StatelessWidget {
       dueTime.minute,
     );
 
-    final notificationTime = taskDateTime.subtract(Duration(minutes: minutesBefore));
+    final notificationTime = taskDateTime.subtract(
+      Duration(minutes: minutesBefore),
+    );
     final now = DateTime.now();
 
     if (notificationTime.isBefore(now)) {

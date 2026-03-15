@@ -8,6 +8,7 @@ import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_c
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_priority_enum_extensions.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_status_enum_extensions.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_type_enum_extensions.dart';
+import 'package:intl/intl.dart';
 
 class TaskItemList extends StatelessWidget {
   final TaskModel task;
@@ -119,24 +120,7 @@ class TaskItemList extends StatelessWidget {
                     // Notification icon (only if task has dueDate and dueTime)
                     if (task.dueDate != null && task.dueTime != null) ...[
                       const SizedBox(width: 6),
-                      InkWell(
-                        onTap: onToggleNotification != null
-                            ? () => onToggleNotification!(!task.shouldNotify)
-                            : null,
-                        borderRadius: BorderRadius.circular(12),
-                        child: Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: Icon(
-                            task.shouldNotify
-                                ? Icons.notifications_active
-                                : Icons.notifications_off_outlined,
-                            size: 18,
-                            color: task.shouldNotify
-                                ? Colors.amber
-                                : textColor.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      ),
+                      Icon(Icons.notifications_active),
                     ],
                   ],
                 ),
@@ -194,7 +178,7 @@ class TaskItemList extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '${task.dueDate!.day}/${task.dueDate!.month}/${task.dueDate!.year}',
+                            '${task.dueDate!.day}/${task.dueDate!.month}/${task.dueDate!.year} ${task.dueTime != null ? '- ${DateFormat('HH:mm').format(task.dueTime!)}' : ''}',
                             textAlign: TextAlign.start,
                             style: TextStyle(
                               fontSize: 11,
