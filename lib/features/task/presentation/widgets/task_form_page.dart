@@ -555,7 +555,7 @@ class _TaskFormPageState extends State<TaskFormPage>
     }
   }
 
-  void _showNotifyBeforeSelector(BuildContext context, TaskFormState state) {
+  void _showNotifyBeforeSelector(BuildContext widgetContext, TaskFormState state) {
     final options = [
       {'label': 'No horário da tarefa', 'value': 0},
       {'label': '5 minutos antes', 'value': 5},
@@ -568,7 +568,7 @@ class _TaskFormPageState extends State<TaskFormPage>
     ];
 
     showModalBottomSheet(
-      context: context,
+      context: widgetContext,
       isScrollControlled: true,
       builder: (context) {
         return DraggableScrollableSheet(
@@ -610,7 +610,7 @@ class _TaskFormPageState extends State<TaskFormPage>
                           title: Text(option['label'] as String),
                           selected: isSelected,
                           onTap: () {
-                            context.read<TaskFormBloc>().add(
+                            widgetContext.read<TaskFormBloc>().add(
                                   TaskFormUpdateFieldsEvent(
                                     notifyMinutesBefore: option['value'] as int,
                                   ),

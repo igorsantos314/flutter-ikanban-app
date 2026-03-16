@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
+import 'package:flutter_ikanban_app/features/board/domain/repository/board_repository.dart';
+import 'package:flutter_ikanban_app/features/board/domain/services/board_selection_service.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/modals/task_details_bottom_sheet.dart';
 
@@ -57,6 +59,31 @@ class NotificationNavigationService {
 
       log('[NotificationNavigationService] ✅ Task found: ${task.title}');
       
+      // If boardId is available, select the board first
+      if (boardId != null) {
+        log('[NotificationNavigationService] 📌 Selecting board: $boardId');
+        final boardRepository = getIt<BoardRepository>();
+        final boardResult = await boardRepository.getBoardById(boardId.toString());
+        
+        // Try to extract board value
+        dynamic board;
+        try {
+          board = (boardResult as dynamic).value;
+        } catch (e) {
+          log('[NotificationNavigationService] ⚠️ Error accessing board: $e (continuing anyway)');
+        }
+        
+        if (board != null) {
+          log('[NotificationNavigationService] ✅ Board found: ${board.title}');
+          // Set the board in BoardSelectionService so TaskListPage shows tasks from this board
+          final boardSelectionService = getIt<BoardSelectionService>();
+          boardSelectionService.selectBoard(board);
+          log('[NotificationNavigationService] ✅ Board selected in service');
+        } else {
+          log('[NotificationNavigationService] ⚠️ Board not found: $boardId (continuing anyway)');
+        }
+      }
+      
       // Get navigator context
       final context = AppNavigation.router.routerDelegate.navigatorKey.currentContext;
       
@@ -66,6 +93,7 @@ class NotificationNavigationService {
       }
 
       // Navigate to tasks page
+      log('[NotificationNavigationService] 🚀 Navigating to tasks page');
       AppNavigation.navigateToTasks(context);
 
       // Wait for navigation to complete and page to be ready

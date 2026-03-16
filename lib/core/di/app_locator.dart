@@ -26,6 +26,7 @@ import 'package:flutter_ikanban_app/features/board/domain/services/board_selecti
 import 'package:flutter_ikanban_app/features/board/domain/use_cases/create_board_use_case.dart';
 import 'package:flutter_ikanban_app/features/board/domain/use_cases/delete_board_use_case.dart';
 import 'package:flutter_ikanban_app/features/board/domain/use_cases/list_board_use_case.dart';
+import 'package:flutter_ikanban_app/features/board/domain/use_cases/update_board_use_case.dart';
 import 'package:flutter_ikanban_app/features/board/infra/local/board_local_data_source.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/use_cases/load_settings_use_case.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/use_cases/save_settings_use_case.dart';
@@ -138,6 +139,10 @@ void _setupBoardModule() {
 
   getIt.registerLazySingleton<CreateBoardUseCase>(
     () => CreateBoardUseCase(getIt()),
+  );
+
+  getIt.registerLazySingleton<UpdateBoardUseCase>(
+    () => UpdateBoardUseCase(getIt()),
   );
 
   getIt.registerLazySingleton<DeleteBoardUseCase>(

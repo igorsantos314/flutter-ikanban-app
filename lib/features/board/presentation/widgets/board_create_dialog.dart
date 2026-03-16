@@ -11,7 +11,7 @@ class BoardCreateDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => BoardFormBloc(getIt()),
+      create: (context) => BoardFormBloc(getIt(), getIt()),
       child: const BoardCreateDialogContent(),
     );
   }

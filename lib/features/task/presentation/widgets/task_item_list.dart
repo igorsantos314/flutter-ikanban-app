@@ -178,7 +178,7 @@ class TaskItemList extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '${task.dueDate!.day}/${task.dueDate!.month}/${task.dueDate!.year} ${task.dueTime != null ? '- ${DateFormat('HH:mm').format(task.dueTime!)}' : ''}',
+                            '${DateFormat('dd/MM/yyyy').format(task.dueDate!)} ${task.dueTime != null ? '- ${DateFormat('HH:mm').format(task.dueTime!)}' : ''}',
                             textAlign: TextAlign.start,
                             style: TextStyle(
                               fontSize: 11,
