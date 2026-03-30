@@ -67,17 +67,9 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     CreateTaskEvent event,
     Emitter<TaskFormState> emit,
   ) async {
-    print('[📝 BLOC] ========================================');
-    print('[📝 BLOC] CREATE TASK EVENT RECEIVED');
-    print('[📝 BLOC] ========================================');
-    print('[📝 BLOC] Title: ${state.title}');
-    print('[📝 BLOC] dueDate: ${state.dueDate}');
-    print('[📝 BLOC] dueTime: ${state.dueTime}');
-    
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     if (state.title.isEmpty) {
-      print('[📝 BLOC] ❌ Title is empty - aborting');
       emit(
         state.copyWith(isLoading: false, titleError: 'O título é obrigatório.'),
       );
@@ -101,7 +93,6 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         createdAt: DateTime.now(),
         boardId: boardId,
       );
-      
       
       Outcome<void, dynamic> outcome;
 
@@ -131,8 +122,6 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         },
       );
     } catch (e) {
-      print('[📝 BLOC] ❌ Exception: $e');
-      print('[📝 BLOC] ========================================');
       log('Error creating task: $e');
       _handleTaskRepositoryError(
         createError: CreateTaskUseCaseError.genericError,

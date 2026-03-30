@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ikanban_app/core/navigation/app_navigation.dart';
+import 'package:go_router/go_router.dart';
 
-class ScaffoldWithNavBar extends StatefulWidget {
+class ScaffoldWithNavBar extends StatelessWidget {
   final Widget child;
 
   const ScaffoldWithNavBar({super.key, required this.child});
 
   @override
-  State<ScaffoldWithNavBar> createState() => _ScaffoldWithNavBarState();
-}
-
-class _ScaffoldWithNavBarState extends State<ScaffoldWithNavBar> {
-  int selectedIndex = 0;
-
-  @override
   Widget build(BuildContext context) {
+    final location = GoRouterState.of(context).uri.toString();
+    final selectedIndex = _calculateSelectedIndex(location);
+
     return Scaffold(
-      body: widget.child,
+      body: child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
         onDestinationSelected: (index) {
-          setState(() {
-            selectedIndex = index;
-          });
           _onItemTapped(index, context);
         },
         destinations: const [
@@ -39,6 +33,13 @@ class _ScaffoldWithNavBarState extends State<ScaffoldWithNavBar> {
         ],
       ),
     );
+  }
+
+  int _calculateSelectedIndex(String location) {
+    if (location.startsWith(AppNavigation.settings)) {
+      return 1;
+    }
+    return 0; // Default to home
   }
 
   void _onItemTapped(int index, BuildContext context) {

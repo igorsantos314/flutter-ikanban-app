@@ -196,7 +196,7 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => AppNavigation.navigateToBoards(context),
+            onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(getIt<BoardSelectionService>().selectedBoardName),
         ),

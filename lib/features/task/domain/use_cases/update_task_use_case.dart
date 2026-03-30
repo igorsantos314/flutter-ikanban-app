@@ -14,13 +14,9 @@ class UpdateTaskUseCase {
   UpdateTaskUseCase(this.taskRepository);
   
   Future<Outcome<void, UpdateTaskUseCaseError>> execute(TaskModel task) async {
-    print('[📝 UPDATE USE CASE] Updating task: ${task.title}');
-    print('[📝 UPDATE USE CASE] status: ${task.status}');
-    
     final result = await taskRepository.updateTask(task);
     return result.when(
       success: (_) async {
-        print('[📝 UPDATE USE CASE] ✅ Task updated successfully');
         return const Outcome.success();
       },
       failure: (error, message, throwable) {
