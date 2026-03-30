@@ -15,19 +15,21 @@ class TaskEditPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => TaskFormBloc(getIt.get(), getIt.get(), getIt.get(), getIt.get()),
-      child: TaskEditPageContent(taskId: taskId),
+      create: (context) {
+        final bloc = TaskFormBloc(getIt.get(), getIt.get(), getIt.get(), getIt.get());
+        bloc.add(LoadTaskFormEvent(taskId));
+        return bloc;
+      },
+      child: const TaskEditPageContent(),
     );
   }
 }
 
 class TaskEditPageContent extends StatelessWidget {
-  final int taskId;
-  const TaskEditPageContent({super.key, required this.taskId});
+  const TaskEditPageContent({super.key});
 
   @override
   Widget build(BuildContext context) {
-    context.read<TaskFormBloc>().add(LoadTaskFormEvent(taskId));
     return MultiBlocListener(
       listeners: [
         BlocListener<TaskFormBloc, TaskFormState>(

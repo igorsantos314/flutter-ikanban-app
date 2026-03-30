@@ -16,11 +16,15 @@ abstract class TaskModel with _$TaskModel {
     @Default(TaskStatus.backlog) TaskStatus status,
     @Default(TaskPriority.low) TaskPriority priority,
     DateTime? dueDate,
+    DateTime? dueTime,
     @Default(TaskComplexity.easy) TaskComplexity complexity,
     @Default(TaskType.personal) TaskType type,
     @Default(TaskColors.defaultColor) TaskColors color,
     @Default(true) bool isActive,
     required DateTime createdAt,
     int? boardId,
+    // Notification fields
+    @Default(false) bool shouldNotify,
+    int? notifyMinutesBefore,
   }) = _TaskModel;
 }

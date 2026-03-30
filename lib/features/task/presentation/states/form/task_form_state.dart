@@ -23,6 +23,7 @@ abstract class TaskFormState with _$TaskFormState {
     @Default(TaskStatus.backlog) TaskStatus status,
     @Default(TaskPriority.low) TaskPriority priority,
     DateTime? dueDate,
+    DateTime? dueTime,
 
     @Default(TaskComplexity.easy) TaskComplexity complexity,
     @Default(TaskType.personal) TaskType type,

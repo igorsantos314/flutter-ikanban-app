@@ -1,0 +1,30 @@
+{
+  "app": "iKanban",
+  "version": "1.0.0+1",
+  "exportDate": "2026-03-30T08:52:23.248269",
+  "tasks": [],
+  "boards": [
+    {
+      "id": 2,
+      "title": "asdasd",
+      "description": "",
+      "color": "#FF6B6B",
+      "createdAt": "2026-03-30T08:51:12.000",
+      "updatedAt": "2026-03-30T08:51:12.000",
+      "isActive": true
+    }
+  ],
+  "settings": {
+    "appTheme": "system",
+    "language": "pt",
+    "appVersion": "0.6.0 (14)"
+  },
+  "metadata": {
+    "exportedBy": "iKanban Flutter App",
+    "platform": "mobile/desktop",
+    "dataVersion": "1.0",
+    "totalTasks": 0,
+    "totalBoards": 1,
+    "hasSettings": true
+  }
+}

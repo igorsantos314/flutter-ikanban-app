@@ -1,6 +1,7 @@
 // ignore_for_file: camel_case_types
 
 import 'package:flutter/material.dart';
+import 'package:flutter_ikanban_app/core/services/notification/task_notification_service.dart';
 import 'package:flutter_ikanban_app/shared/theme/presentation/ikanban_theme.dart';
 import 'package:flutter_ikanban_app/shared/theme/data/theme_repository_impl.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -17,6 +18,9 @@ void main() async {
 
   final theme = await ThemeRepositoryImpl.getThemePrefs();
   getIt<ThemeProvider>().setTheme(theme);
+
+  // Initialize notification service
+  await getIt<TaskNotificationService>().initialize();
 
   // Initialize App Navigation to ensure have just one Route instance
   AppNavigation.initRouter();

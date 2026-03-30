@@ -48,9 +48,6 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     TaskFormUpdateFieldsEvent event,
     Emitter<TaskFormState> emit,
   ) {
-    log(
-      'Updating fields: title=${event.title}, description=${event.description}, status=${event.status}, priority=${event.priority}, complexity=${event.complexity}, type=${event.type}, dueDate=${event.dueDate}',
-    );
     emit(
       state.copyWith(
         title: event.title ?? state.title,
@@ -60,6 +57,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         complexity: event.complexity ?? state.complexity,
         type: event.type ?? state.type,
         dueDate: event.dueDate ?? state.dueDate,
+        dueTime: event.dueTime ?? state.dueTime,
         color: event.color ?? state.color,
       ),
     );
@@ -81,7 +79,6 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     try {
       // Get the selected board ID from the service
       final boardId = getIt<BoardSelectionService>().selectedBoard?.id;
-      
       final task = TaskModel(
         id: state.taskId,
         title: state.title,
@@ -91,10 +88,12 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         complexity: state.complexity,
         type: state.type,
         dueDate: state.dueDate,
+        dueTime: state.dueTime,
         color: state.color,
         createdAt: DateTime.now(),
         boardId: boardId,
       );
+      
       Outcome<void, dynamic> outcome;
 
       outcome = await _createTaskUseCase.execute(task);
@@ -157,6 +156,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         complexity: state.complexity,
         type: state.type,
         dueDate: state.dueDate,
+        dueTime: state.dueTime,
         color: state.color,
         createdAt: DateTime.now(),
         boardId: boardId,
@@ -274,6 +274,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
               color: task.color,
               type: task.type,
               dueDate: task.dueDate,
+              dueTime: task.dueTime,
             ),
           );
         },

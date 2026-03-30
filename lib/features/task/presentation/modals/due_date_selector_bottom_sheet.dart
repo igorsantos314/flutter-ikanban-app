@@ -5,12 +5,16 @@ import 'package:intl/intl.dart';
 
 class DueDateSelectorBottomSheet extends StatefulWidget {
   final DateTime? selectedDueDate;
+  final DateTime? selectedDueTime;
   final Function(DateTime?) onDueDateSelected;
+  final Function(DateTime?) onDueTimeSelected;
 
   const DueDateSelectorBottomSheet({
     super.key,
     required this.selectedDueDate,
+    this.selectedDueTime,
     required this.onDueDateSelected,
+    required this.onDueTimeSelected,
   });
 
   @override
@@ -21,12 +25,15 @@ class DueDateSelectorBottomSheet extends StatefulWidget {
 class _DueDateSelectorBottomSheetState
     extends State<DueDateSelectorBottomSheet> {
   DateTime? _selectedDate;
+  DateTime? _selectedTime;
   final DateFormat _dateFormat = DateFormat('dd/MM/yyyy');
+  final DateFormat _timeFormat = DateFormat('HH:mm');
 
   @override
   void initState() {
     super.initState();
     _selectedDate = widget.selectedDueDate;
+    _selectedTime = widget.selectedDueTime;
   }
 
   List<DateOption> get _quickOptions {
@@ -68,9 +75,15 @@ class _DueDateSelectorBottomSheetState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.fromLTRB(
+        16.0,
+        16.0,
+        16.0,
+        16.0 + bottomPadding,
+      ),
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -87,18 +100,29 @@ class _DueDateSelectorBottomSheetState
             ),
           ),
           Text(
-            'Selecione a Data de Vencimento',
+            'Selecione a Data e Horário',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           if (_selectedDate != null)
-            Text(
-              'Data selecionada: ${_dateFormat.format(_selectedDate!)}',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
+            Column(
+              children: [
+                Text(
+                  'Data: ${_dateFormat.format(_selectedDate!)}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+                if (_selectedTime != null)
+                  Text(
+                    'Horário: ${_timeFormat.format(_selectedTime!)}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+              ],
             )
           else
             Text(
@@ -126,6 +150,18 @@ class _DueDateSelectorBottomSheetState
                   const SizedBox(height: 8),
                   ..._quickOptions.map((option) => _buildQuickOption(option)),
 
+
+                  const SizedBox(height: 16),
+
+                  Text(
+                    'Horário da Notificação',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildTimePickerOption(theme),
                   const SizedBox(height: 16),
 
                   Text(
@@ -155,6 +191,7 @@ class _DueDateSelectorBottomSheetState
                 child: ElevatedButton(
                   onPressed: () {
                     widget.onDueDateSelected(_selectedDate);
+                    widget.onDueTimeSelected(_selectedTime);
                     Navigator.of(context).pop();
                   },
                   child: const Text('Confirmar'),
@@ -172,7 +209,10 @@ class _DueDateSelectorBottomSheetState
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
-        onTap: () => setState(() => _selectedDate = null),
+        onTap: () => setState(() {
+          _selectedDate = null;
+          _selectedTime = null;
+        }),
         borderRadius: BorderRadius.circular(8),
         child: Container(
           padding: const EdgeInsets.all(12),
@@ -365,6 +405,99 @@ class _DueDateSelectorBottomSheetState
 
   DateTime _getEndOfMonth(DateTime date) {
     return DateTime(date.year, date.month + 1, 0);
+  }
+
+  Widget _buildTimePickerOption(ThemeData theme) {
+    return InkWell(
+      onTap: _showTimePicker,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: _selectedTime != null
+              ? theme.colorScheme.primary.withValues(alpha: 0.1)
+              : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: _selectedTime != null
+                ? theme.colorScheme.primary.withValues(alpha: 0.2)
+                : theme.colorScheme.onSurface.withValues(alpha: 0.1),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.access_time,
+              color: _selectedTime != null
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                _selectedTime != null
+                    ? 'Horário: ${_timeFormat.format(_selectedTime!)}'
+                    : 'Escolher horário (opcional)',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: _selectedTime != null
+                      ? FontWeight.w600
+                      : FontWeight.w500,
+                  color: _selectedTime != null
+                      ? theme.colorScheme.primary.withValues(alpha: 0.9)
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+            ),
+            if (_selectedTime != null)
+              IconButton(
+                icon: Icon(
+                  Icons.clear,
+                  size: 20,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                onPressed: () => setState(() => _selectedTime = null),
+              )
+            else
+              Icon(
+                Icons.keyboard_arrow_right,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showTimePicker() async {
+    final now = DateTime.now();
+    final initialTime = _selectedTime != null
+        ? TimeOfDay(hour: _selectedTime!.hour, minute: _selectedTime!.minute)
+        : TimeOfDay(hour: 9, minute: 0);
+
+    try {
+      final picked = await showTimePicker(
+        context: context,
+        initialTime: initialTime,
+        helpText: 'Selecione o horário para notificação',
+        cancelText: 'Cancelar',
+        confirmText: 'Confirmar',
+      );
+
+      if (picked != null) {
+        setState(() {
+          _selectedTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            picked.hour,
+            picked.minute,
+          );
+        });
+      }
+    } catch (e) {
+      log('Erro ao abrir TimePicker: $e');
+    }
   }
 }
 

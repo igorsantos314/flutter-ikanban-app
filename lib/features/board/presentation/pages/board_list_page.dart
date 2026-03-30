@@ -8,7 +8,7 @@ import 'package:flutter_ikanban_app/features/board/domain/services/board_selecti
 import 'package:flutter_ikanban_app/features/board/presentation/bloc/board_list_bloc.dart';
 import 'package:flutter_ikanban_app/features/board/presentation/events/board_list_event.dart';
 import 'package:flutter_ikanban_app/features/board/presentation/states/board_list_state.dart';
-import 'package:flutter_ikanban_app/features/board/presentation/widgets/board_create_dialog.dart';
+import 'package:flutter_ikanban_app/features/board/presentation/widgets/board_form_bottom_sheet.dart';
 import 'package:flutter_ikanban_app/features/board/presentation/widgets/board_delete_dialog.dart';
 
 class BoardListPage extends StatelessWidget {
@@ -67,12 +67,7 @@ class _BoardListPageContentState extends State<BoardListPageContent> {
           );
         },
       ),
-      body: BlocConsumer<BoardListBloc, BoardListState>(
-        listener: (context, state) {
-          if (state.showCreateDialog) {
-            _showCreateBoardDialog(context);
-          }
-        },
+      body: BlocBuilder<BoardListBloc, BoardListState>(
         builder: (context, state) {
           if (state.isLoading && state.boards.isEmpty) {
             return const Center(child: CircularProgressIndicator());
@@ -183,7 +178,38 @@ class _BoardListPageContentState extends State<BoardListPageContent> {
                                         overflow: TextOverflow.ellipsis,
                                       )
                                     : null,
-                                trailing: const Icon(Icons.arrow_forward_ios),
+                                trailing: PopupMenuButton<String>(
+                                  icon: const Icon(Icons.more_vert),
+                                  onSelected: (value) {
+                                    if (value == 'edit') {
+                                      _showEditBoardBottomSheet(context, board);
+                                    } else if (value == 'delete') {
+                                      _showDeleteBoardDialog(context, board);
+                                    }
+                                  },
+                                  itemBuilder: (context) => [
+                                    const PopupMenuItem(
+                                      value: 'edit',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.edit, size: 20),
+                                          SizedBox(width: 12),
+                                          Text('Editar'),
+                                        ],
+                                      ),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 'delete',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.delete, size: 20, color: Colors.red),
+                                          SizedBox(width: 12),
+                                          Text('Excluir', style: TextStyle(color: Colors.red)),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                                 onTap: () {
                                   context
                                       .read<BoardListBloc>()
@@ -192,9 +218,6 @@ class _BoardListPageContentState extends State<BoardListPageContent> {
                                   getIt<BoardSelectionService>().selectBoard(board);
                                   // Navigate to tasks page
                                   AppNavigation.navigateToTasks(context);
-                                },
-                                onLongPress: () {
-                                  _showDeleteBoardDialog(context, board);
                                 },
                               ),
                             );
@@ -207,20 +230,29 @@ class _BoardListPageContentState extends State<BoardListPageContent> {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateBoardDialog(context),
+        onPressed: () => _showCreateBoardBottomSheet(context),
         icon: const Icon(Icons.add),
         label: const Text('Novo Quadro'),
       ),
     );
   }
 
-  void _showCreateBoardDialog(BuildContext context) {
-    showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => const BoardCreateDialog(),
-    ).then((created) {
-      // Only refresh the boards list if a board was created
+  void _showCreateBoardBottomSheet(BuildContext context) {
+    BoardFormBottomSheet.showCreate(context: context).then((created) {
+      // Refresh the boards list if a board was created
       if (created == true && context.mounted) {
+        context.read<BoardListBloc>().add(RefreshBoardsEvent());
+      }
+    });
+  }
+
+  void _showEditBoardBottomSheet(BuildContext context, BoardModel board) {
+    BoardFormBottomSheet.showEdit(
+      context: context,
+      board: board,
+    ).then((updated) {
+      // Refresh the boards list if the board was updated
+      if (updated == true && context.mounted) {
         context.read<BoardListBloc>().add(RefreshBoardsEvent());
       }
     });

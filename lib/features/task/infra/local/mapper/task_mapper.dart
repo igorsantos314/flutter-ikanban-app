@@ -11,12 +11,15 @@ class TaskMapper {
       status: Value(model.status),
       priority: Value(model.priority),
       dueDate: model.dueDate != null ? Value(model.dueDate!) : const Value.absent(),
+      dueTime: model.dueTime != null ? Value(model.dueTime!) : const Value.absent(),
       complexity: Value(model.complexity),
       type: Value(model.type),
       color: Value(model.color),
       isActive: Value(model.isActive),
       createdAt: Value(model.createdAt),
       boardId: model.boardId != null ? Value(model.boardId!) : const Value.absent(),
+      shouldNotify: Value(model.shouldNotify),
+      notifyMinutesBefore: model.notifyMinutesBefore != null ? Value(model.notifyMinutesBefore!) : const Value.absent(),
     );
   }
   
@@ -28,12 +31,15 @@ class TaskMapper {
       status: entity.status,
       priority: entity.priority,
       dueDate: entity.dueDate,
+      dueTime: entity.dueTime,
       complexity: entity.complexity,
       type: entity.type,
       color: entity.color,
       isActive: entity.isActive,
       createdAt: entity.createdAt,
       boardId: entity.boardId,
+      shouldNotify: entity.shouldNotify,
+      notifyMinutesBefore: entity.notifyMinutesBefore,
     );
   }
 }

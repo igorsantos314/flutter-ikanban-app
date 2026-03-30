@@ -8,6 +8,7 @@ import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_c
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_priority_enum_extensions.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_status_enum_extensions.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_type_enum_extensions.dart';
+import 'package:intl/intl.dart';
 
 class TaskItemList extends StatelessWidget {
   final TaskModel task;
@@ -170,7 +171,7 @@ class TaskItemList extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '${task.dueDate!.day}/${task.dueDate!.month}/${task.dueDate!.year}',
+                            '${DateFormat('dd/MM/yyyy').format(task.dueDate!)} ${task.dueTime != null ? '- ${DateFormat('HH:mm').format(task.dueTime!)}' : ''}',
                             textAlign: TextAlign.start,
                             style: TextStyle(
                               fontSize: 11,

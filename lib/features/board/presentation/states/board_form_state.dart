@@ -1,4 +1,5 @@
 class BoardFormState {
+  final int? boardId; // null = create, non-null = edit
   final String title;
   final String? description;
   final String? color;
@@ -9,6 +10,7 @@ class BoardFormState {
   final bool closeDialog;
 
   const BoardFormState({
+    this.boardId,
     required this.title,
     this.description,
     this.color,
@@ -18,6 +20,8 @@ class BoardFormState {
     this.showNotification = false,
     this.closeDialog = false,
   });
+
+  bool get isEditMode => boardId != null;
 
   factory BoardFormState.initial() {
     return const BoardFormState(
@@ -29,6 +33,7 @@ class BoardFormState {
   }
 
   BoardFormState copyWith({
+    int? boardId,
     String? title,
     String? description,
     String? color,
@@ -39,6 +44,7 @@ class BoardFormState {
     bool? closeDialog,
   }) {
     return BoardFormState(
+      boardId: boardId ?? this.boardId,
       title: title ?? this.title,
       description: description ?? this.description,
       color: color ?? this.color,

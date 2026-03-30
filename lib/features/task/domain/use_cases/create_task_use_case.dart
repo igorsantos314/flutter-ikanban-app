@@ -7,11 +7,15 @@ enum CreateTaskUseCaseError { invalidDataError, genericError }
 
 class CreateTaskUseCase {
   final TaskRepository taskRepository;
+  
   CreateTaskUseCase(this.taskRepository);
+  
   Future<Outcome<void, CreateTaskUseCaseError>> execute(TaskModel task) async {
     final result = await taskRepository.createTask(task);
     return result.when(
-      success: (_) => const Outcome.success(),
+      success: (generatedId) async {
+        return const Outcome.success();
+      },
       failure: (error, message, throwable) {
         switch (error) {
           case TaskRepositoryErrors.validationError:

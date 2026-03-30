@@ -25,12 +25,14 @@ class DateSelectorField<TBloc extends StateStreamable<TState>, TState>
     extends StatelessWidget {
   final String title;
   final DateTime? selectedDate;
+  final DateTime? selectedTime;
   final VoidCallback onTap;
 
   const DateSelectorField({
     super.key,
     required this.title,
     required this.selectedDate,
+    this.selectedTime,
     required this.onTap,
   });
 
@@ -50,7 +52,7 @@ class DateSelectorField<TBloc extends StateStreamable<TState>, TState>
         const SizedBox(height: 8),
         BlocBuilder<TBloc, TState>(
           builder: (context, state) {
-            final dateData = _calculateDateData(selectedDate);
+            final dateData = _calculateDateData(selectedDate, selectedTime);
 
             return InkWell(
               onTap: onTap,
@@ -134,8 +136,9 @@ class DateSelectorField<TBloc extends StateStreamable<TState>, TState>
   }
 
   /// Calcula as informações de exibição da data baseado na data selecionada
-  DateSelectorData _calculateDateData(DateTime? date) {
+  DateSelectorData _calculateDateData(DateTime? date, DateTime? time) {
     final dateFormat = DateFormat('dd/MM/yyyy');
+    final timeFormat = DateFormat('HH:mm');
     final now = DateTime.now();
 
     if (date == null) {
@@ -165,40 +168,44 @@ class DateSelectorField<TBloc extends StateStreamable<TState>, TState>
         date.day == tomorrow.day;
 
     if (isOverdue) {
+      final timeText = time != null ? ' às ${timeFormat.format(time)}' : '';
       return DateSelectorData(
         selectedDate: date,
         color: Colors.red,
         icon: Icons.warning,
-        text: 'Atrasada - ${dateFormat.format(date)}',
+        text: 'Atrasada - ${dateFormat.format(date)}$timeText',
         subtitle: 'Esta tarefa está atrasada',
       );
     }
 
     if (isToday) {
+      final timeText = time != null ? ' às ${timeFormat.format(time)}' : '';
       return DateSelectorData(
         selectedDate: date,
         color: Colors.orange,
         icon: Icons.today,
-        text: 'Hoje - ${dateFormat.format(date)}',
+        text: 'Hoje - ${dateFormat.format(date)}$timeText',
         subtitle: 'Vence hoje',
       );
     }
 
     if (isTomorrow) {
+      final timeText = time != null ? ' às ${timeFormat.format(time)}' : '';
       return DateSelectorData(
         selectedDate: date,
         color: Colors.blue,
         icon: Icons.wb_sunny,
-        text: 'Amanhã - ${dateFormat.format(date)}',
+        text: 'Amanhã - ${dateFormat.format(date)}$timeText',
         subtitle: 'Vence amanhã',
       );
     }
 
+    final timeText = time != null ? ' às ${timeFormat.format(time)}' : '';
     return DateSelectorData(
       selectedDate: date,
       color: Colors.green,
       icon: Icons.schedule,
-      text: dateFormat.format(date),
+      text: '${dateFormat.format(date)}$timeText',
       subtitle: 'Vencimento futuro',
     );
   }

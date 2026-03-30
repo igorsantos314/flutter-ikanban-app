@@ -98,6 +98,15 @@ class ToggleLayoutModeEvent extends TaskEvent {
   const ToggleLayoutModeEvent();
 }
 
+class ShowTaskDetailsEvent extends TaskEvent {
+  final TaskModel task;
+
+  const ShowTaskDetailsEvent({required this.task});
+
+  @override
+  List<Object> get props => [task];
+}
+
 class ToggleTaskItemSizeEvent extends TaskEvent {
   const ToggleTaskItemSizeEvent();
 }
@@ -133,15 +142,6 @@ class ApplySortEvent extends TaskEvent {
 
   @override
   List<Object> get props => [sortBy, sortOrder];
-}
-
-class ShowTaskDetailsEvent extends TaskEvent {
-  final TaskModel task;
-
-  const ShowTaskDetailsEvent({required this.task});
-
-  @override
-  List<Object> get props => [task];
 }
 
 class WatchTaskListEditsEvent extends TaskEvent {

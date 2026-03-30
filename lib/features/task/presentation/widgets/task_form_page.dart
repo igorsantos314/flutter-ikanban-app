@@ -208,12 +208,15 @@ class _TaskFormPageState extends State<TaskFormPage>
                     DateSelectorField<TaskFormBloc, TaskFormState>(
                       title: 'Data de Vencimento',
                       selectedDate: state.dueDate,
+                      selectedTime: state.dueTime,
                       onTap: () {
                         _removeFocus();
                         showDueDateSelector(context, state);
                       },
                     ),
-                    const SizedBox(height: 32),
+                    
+                    // Space for floating action buttons
+                    const SizedBox(height: 128),
                   ],
                 ),
               ),

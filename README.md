@@ -41,7 +41,7 @@ lib/
 │   ├── ui/                # Componentes UI reutilizáveis
 │   └── utils/             # Utilitários e helpers
 ├── features/               # Funcionalidades por domínio
-│   ├── board/             # Funcionalidade do quadro Kanban (Em desenvolvimento)
+│   ├── board/             # Funcionalidade do quadro Kanban
 │   ├── task/              # Gerenciamento de tarefas
 │   └── settings/          # Configurações da aplicação
 └── main.dart              # Ponto de entrada da aplicação
@@ -83,6 +83,13 @@ dev_dependencies:
 
 ## 🚀 Funcionalidades
 
+### 📋 **Gerenciamento de Quadros Kanban**
+- ✅ **CRUD completo** - Criar, editar, visualizar e excluir quadros
+- 🎨 **Sistema de cores** personalizáveis para quadros
+- 📁 **Organização** - Agrupe suas tarefas em diferentes quadros
+- 🔄 **Seleção de quadro ativo** - Trabalhe com um quadro por vez
+- 📊 **Visualização em lista** com informações sobre tarefas
+
 ### 📋 **Gerenciamento de Tarefas**
 - ✅ **CRUD completo** - Criar, editar, visualizar e excluir tarefas
 - 🏷️ **Categorização avançada**:
@@ -92,12 +99,15 @@ dev_dependencies:
   - **Tipo**: Pessoal, Trabalho, Estudo, Projeto
 - 🎨 **Sistema de cores** personalizáveis para tarefas
 - 📅 **Datas de vencimento** com controle temporal
-- 🔍 **Busca inteligente** com filtros avançados
+- � **Sistema de notificações** - Receba lembretes sobre suas tarefas
+- 👥 **Vinculação de tarefas a quadros** - Organize tarefas dentro de quadros específicos
+- �🔍 **Busca inteligente** com filtros avançados
 
 ### 🎛️ **Interface e UX**
 - 📱 **AppBar customizada** com busca expansível
 - 🌙 **Modo escuro/claro** com alternância automática
 - 📊 **Visualização em Kanban** para fluxo de trabalho
+- 🎨 **Cards coloridos** para fácil identificação visual
 - 📱 **Design responsivo** para todas as telas
 
 ### 🔧 **Configurações**
@@ -108,7 +118,12 @@ dev_dependencies:
 
 ## 📱 Screenshots
 
-### 🏠 Tela Principal - Lista de Tarefas
+### 🏛️ Gerência de Quadros
+- Lista de quadros com cores personalizadas
+- Criação e edição de quadros
+- Visualização de estatísticas de tarefas por quadro
+
+### �🏠 Tela Principal - Lista de Tarefas
 - Visualização em lista com filtros
 - Cards coloridos por categoria
 - Indicadores de status e prioridade
@@ -285,13 +300,12 @@ Este projeto está sob a licença **MIT**. Veja o arquivo `LICENSE` para mais de
 ## 🎯 Roadmap
 
 ### 🔮 **Próximas Funcionalidades:**
-- [ ] 🔔 Sistema de notificações push
-- [ ] ☁️ Sincronização em nuvem
-- [ ] 👥 Colaboração em equipe
 - [ ] 📊 Relatórios e analytics
 - [ ] 🔄 Integração com APIs externas
 - [ ] 📱 Widget para tela inicial
 - [ ] 🎵 Sons e haptic feedback
+- [ ] ☁️ Sincronização em nuvem
+- [ ] 👥 Colaboração em equipe
 
 ### 🛠️ **Melhorias Técnicas:**
 - [ ] 🧪 Aumentar cobertura de testes

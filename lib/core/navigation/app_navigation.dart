@@ -94,7 +94,7 @@ class AppNavigation {
   }
 
   static void navigateToTasks(BuildContext context) {
-    context.go(tasks);
+    context.push(tasks);
   }
 
   static void navigateToTask(BuildContext context, {int? taskId}) {
@@ -106,7 +106,7 @@ class AppNavigation {
   }
 
   static void navigateToSettings(BuildContext context) {
-    context.go(settings);
+    context.push(settings);
   }
 
   static void navigateToOnboarding(BuildContext context) {

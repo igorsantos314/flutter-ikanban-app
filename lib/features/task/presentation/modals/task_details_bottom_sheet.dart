@@ -221,7 +221,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                               : Colors.grey,
                           label: 'Vencimento',
                           value: task.dueDate != null
-                              ? DateFormat('dd/MM/yyyy').format(task.dueDate!)
+                              ? "${DateFormat('dd/MM/yyyy').format(task.dueDate!)} ${task.dueTime != null ? DateFormat('HH:mm').format(task.dueTime!) : ''}"
                               : 'Sem data',
                           description: task.dueDate != null
                               ? _getDateDescription(task.dueDate!)
@@ -252,7 +252,9 @@ class TaskDetailsBottomSheet extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
+
+            const SizedBox(height: 4),
 
             // Action buttons
             Row(
