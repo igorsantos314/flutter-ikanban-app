@@ -1,7 +1,7 @@
 name: flutter_ikanban_app
-description: "A new Flutter project."
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 0.6.0+14
+description: "A kanban board app built with Flutter, featuring task management and local data persistence using SQLite. The app allows users to create, update, and organize tasks across different columns (e.g., To Do, In Progress, Done and others) while providing a smooth and intuitive user experience."
+publish_to: 'none'
+version: 0.7.1+15
 
 environment:
   sdk: ^3.9.2
