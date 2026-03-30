@@ -16,8 +16,6 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
   final TaskComplexity? complexity;
   final TaskType? type;
   final TaskColors? color;
-  final bool? shouldNotify;
-  final int? notifyMinutesBefore;
 
   const TaskFormUpdateFieldsEvent({
     this.title,
@@ -29,8 +27,6 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
     this.complexity,
     this.type,
     this.color,
-    this.shouldNotify,
-    this.notifyMinutesBefore,
   });
 
   @override
@@ -44,8 +40,6 @@ class TaskFormUpdateFieldsEvent extends TaskEvent {
     ?complexity,
     ?type,
     ?color,
-    ?shouldNotify,
-    ?notifyMinutesBefore,
   ];
 }
 

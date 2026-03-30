@@ -164,11 +164,11 @@ void _setupTaskModule() {
   );
 
   getIt.registerLazySingleton<CreateTaskUseCase>(
-    () => CreateTaskUseCase(getIt(), getIt()),
+    () => CreateTaskUseCase(getIt()),
   );
 
   getIt.registerLazySingleton<UpdateTaskUseCase>(
-    () => UpdateTaskUseCase(getIt(), getIt()),
+    () => UpdateTaskUseCase(getIt()),
   );
 
   getIt.registerLazySingleton<GetTaskByIdUseCase>(

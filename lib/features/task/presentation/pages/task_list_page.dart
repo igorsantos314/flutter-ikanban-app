@@ -466,14 +466,6 @@ class _TaskListPageContentState extends State<TaskListPageContent>
             ToggleTaskCompletionEvent(id: task.id!),
           );
         },
-        onToggleNotification: (shouldNotify) {
-          context.read<TaskListBloc>().add(
-            ToggleTaskNotificationEvent(
-              task: task,
-              shouldNotify: shouldNotify,
-            ),
-          );
-        },
       );
     }
   }

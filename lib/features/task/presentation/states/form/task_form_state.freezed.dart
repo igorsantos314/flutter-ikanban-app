@@ -14,8 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TaskFormState {
 
- int? get taskId; int? get boardId; String get title; String? get titleError; String get description; String? get descriptionError; TaskStatus get status; TaskPriority get priority; DateTime? get dueDate; DateTime? get dueTime; TaskComplexity get complexity; TaskType get type; TaskColors get color;// Notification fields
- bool get shouldNotify; int? get notifyMinutesBefore; bool get showNotification; NotificationType get notificationType; String get notificationMessage; bool get closeScreen; bool get isLoading; String? get errorMessage;
+ int? get taskId; int? get boardId; String get title; String? get titleError; String get description; String? get descriptionError; TaskStatus get status; TaskPriority get priority; DateTime? get dueDate; DateTime? get dueTime; TaskComplexity get complexity; TaskType get type; TaskColors get color; bool get showNotification; NotificationType get notificationType; String get notificationMessage; bool get closeScreen; bool get isLoading; String? get errorMessage;
 /// Create a copy of TaskFormState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +25,16 @@ $TaskFormStateCopyWith<TaskFormState> get copyWith => _$TaskFormStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskFormState&&(identical(other.taskId, taskId) || other.taskId == taskId)&&(identical(other.boardId, boardId) || other.boardId == boardId)&&(identical(other.title, title) || other.title == title)&&(identical(other.titleError, titleError) || other.titleError == titleError)&&(identical(other.description, description) || other.description == description)&&(identical(other.descriptionError, descriptionError) || other.descriptionError == descriptionError)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.dueTime, dueTime) || other.dueTime == dueTime)&&(identical(other.complexity, complexity) || other.complexity == complexity)&&(identical(other.type, type) || other.type == type)&&(identical(other.color, color) || other.color == color)&&(identical(other.shouldNotify, shouldNotify) || other.shouldNotify == shouldNotify)&&(identical(other.notifyMinutesBefore, notifyMinutesBefore) || other.notifyMinutesBefore == notifyMinutesBefore)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage)&&(identical(other.closeScreen, closeScreen) || other.closeScreen == closeScreen)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskFormState&&(identical(other.taskId, taskId) || other.taskId == taskId)&&(identical(other.boardId, boardId) || other.boardId == boardId)&&(identical(other.title, title) || other.title == title)&&(identical(other.titleError, titleError) || other.titleError == titleError)&&(identical(other.description, description) || other.description == description)&&(identical(other.descriptionError, descriptionError) || other.descriptionError == descriptionError)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.dueTime, dueTime) || other.dueTime == dueTime)&&(identical(other.complexity, complexity) || other.complexity == complexity)&&(identical(other.type, type) || other.type == type)&&(identical(other.color, color) || other.color == color)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage)&&(identical(other.closeScreen, closeScreen) || other.closeScreen == closeScreen)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hashAll([runtimeType,taskId,boardId,title,titleError,description,descriptionError,status,priority,dueDate,dueTime,complexity,type,color,shouldNotify,notifyMinutesBefore,showNotification,notificationType,notificationMessage,closeScreen,isLoading,errorMessage]);
+int get hashCode => Object.hashAll([runtimeType,taskId,boardId,title,titleError,description,descriptionError,status,priority,dueDate,dueTime,complexity,type,color,showNotification,notificationType,notificationMessage,closeScreen,isLoading,errorMessage]);
 
 @override
 String toString() {
-  return 'TaskFormState(taskId: $taskId, boardId: $boardId, title: $title, titleError: $titleError, description: $description, descriptionError: $descriptionError, status: $status, priority: $priority, dueDate: $dueDate, dueTime: $dueTime, complexity: $complexity, type: $type, color: $color, shouldNotify: $shouldNotify, notifyMinutesBefore: $notifyMinutesBefore, showNotification: $showNotification, notificationType: $notificationType, notificationMessage: $notificationMessage, closeScreen: $closeScreen, isLoading: $isLoading, errorMessage: $errorMessage)';
+  return 'TaskFormState(taskId: $taskId, boardId: $boardId, title: $title, titleError: $titleError, description: $description, descriptionError: $descriptionError, status: $status, priority: $priority, dueDate: $dueDate, dueTime: $dueTime, complexity: $complexity, type: $type, color: $color, showNotification: $showNotification, notificationType: $notificationType, notificationMessage: $notificationMessage, closeScreen: $closeScreen, isLoading: $isLoading, errorMessage: $errorMessage)';
 }
 
 
@@ -46,7 +45,7 @@ abstract mixin class $TaskFormStateCopyWith<$Res>  {
   factory $TaskFormStateCopyWith(TaskFormState value, $Res Function(TaskFormState) _then) = _$TaskFormStateCopyWithImpl;
 @useResult
 $Res call({
- int? taskId, int? boardId, String title, String? titleError, String description, String? descriptionError, TaskStatus status, TaskPriority priority, DateTime? dueDate, DateTime? dueTime, TaskComplexity complexity, TaskType type, TaskColors color, bool shouldNotify, int? notifyMinutesBefore, bool showNotification, NotificationType notificationType, String notificationMessage, bool closeScreen, bool isLoading, String? errorMessage
+ int? taskId, int? boardId, String title, String? titleError, String description, String? descriptionError, TaskStatus status, TaskPriority priority, DateTime? dueDate, DateTime? dueTime, TaskComplexity complexity, TaskType type, TaskColors color, bool showNotification, NotificationType notificationType, String notificationMessage, bool closeScreen, bool isLoading, String? errorMessage
 });
 
 
@@ -63,7 +62,7 @@ class _$TaskFormStateCopyWithImpl<$Res>
 
 /// Create a copy of TaskFormState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? taskId = freezed,Object? boardId = freezed,Object? title = null,Object? titleError = freezed,Object? description = null,Object? descriptionError = freezed,Object? status = null,Object? priority = null,Object? dueDate = freezed,Object? dueTime = freezed,Object? complexity = null,Object? type = null,Object? color = null,Object? shouldNotify = null,Object? notifyMinutesBefore = freezed,Object? showNotification = null,Object? notificationType = null,Object? notificationMessage = null,Object? closeScreen = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? taskId = freezed,Object? boardId = freezed,Object? title = null,Object? titleError = freezed,Object? description = null,Object? descriptionError = freezed,Object? status = null,Object? priority = null,Object? dueDate = freezed,Object? dueTime = freezed,Object? complexity = null,Object? type = null,Object? color = null,Object? showNotification = null,Object? notificationType = null,Object? notificationMessage = null,Object? closeScreen = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
 as int?,boardId: freezed == boardId ? _self.boardId : boardId // ignore: cast_nullable_to_non_nullable
@@ -78,9 +77,7 @@ as DateTime?,dueTime: freezed == dueTime ? _self.dueTime : dueTime // ignore: ca
 as DateTime?,complexity: null == complexity ? _self.complexity : complexity // ignore: cast_nullable_to_non_nullable
 as TaskComplexity,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as TaskType,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
-as TaskColors,shouldNotify: null == shouldNotify ? _self.shouldNotify : shouldNotify // ignore: cast_nullable_to_non_nullable
-as bool,notifyMinutesBefore: freezed == notifyMinutesBefore ? _self.notifyMinutesBefore : notifyMinutesBefore // ignore: cast_nullable_to_non_nullable
-as int?,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
+as TaskColors,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
 as bool,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
 as NotificationType,notificationMessage: null == notificationMessage ? _self.notificationMessage : notificationMessage // ignore: cast_nullable_to_non_nullable
 as String,closeScreen: null == closeScreen ? _self.closeScreen : closeScreen // ignore: cast_nullable_to_non_nullable
@@ -171,10 +168,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? taskId,  int? boardId,  String title,  String? titleError,  String description,  String? descriptionError,  TaskStatus status,  TaskPriority priority,  DateTime? dueDate,  DateTime? dueTime,  TaskComplexity complexity,  TaskType type,  TaskColors color,  bool shouldNotify,  int? notifyMinutesBefore,  bool showNotification,  NotificationType notificationType,  String notificationMessage,  bool closeScreen,  bool isLoading,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? taskId,  int? boardId,  String title,  String? titleError,  String description,  String? descriptionError,  TaskStatus status,  TaskPriority priority,  DateTime? dueDate,  DateTime? dueTime,  TaskComplexity complexity,  TaskType type,  TaskColors color,  bool showNotification,  NotificationType notificationType,  String notificationMessage,  bool closeScreen,  bool isLoading,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TaskFormState() when $default != null:
-return $default(_that.taskId,_that.boardId,_that.title,_that.titleError,_that.description,_that.descriptionError,_that.status,_that.priority,_that.dueDate,_that.dueTime,_that.complexity,_that.type,_that.color,_that.shouldNotify,_that.notifyMinutesBefore,_that.showNotification,_that.notificationType,_that.notificationMessage,_that.closeScreen,_that.isLoading,_that.errorMessage);case _:
+return $default(_that.taskId,_that.boardId,_that.title,_that.titleError,_that.description,_that.descriptionError,_that.status,_that.priority,_that.dueDate,_that.dueTime,_that.complexity,_that.type,_that.color,_that.showNotification,_that.notificationType,_that.notificationMessage,_that.closeScreen,_that.isLoading,_that.errorMessage);case _:
   return orElse();
 
 }
@@ -192,10 +189,10 @@ return $default(_that.taskId,_that.boardId,_that.title,_that.titleError,_that.de
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? taskId,  int? boardId,  String title,  String? titleError,  String description,  String? descriptionError,  TaskStatus status,  TaskPriority priority,  DateTime? dueDate,  DateTime? dueTime,  TaskComplexity complexity,  TaskType type,  TaskColors color,  bool shouldNotify,  int? notifyMinutesBefore,  bool showNotification,  NotificationType notificationType,  String notificationMessage,  bool closeScreen,  bool isLoading,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? taskId,  int? boardId,  String title,  String? titleError,  String description,  String? descriptionError,  TaskStatus status,  TaskPriority priority,  DateTime? dueDate,  DateTime? dueTime,  TaskComplexity complexity,  TaskType type,  TaskColors color,  bool showNotification,  NotificationType notificationType,  String notificationMessage,  bool closeScreen,  bool isLoading,  String? errorMessage)  $default,) {final _that = this;
 switch (_that) {
 case _TaskFormState():
-return $default(_that.taskId,_that.boardId,_that.title,_that.titleError,_that.description,_that.descriptionError,_that.status,_that.priority,_that.dueDate,_that.dueTime,_that.complexity,_that.type,_that.color,_that.shouldNotify,_that.notifyMinutesBefore,_that.showNotification,_that.notificationType,_that.notificationMessage,_that.closeScreen,_that.isLoading,_that.errorMessage);case _:
+return $default(_that.taskId,_that.boardId,_that.title,_that.titleError,_that.description,_that.descriptionError,_that.status,_that.priority,_that.dueDate,_that.dueTime,_that.complexity,_that.type,_that.color,_that.showNotification,_that.notificationType,_that.notificationMessage,_that.closeScreen,_that.isLoading,_that.errorMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -212,10 +209,10 @@ return $default(_that.taskId,_that.boardId,_that.title,_that.titleError,_that.de
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? taskId,  int? boardId,  String title,  String? titleError,  String description,  String? descriptionError,  TaskStatus status,  TaskPriority priority,  DateTime? dueDate,  DateTime? dueTime,  TaskComplexity complexity,  TaskType type,  TaskColors color,  bool shouldNotify,  int? notifyMinutesBefore,  bool showNotification,  NotificationType notificationType,  String notificationMessage,  bool closeScreen,  bool isLoading,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? taskId,  int? boardId,  String title,  String? titleError,  String description,  String? descriptionError,  TaskStatus status,  TaskPriority priority,  DateTime? dueDate,  DateTime? dueTime,  TaskComplexity complexity,  TaskType type,  TaskColors color,  bool showNotification,  NotificationType notificationType,  String notificationMessage,  bool closeScreen,  bool isLoading,  String? errorMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _TaskFormState() when $default != null:
-return $default(_that.taskId,_that.boardId,_that.title,_that.titleError,_that.description,_that.descriptionError,_that.status,_that.priority,_that.dueDate,_that.dueTime,_that.complexity,_that.type,_that.color,_that.shouldNotify,_that.notifyMinutesBefore,_that.showNotification,_that.notificationType,_that.notificationMessage,_that.closeScreen,_that.isLoading,_that.errorMessage);case _:
+return $default(_that.taskId,_that.boardId,_that.title,_that.titleError,_that.description,_that.descriptionError,_that.status,_that.priority,_that.dueDate,_that.dueTime,_that.complexity,_that.type,_that.color,_that.showNotification,_that.notificationType,_that.notificationMessage,_that.closeScreen,_that.isLoading,_that.errorMessage);case _:
   return null;
 
 }
@@ -227,7 +224,7 @@ return $default(_that.taskId,_that.boardId,_that.title,_that.titleError,_that.de
 
 
 class _TaskFormState implements TaskFormState {
-  const _TaskFormState({this.taskId, this.boardId, this.title = "", this.titleError = null, this.description = "", this.descriptionError = null, this.status = TaskStatus.backlog, this.priority = TaskPriority.low, this.dueDate, this.dueTime, this.complexity = TaskComplexity.easy, this.type = TaskType.personal, this.color = TaskColors.defaultColor, this.shouldNotify = false, this.notifyMinutesBefore, this.showNotification = false, this.notificationType = NotificationType.info, this.notificationMessage = "", this.closeScreen = false, this.isLoading = false, this.errorMessage});
+  const _TaskFormState({this.taskId, this.boardId, this.title = "", this.titleError = null, this.description = "", this.descriptionError = null, this.status = TaskStatus.backlog, this.priority = TaskPriority.low, this.dueDate, this.dueTime, this.complexity = TaskComplexity.easy, this.type = TaskType.personal, this.color = TaskColors.defaultColor, this.showNotification = false, this.notificationType = NotificationType.info, this.notificationMessage = "", this.closeScreen = false, this.isLoading = false, this.errorMessage});
   
 
 @override final  int? taskId;
@@ -243,9 +240,6 @@ class _TaskFormState implements TaskFormState {
 @override@JsonKey() final  TaskComplexity complexity;
 @override@JsonKey() final  TaskType type;
 @override@JsonKey() final  TaskColors color;
-// Notification fields
-@override@JsonKey() final  bool shouldNotify;
-@override final  int? notifyMinutesBefore;
 @override@JsonKey() final  bool showNotification;
 @override@JsonKey() final  NotificationType notificationType;
 @override@JsonKey() final  String notificationMessage;
@@ -263,16 +257,16 @@ _$TaskFormStateCopyWith<_TaskFormState> get copyWith => __$TaskFormStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskFormState&&(identical(other.taskId, taskId) || other.taskId == taskId)&&(identical(other.boardId, boardId) || other.boardId == boardId)&&(identical(other.title, title) || other.title == title)&&(identical(other.titleError, titleError) || other.titleError == titleError)&&(identical(other.description, description) || other.description == description)&&(identical(other.descriptionError, descriptionError) || other.descriptionError == descriptionError)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.dueTime, dueTime) || other.dueTime == dueTime)&&(identical(other.complexity, complexity) || other.complexity == complexity)&&(identical(other.type, type) || other.type == type)&&(identical(other.color, color) || other.color == color)&&(identical(other.shouldNotify, shouldNotify) || other.shouldNotify == shouldNotify)&&(identical(other.notifyMinutesBefore, notifyMinutesBefore) || other.notifyMinutesBefore == notifyMinutesBefore)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage)&&(identical(other.closeScreen, closeScreen) || other.closeScreen == closeScreen)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskFormState&&(identical(other.taskId, taskId) || other.taskId == taskId)&&(identical(other.boardId, boardId) || other.boardId == boardId)&&(identical(other.title, title) || other.title == title)&&(identical(other.titleError, titleError) || other.titleError == titleError)&&(identical(other.description, description) || other.description == description)&&(identical(other.descriptionError, descriptionError) || other.descriptionError == descriptionError)&&(identical(other.status, status) || other.status == status)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.dueTime, dueTime) || other.dueTime == dueTime)&&(identical(other.complexity, complexity) || other.complexity == complexity)&&(identical(other.type, type) || other.type == type)&&(identical(other.color, color) || other.color == color)&&(identical(other.showNotification, showNotification) || other.showNotification == showNotification)&&(identical(other.notificationType, notificationType) || other.notificationType == notificationType)&&(identical(other.notificationMessage, notificationMessage) || other.notificationMessage == notificationMessage)&&(identical(other.closeScreen, closeScreen) || other.closeScreen == closeScreen)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hashAll([runtimeType,taskId,boardId,title,titleError,description,descriptionError,status,priority,dueDate,dueTime,complexity,type,color,shouldNotify,notifyMinutesBefore,showNotification,notificationType,notificationMessage,closeScreen,isLoading,errorMessage]);
+int get hashCode => Object.hashAll([runtimeType,taskId,boardId,title,titleError,description,descriptionError,status,priority,dueDate,dueTime,complexity,type,color,showNotification,notificationType,notificationMessage,closeScreen,isLoading,errorMessage]);
 
 @override
 String toString() {
-  return 'TaskFormState(taskId: $taskId, boardId: $boardId, title: $title, titleError: $titleError, description: $description, descriptionError: $descriptionError, status: $status, priority: $priority, dueDate: $dueDate, dueTime: $dueTime, complexity: $complexity, type: $type, color: $color, shouldNotify: $shouldNotify, notifyMinutesBefore: $notifyMinutesBefore, showNotification: $showNotification, notificationType: $notificationType, notificationMessage: $notificationMessage, closeScreen: $closeScreen, isLoading: $isLoading, errorMessage: $errorMessage)';
+  return 'TaskFormState(taskId: $taskId, boardId: $boardId, title: $title, titleError: $titleError, description: $description, descriptionError: $descriptionError, status: $status, priority: $priority, dueDate: $dueDate, dueTime: $dueTime, complexity: $complexity, type: $type, color: $color, showNotification: $showNotification, notificationType: $notificationType, notificationMessage: $notificationMessage, closeScreen: $closeScreen, isLoading: $isLoading, errorMessage: $errorMessage)';
 }
 
 
@@ -283,7 +277,7 @@ abstract mixin class _$TaskFormStateCopyWith<$Res> implements $TaskFormStateCopy
   factory _$TaskFormStateCopyWith(_TaskFormState value, $Res Function(_TaskFormState) _then) = __$TaskFormStateCopyWithImpl;
 @override @useResult
 $Res call({
- int? taskId, int? boardId, String title, String? titleError, String description, String? descriptionError, TaskStatus status, TaskPriority priority, DateTime? dueDate, DateTime? dueTime, TaskComplexity complexity, TaskType type, TaskColors color, bool shouldNotify, int? notifyMinutesBefore, bool showNotification, NotificationType notificationType, String notificationMessage, bool closeScreen, bool isLoading, String? errorMessage
+ int? taskId, int? boardId, String title, String? titleError, String description, String? descriptionError, TaskStatus status, TaskPriority priority, DateTime? dueDate, DateTime? dueTime, TaskComplexity complexity, TaskType type, TaskColors color, bool showNotification, NotificationType notificationType, String notificationMessage, bool closeScreen, bool isLoading, String? errorMessage
 });
 
 
@@ -300,7 +294,7 @@ class __$TaskFormStateCopyWithImpl<$Res>
 
 /// Create a copy of TaskFormState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? taskId = freezed,Object? boardId = freezed,Object? title = null,Object? titleError = freezed,Object? description = null,Object? descriptionError = freezed,Object? status = null,Object? priority = null,Object? dueDate = freezed,Object? dueTime = freezed,Object? complexity = null,Object? type = null,Object? color = null,Object? shouldNotify = null,Object? notifyMinutesBefore = freezed,Object? showNotification = null,Object? notificationType = null,Object? notificationMessage = null,Object? closeScreen = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? taskId = freezed,Object? boardId = freezed,Object? title = null,Object? titleError = freezed,Object? description = null,Object? descriptionError = freezed,Object? status = null,Object? priority = null,Object? dueDate = freezed,Object? dueTime = freezed,Object? complexity = null,Object? type = null,Object? color = null,Object? showNotification = null,Object? notificationType = null,Object? notificationMessage = null,Object? closeScreen = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
   return _then(_TaskFormState(
 taskId: freezed == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
 as int?,boardId: freezed == boardId ? _self.boardId : boardId // ignore: cast_nullable_to_non_nullable
@@ -315,9 +309,7 @@ as DateTime?,dueTime: freezed == dueTime ? _self.dueTime : dueTime // ignore: ca
 as DateTime?,complexity: null == complexity ? _self.complexity : complexity // ignore: cast_nullable_to_non_nullable
 as TaskComplexity,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as TaskType,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
-as TaskColors,shouldNotify: null == shouldNotify ? _self.shouldNotify : shouldNotify // ignore: cast_nullable_to_non_nullable
-as bool,notifyMinutesBefore: freezed == notifyMinutesBefore ? _self.notifyMinutesBefore : notifyMinutesBefore // ignore: cast_nullable_to_non_nullable
-as int?,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
+as TaskColors,showNotification: null == showNotification ? _self.showNotification : showNotification // ignore: cast_nullable_to_non_nullable
 as bool,notificationType: null == notificationType ? _self.notificationType : notificationType // ignore: cast_nullable_to_non_nullable
 as NotificationType,notificationMessage: null == notificationMessage ? _self.notificationMessage : notificationMessage // ignore: cast_nullable_to_non_nullable
 as String,closeScreen: null == closeScreen ? _self.closeScreen : closeScreen // ignore: cast_nullable_to_non_nullable

@@ -59,8 +59,6 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         dueDate: event.dueDate ?? state.dueDate,
         dueTime: event.dueTime ?? state.dueTime,
         color: event.color ?? state.color,
-        shouldNotify: event.shouldNotify ?? state.shouldNotify,
-        notifyMinutesBefore: event.notifyMinutesBefore ?? state.notifyMinutesBefore,
       ),
     );
   }
@@ -73,7 +71,6 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     print('[📝 BLOC] CREATE TASK EVENT RECEIVED');
     print('[📝 BLOC] ========================================');
     print('[📝 BLOC] Title: ${state.title}');
-    print('[📝 BLOC] shouldNotify: ${state.shouldNotify}');
     print('[📝 BLOC] dueDate: ${state.dueDate}');
     print('[📝 BLOC] dueTime: ${state.dueTime}');
     
@@ -88,12 +85,8 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     }
 
     try {
-      print('[📝 BLOC] Getting board ID...');
       // Get the selected board ID from the service
       final boardId = getIt<BoardSelectionService>().selectedBoard?.id;
-      print('[📝 BLOC] Board ID: $boardId');
-      
-      print('[📝 BLOC] Creating TaskModel...');
       final task = TaskModel(
         id: state.taskId,
         title: state.title,
@@ -107,30 +100,19 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         color: state.color,
         createdAt: DateTime.now(),
         boardId: boardId,
-        shouldNotify: state.shouldNotify,
-        notifyMinutesBefore: state.notifyMinutesBefore,
       );
       
-      print('[📝 BLOC] Task created with:');
-      print('[📝 BLOC]   - shouldNotify: ${task.shouldNotify}');
-      print('[📝 BLOC]   - dueDate: ${task.dueDate}');
-      print('[📝 BLOC]   - dueTime: ${task.dueTime}');
-      print('[📝 BLOC]   - notifyMinutesBefore: ${task.notifyMinutesBefore}');
       
       Outcome<void, dynamic> outcome;
 
-      print('[📝 BLOC] Calling CreateTaskUseCase.execute...');
       outcome = await _createTaskUseCase.execute(task);
       if (state.taskId != null) {
-        print('[📝 BLOC] Task has ID - calling UpdateTaskUseCase instead');
         // If taskId is not null, we are updating an existing task
         outcome = await _updateTaskUseCase.execute(task);
       }
 
-      print('[📝 BLOC] Use case completed - processing outcome...');
       outcome.when(
         success: (task) {
-          print('[📝 BLOC] ✅ Success!');
           log('Action completed successfully');
           emit(
             state.copyWith(
@@ -142,13 +124,10 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
               closeScreen: true,
             ),
           );
-          print('[📝 BLOC] ========================================');
         },
         failure: (error, message, throwable) {
-          print('[📝 BLOC] ❌ Failed: $message');
           log('Failed to create task: $message');
           _handleTaskRepositoryError(createError: error, emit: emit);
-          print('[📝 BLOC] ========================================');
         },
       );
     } catch (e) {
@@ -192,8 +171,6 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         color: state.color,
         createdAt: DateTime.now(),
         boardId: boardId,
-        shouldNotify: state.shouldNotify,
-        notifyMinutesBefore: state.notifyMinutesBefore,
       );
 
       final outcome = await _updateTaskUseCase.execute(task);
@@ -309,8 +286,6 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
               type: task.type,
               dueDate: task.dueDate,
               dueTime: task.dueTime,
-              shouldNotify: task.shouldNotify,
-              notifyMinutesBefore: task.notifyMinutesBefore,
             ),
           );
         },

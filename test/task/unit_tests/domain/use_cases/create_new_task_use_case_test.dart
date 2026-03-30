@@ -26,7 +26,7 @@ void main() {
   setUp(() {
     mockRepository = MockTaskRepository();
     mockNotificationService = MockTaskNotificationService();
-    useCase = CreateTaskUseCase(mockRepository, mockNotificationService);
+    useCase = CreateTaskUseCase(mockRepository);
     testTask = TaskModel(
       title: 'Test Task',
       description: 'Test Description',

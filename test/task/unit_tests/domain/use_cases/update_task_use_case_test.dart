@@ -34,7 +34,7 @@ void main() {
   setUp(() {
     mockRepository = MockTaskRepository();
     mockNotificationService = MockTaskNotificationService();
-    useCase = UpdateTaskUseCase(mockRepository, mockNotificationService);
+    useCase = UpdateTaskUseCase(mockRepository);
 
     // Set up default mocks for notification service
     when(() => mockNotificationService.scheduleTaskNotification(any()))

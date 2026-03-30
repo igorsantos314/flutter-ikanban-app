@@ -69,7 +69,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
 
     on<ToggleTaskCompletionEvent>(_onToggleTaskCompletion);
     on<TaskSelectedEvent>(_onTaskSelected);
-    on<ToggleTaskNotificationEvent>(_onToggleTaskNotification);
 
     // UI events
     on<TaskFormResetEvent>(_onTaskFormReset);
@@ -493,50 +492,6 @@ class TaskListBloc extends Bloc<TaskEvent, TaskListState> {
     Emitter<TaskListState> emit,
   ) {
     emit(state.copyWith(selectedTask: event.task, showStatusSelector: true));
-  }
-
-  FutureOr<void> _onToggleTaskNotification(
-    ToggleTaskNotificationEvent event,
-    Emitter<TaskListState> emit,
-  ) async {
-    final updatedTask = event.task.copyWith(
-      shouldNotify: event.shouldNotify,
-      // Se desativando, mantém o valor anterior de notifyMinutesBefore
-      // Se ativando e não tem valor, define padrão de 15 minutos
-      notifyMinutesBefore: event.shouldNotify
-          ? (event.task.notifyMinutesBefore ?? 15)
-          : event.task.notifyMinutesBefore,
-    );
-
-    final outcome = await _updateTaskUseCase.execute(updatedTask);
-
-    outcome.when(
-      success: (_) {
-        log('[TaskListBloc] Notification toggled successfully for task ${event.task.id}');
-        emit(
-          state.copyWith(
-            notificationType: NotificationType.success,
-            showNotification: true,
-            notificationMessage: event.shouldNotify
-                ? 'Notificação ativada para esta tarefa'
-                : 'Notificação desativada para esta tarefa',
-          ),
-        );
-      },
-      failure: (error, message, throwable) {
-        log(
-          '[TaskListBloc] Error toggling notification: $error, message: $message',
-        );
-        emit(
-          state.copyWith(
-            showNotification: true,
-            notificationMessage:
-                message ?? 'Erro ao atualizar configuração de notificação',
-            notificationType: NotificationType.error,
-          ),
-        );
-      },
-    );
   }
 
   FutureOr<void> _onTaskListUpdateStatus(

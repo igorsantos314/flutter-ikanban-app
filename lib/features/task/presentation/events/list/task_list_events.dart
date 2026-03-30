@@ -98,19 +98,6 @@ class ToggleLayoutModeEvent extends TaskEvent {
   const ToggleLayoutModeEvent();
 }
 
-class ToggleTaskNotificationEvent extends TaskEvent {
-  final TaskModel task;
-  final bool shouldNotify;
-
-  const ToggleTaskNotificationEvent({
-    required this.task,
-    required this.shouldNotify,
-  });
-
-  @override
-  List<Object> get props => [task, shouldNotify];
-}
-
 class ShowTaskDetailsEvent extends TaskEvent {
   final TaskModel task;
 
