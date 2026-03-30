@@ -20,12 +20,10 @@ class TaskRepositoryImpl implements TaskRepository {
   @override
   Future<Outcome<int, TaskRepositoryErrors>> createTask(TaskModel task) async {
     try {
-      print('[💾 REPOSITORY] Creating task in database...');
       final entity = TaskMapper.toEntity(task);
       final generatedId = await _localDataSource.insertTask(entity);
       return Outcome.success(value: generatedId);
     } catch (e) {
-      print('[💾 REPOSITORY] ❌ Failed to create task: $e');
       return Outcome.failure(
         error: GenericError(),
         message: 'Failed to create task',
