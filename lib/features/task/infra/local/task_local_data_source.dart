@@ -202,6 +202,15 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
     });
   }
 
+  Future<int> insertTaskInTransaction(TaskEntityCompanion task) async {
+    return await db.transaction(() async {
+      return await into(db.taskEntity).insert(
+        task,
+        mode: InsertMode.insertOrReplace,
+      );
+    });
+  }
+
   OrderingTerm _getOrderByColumn(SortField? orderBy, bool ascending) {
     log('[TaskLocalDataSource] Ordering by: $orderBy, ascending: $ascending');
 

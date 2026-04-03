@@ -15,17 +15,18 @@ import 'package:path/path.dart' as p;
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_ikanban_app/features/task/infra/local/tables/task_table_entity.dart';
+import 'package:flutter_ikanban_app/features/task/infra/local/tables/checklist_item_entity_table.dart';
 import 'package:path_provider/path_provider.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [TaskEntity, BoardEntity])
+@DriftDatabase(tables: [TaskEntity, BoardEntity, ChecklistItemEntity])
 class AppDatabase extends _$AppDatabase {
   static const String dbName = 'ikanban_app.db';
   AppDatabase() : super(_openConnection(dbName));
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -38,6 +39,10 @@ class AppDatabase extends _$AppDatabase {
         // Add notification columns to TaskEntity
         await migrator.addColumn(taskEntity, taskEntity.shouldNotify);
         await migrator.addColumn(taskEntity, taskEntity.notifyMinutesBefore);
+      }
+      if (from < 5) {
+        // Create checklist_item_entity table
+        await migrator.createTable(checklistItemEntity);
       }
     },
   );

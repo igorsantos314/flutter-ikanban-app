@@ -16,7 +16,7 @@ class TaskEditPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) {
-        final bloc = TaskFormBloc(getIt.get(), getIt.get(), getIt.get(), getIt.get());
+        final bloc = TaskFormBloc(getIt.get(), getIt.get(), getIt.get(), getIt.get(), getIt.get());
         bloc.add(LoadTaskFormEvent(taskId));
         return bloc;
       },

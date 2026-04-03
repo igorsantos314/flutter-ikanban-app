@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
+import 'package:flutter_ikanban_app/features/task/domain/repository/checklist_item_repository.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/create_task_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/delete_task_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/get_task_by_id_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/domain/use_cases/update_task_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_form_bloc.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_complexity_enum_extensions.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_priority_enum_extensions.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_status_enum_extensions.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_type_enum_extensions.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/modals/add_checklist_item_bottom_sheet.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/modals/edit_checklist_item_bottom_sheet.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/widgets/checklist_section.dart';
 import 'package:intl/intl.dart';
 
 class TaskDetailsBottomSheet extends StatelessWidget {
@@ -251,6 +263,86 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                 ),
               ],
             ),
+
+            const SizedBox(height: 20),
+
+            // Checklist section
+            if (task.id != null)
+              BlocProvider(
+                create: (context) {
+                  final bloc = TaskFormBloc(
+                    getIt<CreateTaskUseCase>(),
+                    getIt<UpdateTaskUseCase>(),
+                    getIt<GetTaskByIdUseCase>(),
+                    getIt<DeleteTaskUseCase>(),
+                    getIt<ChecklistItemRepository>(),
+                  );
+                  bloc.add(LoadChecklistItemsEvent(task.id!));
+                  return bloc;
+                },
+                child: Builder(
+                  builder: (blocContext) {
+                    return ChecklistSection(
+                      taskId: task.id!,
+                      onAddItem: () {
+                        AddChecklistItemBottomSheet.show(
+                          context: context,
+                          taskId: task.id!,
+                          onAdd: (title, description) {
+                            blocContext.read<TaskFormBloc>().add(
+                              AddChecklistItemEvent(
+                                title: title,
+                                description: description,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      onToggleItem: (itemId, index) {
+                        blocContext.read<TaskFormBloc>().add(
+                          ToggleChecklistItemEvent(
+                            itemId: itemId,
+                            index: index,
+                          ),
+                        );
+                      },
+                      onDeleteItem: (itemId, index) {
+                        blocContext.read<TaskFormBloc>().add(
+                          DeleteChecklistItemEvent(
+                            itemId: itemId,
+                            index: index,
+                          ),
+                        );
+                      },
+                      onTapItem: (item, index) {
+                        EditChecklistItemBottomSheet.show(
+                          context: context,
+                          item: item,
+                          onSave: (title, description, isCompleted) {
+                            blocContext.read<TaskFormBloc>().add(
+                              EditChecklistItemEvent(
+                                itemId: item.id ?? -1,
+                                index: index,
+                                title: title,
+                                description: description,
+                                isCompleted: isCompleted,
+                              ),
+                            );
+                          },
+                          onDelete: () {
+                            blocContext.read<TaskFormBloc>().add(
+                              DeleteChecklistItemEvent(
+                                itemId: item.id ?? -1,
+                                index: index,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
 
             const SizedBox(height: 20),
 

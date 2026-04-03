@@ -15,6 +15,10 @@ import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/date_selector_field.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/widgets/selectors/task_form_selectors_mixin.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.dart';
+import 'package:flutter_ikanban_app/features/task/domain/model/checklist_item_model.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/widgets/checklist_section.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/modals/add_checklist_item_bottom_sheet.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/modals/edit_checklist_item_bottom_sheet.dart';
 
 class TaskFormPage extends StatefulWidget {
   final String title;
@@ -214,6 +218,35 @@ class _TaskFormPageState extends State<TaskFormPage>
                         showDueDateSelector(context, state);
                       },
                     ),
+                    const SizedBox(height: 24),
+
+                    // Checklist Section
+                    ChecklistSection(
+                      taskId: state.taskId,
+                      onAddItem: () => _showAddChecklistItemBottomSheet(context, bloc),
+                      onToggleItem: (itemId, index) {
+                        bloc.add(ToggleChecklistItemEvent(
+                          itemId: itemId,
+                          index: index,
+                        ));
+                      },
+                      onDeleteItem: (itemId, index) {
+                        bloc.add(DeleteChecklistItemEvent(
+                          itemId: itemId,
+                          index: index,
+                        ));
+                      },
+                      onTapItem: widget.isEditMode
+                          ? (item, index) {
+                              _showEditChecklistItemBottomSheet(
+                                context,
+                                bloc,
+                                item,
+                                index,
+                              );
+                            }
+                          : null,
+                    ),
                     
                     // Space for floating action buttons
                     const SizedBox(height: 128),
@@ -229,5 +262,58 @@ class _TaskFormPageState extends State<TaskFormPage>
 
   void _removeFocus() {
     FocusScope.of(context).requestFocus(FocusNode());
+  }
+
+  void _showAddChecklistItemBottomSheet(BuildContext context, TaskFormBloc bloc) {
+    final colorScheme = Theme.of(context).colorScheme;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (bottomSheetContext) {
+        return Container(
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: AddChecklistItemBottomSheet(
+            onAdd: (title, description) {
+              bloc.add(AddChecklistItemEvent(
+                title: title,
+                description: description,
+              ));
+              Navigator.of(bottomSheetContext).pop();
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void _showEditChecklistItemBottomSheet(
+    BuildContext context,
+    TaskFormBloc bloc,
+    ChecklistItemModel item,
+    int index,
+  ) {
+    EditChecklistItemBottomSheet.show(
+      context: context,
+      item: item,
+      onSave: (title, description, isCompleted) {
+        bloc.add(EditChecklistItemEvent(
+          itemId: item.id ?? -1,
+          index: index,
+          title: title,
+          description: description,
+          isCompleted: isCompleted,
+        ));
+      },
+      onDelete: () {
+        bloc.add(DeleteChecklistItemEvent(
+          itemId: item.id ?? -1,
+          index: index,
+        ));
+      },
+    );
   }
 }
