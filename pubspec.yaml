@@ -1,7 +1,7 @@
 name: flutter_ikanban_app
 description: "A kanban board app built with Flutter, featuring task management and local data persistence using SQLite. The app allows users to create, update, and organize tasks across different columns (e.g., To Do, In Progress, Done and others) while providing a smooth and intuitive user experience."
 publish_to: 'none'
-version: 0.7.1+15
+version: 0.8.0+16
 
 environment:
   sdk: ^3.9.2
