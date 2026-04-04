@@ -196,14 +196,14 @@ class _ChecklistItemTile extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Checkbox
                 GestureDetector(
                   onTap: onToggle,
                   child: Container(
-                    width: 20,
-                    height: 20,
+                    width: 28,
+                    height: 28,
                     margin: const EdgeInsets.only(top: 2),
                     decoration: BoxDecoration(
                       color: item.isCompleted
@@ -242,8 +242,9 @@ class _ChecklistItemTile extends StatelessWidget {
                           decoration: item.isCompleted
                               ? TextDecoration.lineThrough
                               : null,
-                          decorationColor: colorScheme.onSurface
-                              .withValues(alpha: 0.5),
+                          decorationColor: colorScheme.onSurface.withValues(
+                            alpha: 0.5,
+                          ),
                         ),
                       ),
                       if (item.description != null &&
@@ -256,8 +257,9 @@ class _ChecklistItemTile extends StatelessWidget {
                             decoration: item.isCompleted
                                 ? TextDecoration.lineThrough
                                 : null,
-                            decorationColor: colorScheme.onSurface
-                                .withValues(alpha: 0.4),
+                            decorationColor: colorScheme.onSurface.withValues(
+                              alpha: 0.4,
+                            ),
                           ),
                         ),
                       ],
