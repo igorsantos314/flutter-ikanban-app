@@ -9,6 +9,7 @@ import 'package:flutter_ikanban_app/features/board/domain/services/board_selecti
 import 'package:flutter_ikanban_app/features/task/domain/model/checklist_item_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/checklist_item_repository.dart';
+import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/create_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/delete_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/get_task_by_id_use_case.dart';
@@ -23,6 +24,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
   final GetTaskByIdUseCase _getTaskByIdUseCase;
   final DeleteTaskUseCase _deleteTaskUseCase;
   final ChecklistItemRepository _checklistRepository;
+  final TaskRepository _taskRepository;
   StreamSubscription? _checklistSubscription;
 
   static const int maxChecklistItems = 50;
@@ -33,6 +35,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     this._getTaskByIdUseCase,
     this._deleteTaskUseCase,
     this._checklistRepository,
+    this._taskRepository,
   ) : super(TaskFormState.initial()) {
     on<TaskFormUpdateFieldsEvent>(_onUpdateFields);
     on<CreateTaskEvent>(_onCreateTask);
@@ -46,6 +49,11 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     on<DeleteChecklistItemEvent>(_onDeleteChecklistItem);
     on<EditChecklistItemEvent>(_onEditChecklistItem);
     on<UpdateChecklistItemsInternalEvent>(_onUpdateChecklistItemsInternal);
+    // Immediate checklist events
+    on<AddChecklistItemImmediateEvent>(_onAddChecklistItemImmediate);
+    on<ToggleChecklistItemImmediateEvent>(_onToggleChecklistItemImmediate);
+    on<DeleteChecklistItemImmediateEvent>(_onDeleteChecklistItemImmediate);
+    on<EditChecklistItemImmediateEvent>(_onEditChecklistItemImmediate);
   }
 
   void _onResetForm(TaskFormResetEvent event, Emitter<TaskFormState> emit) {
@@ -72,6 +80,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         dueDate: event.dueDate ?? state.dueDate,
         dueTime: event.dueTime ?? state.dueTime,
         color: event.color ?? state.color,
+        hasUnsavedChanges: true,
       ),
     );
   }
@@ -107,55 +116,38 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
         boardId: boardId,
       );
       
-      Outcome<dynamic, dynamic> outcome;
-
-      if (state.taskId != null) {
-        // If taskId is not null, we are updating an existing task
-        outcome = await _updateTaskUseCase.execute(task);
-      } else {
-        // Criando nova tarefa - salvar com transação incluindo checklists
-        final createOutcome = await _createTaskUseCase.execute(task);
-        outcome = createOutcome;
-        
-        // Se temos checklists pendentes, salvar com transação
-        createOutcome.when(
-          success: (taskId) {
-            if (taskId != null && state.checklistItems.isNotEmpty) {
-              // Atualizar taskId dos itens e salvar
-              final itemsToSave = state.checklistItems
-                  .map((item) => item.copyWith(taskId: taskId))
-                  .toList();
-              
-              // Salvar checklists de forma assíncrona (não bloqueante)
-              _checklistRepository.createChecklistItems(itemsToSave).then((checklistOutcome) {
-                checklistOutcome.when(
-                  success: (_) {
-                    log('Checklist items saved successfully');
-                  },
-                  failure: (error, message, throwable) {
-                    log('Failed to save checklist items: $message');
-                  },
-                );
-              });
-            }
-          },
-          failure: (error, message, throwable) {
-            // Não faz nada, será tratado abaixo
-          },
-        );
-      }
-
-      outcome.when(
-        success: (result) {
-          log('Action completed successfully');
+      // Criar a tarefa
+      final createOutcome = await _createTaskUseCase.execute(task);
+      
+      await createOutcome.when(
+        success: (taskId) async {
+          // Salvar checklists se houver algum
+          if (taskId != null && state.checklistItems.isNotEmpty) {
+            final itemsToSave = state.checklistItems
+                .map((item) => item.copyWith(taskId: taskId))
+                .toList();
+            
+            final checklistOutcome = await _checklistRepository.createChecklistItems(itemsToSave);
+            
+            checklistOutcome.when(
+              success: (_) {
+                log('Checklist items saved successfully');
+              },
+              failure: (error, message, throwable) {
+                log('Failed to save checklist items: $message');
+              },
+            );
+          }
+          
+          log('Task created successfully');
           emit(
             state.copyWith(
               isLoading: false,
               showNotification: true,
               notificationType: NotificationType.success,
-              notificationMessage:
-                  'Tarefa ${state.taskId == null ? 'criada' : 'atualizada'} com sucesso!',
+              notificationMessage: 'Tarefa criada com sucesso!',
               closeScreen: true,
+              hasUnsavedChanges: false,
             ),
           );
         },
@@ -207,8 +199,35 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
 
       final outcome = await _updateTaskUseCase.execute(task);
 
-      outcome.when(
-        success: (task) {
+      await outcome.when(
+        success: (task) async {
+          // Sincronizar checklists se a tarefa foi atualizada
+          if (state.taskId != null) {
+            // Deletar todos os checklists antigos
+            await _checklistRepository.deleteAllChecklistItemsByTaskId(state.taskId!);
+            
+            // Criar novos checklists se houver algum
+            if (state.checklistItems.isNotEmpty) {
+              final itemsToSave = state.checklistItems
+                  .map((item) => item.copyWith(taskId: state.taskId!))
+                  .toList();
+              
+              final checklistOutcome = await _checklistRepository.createChecklistItems(itemsToSave);
+              
+              checklistOutcome.when(
+                success: (_) {
+                  log('Checklist items synchronized successfully');
+                },
+                failure: (error, message, throwable) {
+                  log('Failed to synchronize checklist items: $message');
+                },
+              );
+            }
+            
+            // Atualizar os stats do checklist após as operações batch
+            await _taskRepository.updateTaskChecklistStats(state.taskId!);
+          }
+          
           log('Update completed successfully');
           emit(
             state.copyWith(
@@ -217,6 +236,7 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
               notificationType: NotificationType.success,
               notificationMessage: 'Tarefa atualizada com sucesso!',
               closeScreen: true,
+              hasUnsavedChanges: false,
             ),
           );
         },
@@ -291,8 +311,8 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
     try {
       final outcome = await _getTaskByIdUseCase.execute(event.taskId);
 
-      outcome.when(
-        success: (task) {
+      await outcome.when(
+        success: (task) async {
           log('Task loaded successfully $task');
 
           if (task == null) {
@@ -304,9 +324,10 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
             return;
           }
 
+          // Atualizar o state com os dados da task, mas manter loading=true
           emit(
             state.copyWith(
-              isLoading: false,
+              isLoading: true, // Manter loading enquanto carrega checklist
               taskId: task.id,
               boardId: task.boardId,
               title: task.title,
@@ -320,6 +341,37 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
               dueTime: task.dueTime,
             ),
           );
+          
+          // Carregar os itens do checklist e aguardar antes de desativar loading
+          if (task.id != null) {
+            // Carregar checklist items de forma síncrona
+            final checklistOutcome = await _checklistRepository
+                .watchChecklistItemsByTaskId(task.id!)
+                .first;
+            
+            await checklistOutcome.when(
+              success: (items) async {
+                if (items != null) {
+                  emit(state.copyWith(
+                    checklistItems: items.cast<ChecklistItemModel>(),
+                    checklistItemCount: items.length,
+                    isLoading: false, // Agora sim desativa loading
+                  ));
+                } else {
+                  emit(state.copyWith(isLoading: false));
+                }
+              },
+              failure: (error, message, throwable) {
+                log('Failed to load checklist items: $message');
+                emit(state.copyWith(isLoading: false));
+              },
+            );
+            
+            // Agora sim inicia o watch stream para mudanças futuras
+            add(LoadChecklistItemsEvent(task.id!));
+          } else {
+            emit(state.copyWith(isLoading: false));
+          }
         },
         failure: (error, message, throwable) {
           log('Failed to load task: $message');
@@ -376,24 +428,91 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
       return;
     }
 
-    // Se taskId é null, tarefa ainda não foi salva, adiciona à lista em memória
-    if (state.taskId == null) {
-      final newItem = ChecklistItemModel(
-        title: event.title,
-        description: event.description,
-        taskId: 0, // Temporário, será atualizado ao salvar
-        createdAt: DateTime.now(),
-      );
+    // Apenas adiciona ao state local - será salvo quando a tarefa for salva
+    final newItem = ChecklistItemModel(
+      title: event.title,
+      description: event.description,
+      taskId: state.taskId ?? 0, // Será atualizado ao salvar
+      createdAt: DateTime.now(),
+    );
 
-      final updatedItems = [...state.checklistItems, newItem];
+    final updatedItems = [...state.checklistItems, newItem];
+    emit(state.copyWith(
+      checklistItems: updatedItems,
+      checklistItemCount: updatedItems.length,
+      hasUnsavedChanges: true,
+    ));
+  }
+
+  Future<void> _onToggleChecklistItem(
+    ToggleChecklistItemEvent event,
+    Emitter<TaskFormState> emit,
+  ) async {
+    // Atualiza apenas no state local usando o índice - será salvo quando a tarefa for salva
+    final updatedItems = List<ChecklistItemModel>.from(state.checklistItems);
+    if (event.index >= 0 && event.index < updatedItems.length) {
+      updatedItems[event.index] = updatedItems[event.index].copyWith(
+        isCompleted: !updatedItems[event.index].isCompleted,
+      );
+      emit(state.copyWith(
+        checklistItems: updatedItems,
+        hasUnsavedChanges: true,
+      ));
+    }
+  }
+
+  Future<void> _onDeleteChecklistItem(
+    DeleteChecklistItemEvent event,
+    Emitter<TaskFormState> emit,
+  ) async {
+    // Remove apenas do state local usando o índice - será salvo quando a tarefa for salva
+    final updatedItems = List<ChecklistItemModel>.from(state.checklistItems);
+    if (event.index >= 0 && event.index < updatedItems.length) {
+      updatedItems.removeAt(event.index);
       emit(state.copyWith(
         checklistItems: updatedItems,
         checklistItemCount: updatedItems.length,
+        hasUnsavedChanges: true,
+      ));
+    }
+  }
+
+  Future<void> _onEditChecklistItem(
+    EditChecklistItemEvent event,
+    Emitter<TaskFormState> emit,
+  ) async {
+    // Atualiza apenas no state local usando o índice - será salvo quando a tarefa for salva
+    final updatedItems = List<ChecklistItemModel>.from(state.checklistItems);
+    if (event.index >= 0 && event.index < updatedItems.length) {
+      updatedItems[event.index] = updatedItems[event.index].copyWith(
+        title: event.title,
+        description: event.description,
+        isCompleted: event.isCompleted,
+      );
+      emit(state.copyWith(
+        checklistItems: updatedItems,
+        hasUnsavedChanges: true,
+      ));
+    }
+  }
+
+  // Immediate checklist handlers (persist to database immediately)
+  Future<void> _onAddChecklistItemImmediate(
+    AddChecklistItemImmediateEvent event,
+    Emitter<TaskFormState> emit,
+  ) async {
+    if (state.checklistItemCount >= maxChecklistItems) {
+      emit(state.copyWith(
+        errorMessage: 'Máximo de $maxChecklistItems itens atingido',
       ));
       return;
     }
 
-    // Tarefa já foi salva, adiciona no banco
+    if (state.taskId == null) {
+      log('Cannot add checklist item immediately without taskId');
+      return;
+    }
+
     final newItem = ChecklistItemModel(
       title: event.title,
       description: event.description,
@@ -401,160 +520,115 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
       createdAt: DateTime.now(),
     );
 
-    // Emit optimistic add
-    final updatedItems = [...state.checklistItems, newItem];
-    emit(state.copyWith(
-      checklistItems: updatedItems,
-      checklistItemCount: updatedItems.length,
-    ));
-
     final outcome = await _checklistRepository.createChecklistItem(newItem);
 
     outcome.when(
       success: (id) {
-        log('Checklist item added successfully with id: $id');
-        // Update item with the real ID from database
-        final itemsWithId = state.checklistItems.map((item) {
-          if (item.id == null && 
-              item.title == newItem.title && 
-              item.taskId == newItem.taskId &&
-              item.createdAt == newItem.createdAt) {
-            return item.copyWith(id: id);
-          }
-          return item;
-        }).toList();
-        emit(state.copyWith(checklistItems: itemsWithId));
+        log('Checklist item added immediately with id: $id');
       },
       failure: (error, message, throwable) {
-        // Revert on failure
-        final revertedItems = state.checklistItems
-            .where((item) => item.id != null || item != newItem)
-            .toList();
+        log('Failed to add checklist item immediately: $message');
         emit(state.copyWith(
-          checklistItems: revertedItems,
-          checklistItemCount: revertedItems.length,
           errorMessage: message ?? 'Falha ao adicionar item',
         ));
       },
     );
   }
 
-  Future<void> _onToggleChecklistItem(
-    ToggleChecklistItemEvent event,
+  Future<void> _onToggleChecklistItemImmediate(
+    ToggleChecklistItemImmediateEvent event,
     Emitter<TaskFormState> emit,
   ) async {
-    // Se taskId é null, atualiza apenas no state local usando o índice
     if (state.taskId == null) {
-      final updatedItems = List<ChecklistItemModel>.from(state.checklistItems);
-      if (event.index >= 0 && event.index < updatedItems.length) {
-        updatedItems[event.index] = updatedItems[event.index].copyWith(
-          isCompleted: !updatedItems[event.index].isCompleted,
-        );
-        emit(state.copyWith(checklistItems: updatedItems));
-      }
+      log('Cannot toggle checklist item immediately without taskId');
       return;
     }
 
     final item = state.checklistItems.firstWhere(
       (item) => item.id == event.itemId,
-      orElse: () => throw Exception('Item not found'),
+      orElse: () {
+        log('Item not found with id: ${event.itemId}');
+        return ChecklistItemModel(
+          title: '',
+          taskId: 0,
+          createdAt: DateTime.now(),
+        );
+      },
     );
+
+    if (item.id == null) {
+      log('Item has no id, cannot toggle');
+      return;
+    }
 
     final updatedItem = item.copyWith(
       isCompleted: !item.isCompleted,
     );
 
-    // Emit optimistic update
-    final updatedItems = state.checklistItems.map((item) {
-      if (item.id == event.itemId) {
-        return updatedItem;
-      }
-      return item;
-    }).toList();
-    
-    emit(state.copyWith(checklistItems: updatedItems));
-
     final outcome = await _checklistRepository.updateChecklistItem(updatedItem);
 
     outcome.when(
       success: (_) {
-        log('Checklist item toggled successfully');
+        log('Checklist item toggled immediately');
       },
       failure: (error, message, throwable) {
-        // Revert on failure
+        log('Failed to toggle checklist item immediately: $message');
         emit(state.copyWith(
-          checklistItems: state.checklistItems,
           errorMessage: message ?? 'Falha ao atualizar status',
         ));
       },
     );
   }
 
-  Future<void> _onDeleteChecklistItem(
-    DeleteChecklistItemEvent event,
+  Future<void> _onDeleteChecklistItemImmediate(
+    DeleteChecklistItemImmediateEvent event,
     Emitter<TaskFormState> emit,
   ) async {
-    // Se taskId é null, remove apenas do state local usando o índice
     if (state.taskId == null) {
-      final updatedItems = List<ChecklistItemModel>.from(state.checklistItems);
-      if (event.index >= 0 && event.index < updatedItems.length) {
-        updatedItems.removeAt(event.index);
-        emit(state.copyWith(
-          checklistItems: updatedItems,
-          checklistItemCount: updatedItems.length,
-        ));
-      }
+      log('Cannot delete checklist item immediately without taskId');
       return;
     }
-
-    // Emit optimistic delete
-    final updatedItems = state.checklistItems
-        .where((item) => item.id != event.itemId)
-        .toList();
-    
-    emit(state.copyWith(
-      checklistItems: updatedItems,
-      checklistItemCount: updatedItems.length,
-    ));
 
     final outcome = await _checklistRepository.deleteChecklistItem(event.itemId);
 
     outcome.when(
       success: (_) {
-        log('Checklist item deleted successfully');
+        log('Checklist item deleted immediately');
       },
       failure: (error, message, throwable) {
-        // Revert on failure
+        log('Failed to delete checklist item immediately: $message');
         emit(state.copyWith(
-          checklistItems: state.checklistItems,
           errorMessage: message ?? 'Falha ao deletar item',
         ));
       },
     );
   }
 
-  Future<void> _onEditChecklistItem(
-    EditChecklistItemEvent event,
+  Future<void> _onEditChecklistItemImmediate(
+    EditChecklistItemImmediateEvent event,
     Emitter<TaskFormState> emit,
   ) async {
-    // Se taskId é null, atualiza apenas no state local usando o índice
     if (state.taskId == null) {
-      final updatedItems = List<ChecklistItemModel>.from(state.checklistItems);
-      if (event.index >= 0 && event.index < updatedItems.length) {
-        updatedItems[event.index] = updatedItems[event.index].copyWith(
-          title: event.title,
-          description: event.description,
-          isCompleted: event.isCompleted,
-        );
-        emit(state.copyWith(checklistItems: updatedItems));
-      }
+      log('Cannot edit checklist item immediately without taskId');
       return;
     }
 
     final item = state.checklistItems.firstWhere(
       (item) => item.id == event.itemId,
-      orElse: () => throw Exception('Item not found'),
+      orElse: () {
+        log('Item not found with id: ${event.itemId}');
+        return ChecklistItemModel(
+          title: '',
+          taskId: 0,
+          createdAt: DateTime.now(),
+        );
+      },
     );
+
+    if (item.id == null) {
+      log('Item has no id, cannot edit');
+      return;
+    }
 
     final updatedItem = item.copyWith(
       title: event.title,
@@ -562,26 +636,15 @@ class TaskFormBloc extends Bloc<TaskEvent, TaskFormState> {
       isCompleted: event.isCompleted,
     );
 
-    // Emit optimistic update
-    final updatedItems = state.checklistItems.map((item) {
-      if (item.id == event.itemId) {
-        return updatedItem;
-      }
-      return item;
-    }).toList();
-    
-    emit(state.copyWith(checklistItems: updatedItems));
-
     final outcome = await _checklistRepository.updateChecklistItem(updatedItem);
 
     outcome.when(
       success: (_) {
-        log('Checklist item updated successfully');
+        log('Checklist item updated immediately');
       },
       failure: (error, message, throwable) {
-        // Revert on failure
+        log('Failed to update checklist item immediately: $message');
         emit(state.copyWith(
-          checklistItems: state.checklistItems,
           errorMessage: message ?? 'Falha ao atualizar item',
         ));
       },

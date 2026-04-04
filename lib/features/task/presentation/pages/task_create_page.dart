@@ -14,7 +14,7 @@ class TaskCreatePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          TaskFormBloc(getIt.get(), getIt.get(), getIt.get(), getIt.get(), getIt.get()),
+          TaskFormBloc(getIt.get(), getIt.get(), getIt.get(), getIt.get(), getIt.get(), getIt.get()),
       child: const TaskCreatePageContent(),
     );
   }
@@ -52,6 +52,26 @@ class TaskCreatePageContent extends StatelessWidget {
               context.read<TaskFormBloc>().add(
                 TaskFormResetEvent(closeScreen: false),
               );
+            }
+          },
+        ),
+        BlocListener<TaskFormBloc, TaskFormState>(
+          listenWhen: (previous, current) =>
+              previous.isLoading != current.isLoading,
+          listener: (context, state) {
+            if (state.isLoading) {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            } else {
+              // Fecha o dialog de loading se estiver aberto
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
             }
           },
         ),

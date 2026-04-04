@@ -20,6 +20,8 @@ class TaskMapper {
       boardId: model.boardId != null ? Value(model.boardId!) : const Value.absent(),
       shouldNotify: Value(model.shouldNotify),
       notifyMinutesBefore: model.notifyMinutesBefore != null ? Value(model.notifyMinutesBefore!) : const Value.absent(),
+      checklistTotal: Value(model.checklistTotal),
+      checklistCompleted: Value(model.checklistCompleted),
     );
   }
   
@@ -40,6 +42,8 @@ class TaskMapper {
       boardId: entity.boardId,
       shouldNotify: entity.shouldNotify,
       notifyMinutesBefore: entity.notifyMinutesBefore,
+      checklistTotal: entity.checklistTotal,
+      checklistCompleted: entity.checklistCompleted,
     );
   }
 }

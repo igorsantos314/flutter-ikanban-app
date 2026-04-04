@@ -182,3 +182,68 @@ class UpdateChecklistItemsInternalEvent extends TaskEvent {
   @override
   List<Object> get props => [items];
 }
+
+// Immediate checklist events (persisted immediately to database)
+class AddChecklistItemImmediateEvent extends TaskEvent {
+  final String title;
+  final String? description;
+
+  const AddChecklistItemImmediateEvent({
+    required this.title,
+    this.description,
+  });
+
+  @override
+  List<Object> get props => [title, if (description != null) description!];
+}
+
+class ToggleChecklistItemImmediateEvent extends TaskEvent {
+  final int itemId;
+  final int index;
+
+  const ToggleChecklistItemImmediateEvent({
+    required this.itemId,
+    required this.index,
+  });
+
+  @override
+  List<Object> get props => [itemId, index];
+}
+
+class DeleteChecklistItemImmediateEvent extends TaskEvent {
+  final int itemId;
+  final int index;
+
+  const DeleteChecklistItemImmediateEvent({
+    required this.itemId,
+    required this.index,
+  });
+
+  @override
+  List<Object> get props => [itemId, index];
+}
+
+class EditChecklistItemImmediateEvent extends TaskEvent {
+  final int itemId;
+  final int index;
+  final String title;
+  final String? description;
+  final bool isCompleted;
+
+  const EditChecklistItemImmediateEvent({
+    required this.itemId,
+    required this.index,
+    required this.title,
+    this.description,
+    required this.isCompleted,
+  });
+
+  @override
+  List<Object> get props => [
+        itemId,
+        index,
+        title,
+        if (description != null) description!,
+        isCompleted,
+      ];
+}

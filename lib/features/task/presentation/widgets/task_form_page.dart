@@ -38,12 +38,43 @@ class _TaskFormPageState extends State<TaskFormPage>
     with TaskFormSelectorsMixin {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  bool _controllersInitialized = false;
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  void _updateControllers(TaskFormState state) {
+    // Para título - sempre atualizar se for diferente
+    if (_titleController.text != state.title) {
+      // Salvar a posição do cursor atual
+      final currentSelection = _titleController.selection;
+      _titleController.text = state.title;
+      
+      // Restaurar o cursor apenas se estava editando
+      if (currentSelection.isValid && 
+          currentSelection.end <= state.title.length) {
+        _titleController.selection = currentSelection;
+      }
+      
+      if (!_controllersInitialized) {
+        _controllersInitialized = true;
+      }
+    }
+    
+    // Para descrição - sempre atualizar se for diferente
+    if (_descriptionController.text != state.description) {
+      final currentSelection = _descriptionController.selection;
+      _descriptionController.text = state.description;
+      
+      if (currentSelection.isValid && 
+          currentSelection.end <= state.description.length) {
+        _descriptionController.selection = currentSelection;
+      }
+    }
   }
 
   void _onRequestDeleteTask({required VoidCallback onDeleteEvent}) {
@@ -83,178 +114,211 @@ class _TaskFormPageState extends State<TaskFormPage>
     final bloc = context.read<TaskFormBloc>();
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton(
-            heroTag: 'save_button',
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: theme.colorScheme.onPrimary,
-            onPressed: () {
-              bloc.add(
-                widget.isEditMode ? UpdateTaskEvent() : CreateTaskEvent(),
-              );
-            },
-            child: const Icon(Icons.save),
-          ),
-          if (widget.isEditMode) ...[
-            const SizedBox(height: 16),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+
+        final state = bloc.state;
+        if (state.hasUnsavedChanges) {
+          final shouldPop = await _showUnsavedChangesDialog(context);
+          if (shouldPop == true && context.mounted) {
+            Navigator.of(context).pop();
+          }
+        } else {
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(title: Text(widget.title)),
+        floatingActionButton: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
             FloatingActionButton(
-              heroTag: 'delete_button',
-              backgroundColor: theme.colorScheme.error,
-              foregroundColor: theme.colorScheme.onError,
+              heroTag: 'save_button',
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
               onPressed: () {
-                _onRequestDeleteTask(
-                  onDeleteEvent: () => bloc.add(DeleteTaskEvent()),
+                bloc.add(
+                  widget.isEditMode ? UpdateTaskEvent() : CreateTaskEvent(),
                 );
               },
-              child: const Icon(Icons.delete),
+              child: const Icon(Icons.save),
             ),
-          ],
-        ],
-      ),
-      body: BlocListener<TaskFormBloc, TaskFormState>(
-        listener: (context, state) {},
-        child: BlocBuilder<TaskFormBloc, TaskFormState>(
-          builder: (context, state) {
-            if (state.isLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    BlocTextField<TaskFormBloc, TaskFormState>(
-                      valueSelector: (state) => state.title,
-                      errorSelector: (state) => state.titleError,
-                      onChanged: (value) =>
-                          bloc.add(TaskFormUpdateFieldsEvent(title: value)),
-                      controller: _titleController,
-                      label: "Título",
-                    ),
-                    const SizedBox(height: 16),
-                    MultilineBlocTextField<TaskFormBloc, TaskFormState>(
-                      valueSelector: (state) => state.description,
-                      errorSelector: (state) => state.descriptionError,
-                      onChanged: (value) => bloc.add(
-                        TaskFormUpdateFieldsEvent(description: value),
-                      ),
-                      controller: _descriptionController,
-                      label: "Descrição",
-                    ),
-                    const SizedBox(height: 24),
-
-                    ColorSelector(
-                      selectedColor: state.color,
-                      onColorSelected: (color) {
-                        bloc.add(TaskFormUpdateFieldsEvent(color: color));
-                      },
-                      availableColors: TaskColors.values,
-                    ),
-                    const SizedBox(height: 16),
-
-                    FormSelectorField(
-                      title: 'Status',
-                      displayText: state.status.displayName,
-                      description: state.status.description,
-                      icon: state.status.icon,
-                      iconColor: state.status.color,
-                      onTap: () {
-                        _removeFocus();
-                        showStatusSelector(context, state);
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    FormSelectorField(
-                      title: 'Prioridade',
-                      displayText: state.priority.displayName,
-                      description: state.priority.description,
-                      icon: state.priority.icon,
-                      iconColor: state.priority.color,
-                      onTap: () {
-                        _removeFocus();
-                        showPrioritySelector(context, state);
-                      }
-                    ),
-                    const SizedBox(height: 16),
-                    ComplexitySelectorField(
-                      title: 'Complexidade',
-                      displayText: state.complexity.displayName,
-                      description: state.complexity.description,
-                      icon: state.complexity.icon,
-                      iconColor: state.complexity.color,
-                      storyPoints: state.complexity.suggestedStoryPoints,
-                      onTap: () {
-                        _removeFocus();
-                        showComplexitySelector(context, state);
-                      }
-                    ),
-                    const SizedBox(height: 16),
-                    FormSelectorField(
-                      title: 'Tipo',
-                      displayText: state.type.displayName,
-                      description: state.type.description.isNotEmpty
-                          ? state.type.description
-                          : null,
-                      icon: state.type.icon,
-                      iconColor: state.type.color,
-                      onTap: () {
-                        _removeFocus();
-                        showTypeSelector(context, state);
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    DateSelectorField<TaskFormBloc, TaskFormState>(
-                      title: 'Data de Vencimento',
-                      selectedDate: state.dueDate,
-                      selectedTime: state.dueTime,
-                      onTap: () {
-                        _removeFocus();
-                        showDueDateSelector(context, state);
-                      },
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Checklist Section
-                    ChecklistSection(
-                      taskId: state.taskId,
-                      onAddItem: () => _showAddChecklistItemBottomSheet(context, bloc),
-                      onToggleItem: (itemId, index) {
-                        bloc.add(ToggleChecklistItemEvent(
-                          itemId: itemId,
-                          index: index,
-                        ));
-                      },
-                      onDeleteItem: (itemId, index) {
-                        bloc.add(DeleteChecklistItemEvent(
-                          itemId: itemId,
-                          index: index,
-                        ));
-                      },
-                      onTapItem: widget.isEditMode
-                          ? (item, index) {
-                              _showEditChecklistItemBottomSheet(
-                                context,
-                                bloc,
-                                item,
-                                index,
-                              );
-                            }
-                          : null,
-                    ),
-                    
-                    // Space for floating action buttons
-                    const SizedBox(height: 128),
-                  ],
-                ),
+            if (widget.isEditMode) ...[
+              const SizedBox(height: 16),
+              FloatingActionButton(
+                heroTag: 'delete_button',
+                backgroundColor: theme.colorScheme.error,
+                foregroundColor: theme.colorScheme.onError,
+                onPressed: () {
+                  _onRequestDeleteTask(
+                    onDeleteEvent: () => bloc.add(DeleteTaskEvent()),
+                  );
+                },
+                child: const Icon(Icons.delete),
               ),
-            );
+            ],
+          ],
+        ),
+        body: BlocListener<TaskFormBloc, TaskFormState>(
+          listener: (context, state) {
+            // Atualizar controllers quando o loading terminar
+            if (!state.isLoading) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _updateControllers(state);
+              });
+            }
           },
+          child: BlocBuilder<TaskFormBloc, TaskFormState>(
+            builder: (context, state) {
+              // Atualizar controllers sempre que o state mudar
+              if (!state.isLoading) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _updateControllers(state);
+                });
+              }
+
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      BlocTextField<TaskFormBloc, TaskFormState>(
+                        valueSelector: (state) => state.title,
+                        errorSelector: (state) => state.titleError,
+                        onChanged: (value) =>
+                            bloc.add(TaskFormUpdateFieldsEvent(title: value)),
+                        controller: _titleController,
+                        label: "Título",
+                      ),
+                      const SizedBox(height: 16),
+                      MultilineBlocTextField<TaskFormBloc, TaskFormState>(
+                        valueSelector: (state) => state.description,
+                        errorSelector: (state) => state.descriptionError,
+                        onChanged: (value) => bloc.add(
+                          TaskFormUpdateFieldsEvent(description: value),
+                        ),
+                        controller: _descriptionController,
+                        label: "Descrição",
+                      ),
+                      const SizedBox(height: 24),
+
+                      ColorSelector(
+                        selectedColor: state.color,
+                        onColorSelected: (color) {
+                          bloc.add(TaskFormUpdateFieldsEvent(color: color));
+                        },
+                        availableColors: TaskColors.values,
+                      ),
+                      const SizedBox(height: 16),
+
+                      FormSelectorField(
+                        title: 'Status',
+                        displayText: state.status.displayName,
+                        description: state.status.description,
+                        icon: state.status.icon,
+                        iconColor: state.status.color,
+                        onTap: () {
+                          _removeFocus();
+                          showStatusSelector(context, state);
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      FormSelectorField(
+                        title: 'Prioridade',
+                        displayText: state.priority.displayName,
+                        description: state.priority.description,
+                        icon: state.priority.icon,
+                        iconColor: state.priority.color,
+                        onTap: () {
+                          _removeFocus();
+                          showPrioritySelector(context, state);
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      ComplexitySelectorField(
+                        title: 'Complexidade',
+                        displayText: state.complexity.displayName,
+                        description: state.complexity.description,
+                        icon: state.complexity.icon,
+                        iconColor: state.complexity.color,
+                        storyPoints: state.complexity.suggestedStoryPoints,
+                        onTap: () {
+                          _removeFocus();
+                          showComplexitySelector(context, state);
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      FormSelectorField(
+                        title: 'Tipo',
+                        displayText: state.type.displayName,
+                        description: state.type.description.isNotEmpty
+                            ? state.type.description
+                            : null,
+                        icon: state.type.icon,
+                        iconColor: state.type.color,
+                        onTap: () {
+                          _removeFocus();
+                          showTypeSelector(context, state);
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      DateSelectorField<TaskFormBloc, TaskFormState>(
+                        title: 'Data de Vencimento',
+                        selectedDate: state.dueDate,
+                        selectedTime: state.dueTime,
+                        onTap: () {
+                          _removeFocus();
+                          showDueDateSelector(context, state);
+                        },
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Checklist Section
+                      ChecklistSection(
+                        taskId: state.taskId,
+                        onAddItem: () =>
+                            _showAddChecklistItemBottomSheet(context, bloc),
+                        onToggleItem: (itemId, index) {
+                          bloc.add(
+                            ToggleChecklistItemEvent(
+                              itemId: itemId,
+                              index: index,
+                            ),
+                          );
+                        },
+                        onDeleteItem: (itemId, index) {
+                          bloc.add(
+                            DeleteChecklistItemEvent(
+                              itemId: itemId,
+                              index: index,
+                            ),
+                          );
+                        },
+                        onTapItem: widget.isEditMode
+                            ? (item, index) {
+                                _showEditChecklistItemBottomSheet(
+                                  context,
+                                  bloc,
+                                  item,
+                                  index,
+                                );
+                              }
+                            : null,
+                      ),
+
+                      // Space for floating action buttons
+                      const SizedBox(height: 128),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -264,7 +328,39 @@ class _TaskFormPageState extends State<TaskFormPage>
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
-  void _showAddChecklistItemBottomSheet(BuildContext context, TaskFormBloc bloc) {
+  Future<bool?> _showUnsavedChangesDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Alterações não salvas'),
+        content: const Text(
+          'Você tem alterações não salvas. Deseja sair sem salvar?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.primary,
+            ),
+            child: const Text('Continuar editando'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Sair sem salvar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddChecklistItemBottomSheet(
+    BuildContext context,
+    TaskFormBloc bloc,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     showModalBottomSheet(
       context: context,
@@ -278,10 +374,9 @@ class _TaskFormPageState extends State<TaskFormPage>
           ),
           child: AddChecklistItemBottomSheet(
             onAdd: (title, description) {
-              bloc.add(AddChecklistItemEvent(
-                title: title,
-                description: description,
-              ));
+              bloc.add(
+                AddChecklistItemEvent(title: title, description: description),
+              );
               Navigator.of(bottomSheetContext).pop();
             },
           ),
@@ -300,19 +395,18 @@ class _TaskFormPageState extends State<TaskFormPage>
       context: context,
       item: item,
       onSave: (title, description, isCompleted) {
-        bloc.add(EditChecklistItemEvent(
-          itemId: item.id ?? -1,
-          index: index,
-          title: title,
-          description: description,
-          isCompleted: isCompleted,
-        ));
+        bloc.add(
+          EditChecklistItemEvent(
+            itemId: item.id ?? -1,
+            index: index,
+            title: title,
+            description: description,
+            isCompleted: isCompleted,
+          ),
+        );
       },
       onDelete: () {
-        bloc.add(DeleteChecklistItemEvent(
-          itemId: item.id ?? -1,
-          index: index,
-        ));
+        bloc.add(DeleteChecklistItemEvent(itemId: item.id ?? -1, index: index));
       },
     );
   }

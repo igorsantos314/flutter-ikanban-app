@@ -40,6 +40,8 @@ abstract class TaskFormState with _$TaskFormState {
     @Default(false) bool isLoading,
     String? errorMessage,
     
+    @Default(false) bool hasUnsavedChanges,
+    
     // Checklist fields
     @Default([]) List<ChecklistItemModel> checklistItems,
     @Default(0) int checklistItemCount,

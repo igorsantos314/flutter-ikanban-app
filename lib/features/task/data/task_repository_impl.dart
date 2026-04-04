@@ -111,7 +111,7 @@ class TaskRepositoryImpl implements TaskRepository {
           onlyActive: onlyActive,
           ascending: ascending,
         )
-        .map<ResultPage<TaskModel>>((event) {
+        .asyncMap<ResultPage<TaskModel>>((event) async {
           final result = event.items
               .map((data) => TaskMapper.fromEntity(data))
               .toList();
@@ -152,7 +152,10 @@ class TaskRepositoryImpl implements TaskRepository {
           ),
         );
       }
-      return Outcome.success(value: TaskMapper.fromEntity(entity));
+      
+      return Outcome.success(
+        value: TaskMapper.fromEntity(entity),
+      );
     } catch (e) {
       return Outcome.failure(
         error: GenericError(),
@@ -212,11 +215,12 @@ class TaskRepositoryImpl implements TaskRepository {
           onlyActive: onlyActive,
           ascending: ascending,
         )
-        .map<Outcome<List<TaskModel>, TaskRepositoryErrors>>((event) {
-          final result = event.items
+        .asyncMap<List<TaskModel>>((event) async {
+          return event.items
               .map((data) => TaskMapper.fromEntity(data))
               .toList();
-
+        })
+        .map<Outcome<List<TaskModel>, TaskRepositoryErrors>>((result) {
           return Outcome<List<TaskModel>, TaskRepositoryErrors>.success(
             value: result,
           );
@@ -238,6 +242,20 @@ class TaskRepositoryImpl implements TaskRepository {
       return Outcome.failure(
         error: GenericError(),
         message: 'Failed to get all tasks',
+        throwable: e,
+      );
+    }
+  }
+
+  @override
+  Future<Outcome<void, TaskRepositoryErrors>> updateTaskChecklistStats(int taskId) async {
+    try {
+      await _localDataSource.updateTaskChecklistStats(taskId);
+      return Outcome.success(value: null);
+    } catch (e) {
+      return Outcome.failure(
+        error: GenericError(),
+        message: 'Failed to update task checklist stats',
         throwable: e,
       );
     }

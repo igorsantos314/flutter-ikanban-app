@@ -15,7 +15,10 @@ class ChecklistItemRepositoryImpl implements ChecklistItemRepository {
   ) async {
     try {
       final entity = ChecklistItemMapper.toEntity(item);
-      final generatedId = await _localDataSource.insertChecklistItem(entity);
+      final generatedId = await _localDataSource.insertChecklistItemWithTaskUpdate(
+        entity,
+        item.taskId,
+      );
       return Outcome.success(value: generatedId);
     } catch (e) {
       return Outcome.failure(
@@ -50,7 +53,16 @@ class ChecklistItemRepositoryImpl implements ChecklistItemRepository {
     int id,
   ) async {
     try {
-      await _localDataSource.deleteChecklistItem(id);
+      // Get item first to obtain taskId
+      final item = await _localDataSource.getChecklistItemById(id);
+      if (item == null) {
+        return Outcome.failure(
+          error: GenericError(),
+          message: 'Checklist item not found',
+        );
+      }
+      
+      await _localDataSource.deleteChecklistItemWithTaskUpdate(id, item.taskId);
       return const Outcome.success();
     } catch (e) {
       return Outcome.failure(
@@ -62,12 +74,31 @@ class ChecklistItemRepositoryImpl implements ChecklistItemRepository {
   }
 
   @override
+  Future<Outcome<void, ChecklistItemRepositoryErrors>> deleteAllChecklistItemsByTaskId(
+    int taskId,
+  ) async {
+    try {
+      await _localDataSource.deleteAllChecklistItemsByTaskId(taskId);
+      return const Outcome.success();
+    } catch (e) {
+      return Outcome.failure(
+        error: GenericError(),
+        message: 'Failed to delete all checklist items by task id',
+        throwable: e,
+      );
+    }
+  }
+
+  @override
   Future<Outcome<void, ChecklistItemRepositoryErrors>> updateChecklistItem(
     ChecklistItemModel item,
   ) async {
     try {
       final entity = ChecklistItemMapper.toEntity(item);
-      await _localDataSource.updateChecklistItem(entity);
+      await _localDataSource.updateChecklistItemWithTaskUpdate(
+        entity,
+        item.taskId,
+      );
       return const Outcome.success();
     } catch (e) {
       return Outcome.failure(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
-import 'package:flutter_ikanban_app/core/ui/modals/loading_modal.dart';
 import 'package:flutter_ikanban_app/core/ui/widgets/snackbars.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_form_bloc.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
@@ -16,7 +15,7 @@ class TaskEditPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) {
-        final bloc = TaskFormBloc(getIt.get(), getIt.get(), getIt.get(), getIt.get(), getIt.get());
+        final bloc = TaskFormBloc(getIt.get(), getIt.get(), getIt.get(), getIt.get(), getIt.get(), getIt.get());
         bloc.add(LoadTaskFormEvent(taskId));
         return bloc;
       },
@@ -64,7 +63,20 @@ class TaskEditPageContent extends StatelessWidget {
           listenWhen: (previous, current) =>
               previous.isLoading != current.isLoading,
           listener: (context, state) {
-            LoadingModal.displayLoading(context, isShow: state.isLoading);
+            if (state.isLoading) {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            } else {
+              // Fecha o dialog de loading se estiver aberto
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            }
           },
         ),
       ],

@@ -641,6 +641,29 @@ class $TaskEntityTable extends TaskEntity
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _checklistTotalMeta = const VerificationMeta(
+    'checklistTotal',
+  );
+  @override
+  late final GeneratedColumn<int> checklistTotal = GeneratedColumn<int>(
+    'checklist_total',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _checklistCompletedMeta =
+      const VerificationMeta('checklistCompleted');
+  @override
+  late final GeneratedColumn<int> checklistCompleted = GeneratedColumn<int>(
+    'checklist_completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -658,6 +681,8 @@ class $TaskEntityTable extends TaskEntity
     boardId,
     shouldNotify,
     notifyMinutesBefore,
+    checklistTotal,
+    checklistCompleted,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -736,6 +761,24 @@ class $TaskEntityTable extends TaskEntity
         notifyMinutesBefore.isAcceptableOrUnknown(
           data['notify_minutes_before']!,
           _notifyMinutesBeforeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('checklist_total')) {
+      context.handle(
+        _checklistTotalMeta,
+        checklistTotal.isAcceptableOrUnknown(
+          data['checklist_total']!,
+          _checklistTotalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('checklist_completed')) {
+      context.handle(
+        _checklistCompletedMeta,
+        checklistCompleted.isAcceptableOrUnknown(
+          data['checklist_completed']!,
+          _checklistCompletedMeta,
         ),
       );
     }
@@ -818,6 +861,14 @@ class $TaskEntityTable extends TaskEntity
         DriftSqlType.int,
         data['${effectivePrefix}notify_minutes_before'],
       ),
+      checklistTotal: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}checklist_total'],
+      )!,
+      checklistCompleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}checklist_completed'],
+      )!,
     );
   }
 
@@ -855,6 +906,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
   final int? boardId;
   final bool shouldNotify;
   final int? notifyMinutesBefore;
+  final int checklistTotal;
+  final int checklistCompleted;
   const TaskData({
     required this.id,
     required this.title,
@@ -871,6 +924,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     this.boardId,
     required this.shouldNotify,
     this.notifyMinutesBefore,
+    required this.checklistTotal,
+    required this.checklistCompleted,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -918,6 +973,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     if (!nullToAbsent || notifyMinutesBefore != null) {
       map['notify_minutes_before'] = Variable<int>(notifyMinutesBefore);
     }
+    map['checklist_total'] = Variable<int>(checklistTotal);
+    map['checklist_completed'] = Variable<int>(checklistCompleted);
     return map;
   }
 
@@ -948,6 +1005,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       notifyMinutesBefore: notifyMinutesBefore == null && nullToAbsent
           ? const Value.absent()
           : Value(notifyMinutesBefore),
+      checklistTotal: Value(checklistTotal),
+      checklistCompleted: Value(checklistCompleted),
     );
   }
 
@@ -974,6 +1033,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       notifyMinutesBefore: serializer.fromJson<int?>(
         json['notifyMinutesBefore'],
       ),
+      checklistTotal: serializer.fromJson<int>(json['checklistTotal']),
+      checklistCompleted: serializer.fromJson<int>(json['checklistCompleted']),
     );
   }
   @override
@@ -995,6 +1056,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       'boardId': serializer.toJson<int?>(boardId),
       'shouldNotify': serializer.toJson<bool>(shouldNotify),
       'notifyMinutesBefore': serializer.toJson<int?>(notifyMinutesBefore),
+      'checklistTotal': serializer.toJson<int>(checklistTotal),
+      'checklistCompleted': serializer.toJson<int>(checklistCompleted),
     };
   }
 
@@ -1014,6 +1077,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     Value<int?> boardId = const Value.absent(),
     bool? shouldNotify,
     Value<int?> notifyMinutesBefore = const Value.absent(),
+    int? checklistTotal,
+    int? checklistCompleted,
   }) => TaskData(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -1032,6 +1097,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     notifyMinutesBefore: notifyMinutesBefore.present
         ? notifyMinutesBefore.value
         : this.notifyMinutesBefore,
+    checklistTotal: checklistTotal ?? this.checklistTotal,
+    checklistCompleted: checklistCompleted ?? this.checklistCompleted,
   );
   TaskData copyWithCompanion(TaskEntityCompanion data) {
     return TaskData(
@@ -1058,6 +1125,12 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       notifyMinutesBefore: data.notifyMinutesBefore.present
           ? data.notifyMinutesBefore.value
           : this.notifyMinutesBefore,
+      checklistTotal: data.checklistTotal.present
+          ? data.checklistTotal.value
+          : this.checklistTotal,
+      checklistCompleted: data.checklistCompleted.present
+          ? data.checklistCompleted.value
+          : this.checklistCompleted,
     );
   }
 
@@ -1078,7 +1151,9 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           ..write('createdAt: $createdAt, ')
           ..write('boardId: $boardId, ')
           ..write('shouldNotify: $shouldNotify, ')
-          ..write('notifyMinutesBefore: $notifyMinutesBefore')
+          ..write('notifyMinutesBefore: $notifyMinutesBefore, ')
+          ..write('checklistTotal: $checklistTotal, ')
+          ..write('checklistCompleted: $checklistCompleted')
           ..write(')'))
         .toString();
   }
@@ -1100,6 +1175,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     boardId,
     shouldNotify,
     notifyMinutesBefore,
+    checklistTotal,
+    checklistCompleted,
   );
   @override
   bool operator ==(Object other) =>
@@ -1119,7 +1196,9 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           other.createdAt == this.createdAt &&
           other.boardId == this.boardId &&
           other.shouldNotify == this.shouldNotify &&
-          other.notifyMinutesBefore == this.notifyMinutesBefore);
+          other.notifyMinutesBefore == this.notifyMinutesBefore &&
+          other.checklistTotal == this.checklistTotal &&
+          other.checklistCompleted == this.checklistCompleted);
 }
 
 class TaskEntityCompanion extends UpdateCompanion<TaskData> {
@@ -1138,6 +1217,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
   final Value<int?> boardId;
   final Value<bool> shouldNotify;
   final Value<int?> notifyMinutesBefore;
+  final Value<int> checklistTotal;
+  final Value<int> checklistCompleted;
   const TaskEntityCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -1154,6 +1235,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     this.boardId = const Value.absent(),
     this.shouldNotify = const Value.absent(),
     this.notifyMinutesBefore = const Value.absent(),
+    this.checklistTotal = const Value.absent(),
+    this.checklistCompleted = const Value.absent(),
   });
   TaskEntityCompanion.insert({
     this.id = const Value.absent(),
@@ -1171,6 +1254,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     this.boardId = const Value.absent(),
     this.shouldNotify = const Value.absent(),
     this.notifyMinutesBefore = const Value.absent(),
+    this.checklistTotal = const Value.absent(),
+    this.checklistCompleted = const Value.absent(),
   }) : title = Value(title),
        status = Value(status),
        priority = Value(priority),
@@ -1193,6 +1278,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Expression<int>? boardId,
     Expression<bool>? shouldNotify,
     Expression<int>? notifyMinutesBefore,
+    Expression<int>? checklistTotal,
+    Expression<int>? checklistCompleted,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1211,6 +1298,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       if (shouldNotify != null) 'should_notify': shouldNotify,
       if (notifyMinutesBefore != null)
         'notify_minutes_before': notifyMinutesBefore,
+      if (checklistTotal != null) 'checklist_total': checklistTotal,
+      if (checklistCompleted != null) 'checklist_completed': checklistCompleted,
     });
   }
 
@@ -1230,6 +1319,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Value<int?>? boardId,
     Value<bool>? shouldNotify,
     Value<int?>? notifyMinutesBefore,
+    Value<int>? checklistTotal,
+    Value<int>? checklistCompleted,
   }) {
     return TaskEntityCompanion(
       id: id ?? this.id,
@@ -1247,6 +1338,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       boardId: boardId ?? this.boardId,
       shouldNotify: shouldNotify ?? this.shouldNotify,
       notifyMinutesBefore: notifyMinutesBefore ?? this.notifyMinutesBefore,
+      checklistTotal: checklistTotal ?? this.checklistTotal,
+      checklistCompleted: checklistCompleted ?? this.checklistCompleted,
     );
   }
 
@@ -1308,6 +1401,12 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     if (notifyMinutesBefore.present) {
       map['notify_minutes_before'] = Variable<int>(notifyMinutesBefore.value);
     }
+    if (checklistTotal.present) {
+      map['checklist_total'] = Variable<int>(checklistTotal.value);
+    }
+    if (checklistCompleted.present) {
+      map['checklist_completed'] = Variable<int>(checklistCompleted.value);
+    }
     return map;
   }
 
@@ -1328,7 +1427,9 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
           ..write('createdAt: $createdAt, ')
           ..write('boardId: $boardId, ')
           ..write('shouldNotify: $shouldNotify, ')
-          ..write('notifyMinutesBefore: $notifyMinutesBefore')
+          ..write('notifyMinutesBefore: $notifyMinutesBefore, ')
+          ..write('checklistTotal: $checklistTotal, ')
+          ..write('checklistCompleted: $checklistCompleted')
           ..write(')'))
         .toString();
   }
@@ -2129,6 +2230,8 @@ typedef $$TaskEntityTableCreateCompanionBuilder =
       Value<int?> boardId,
       Value<bool> shouldNotify,
       Value<int?> notifyMinutesBefore,
+      Value<int> checklistTotal,
+      Value<int> checklistCompleted,
     });
 typedef $$TaskEntityTableUpdateCompanionBuilder =
     TaskEntityCompanion Function({
@@ -2147,6 +2250,8 @@ typedef $$TaskEntityTableUpdateCompanionBuilder =
       Value<int?> boardId,
       Value<bool> shouldNotify,
       Value<int?> notifyMinutesBefore,
+      Value<int> checklistTotal,
+      Value<int> checklistCompleted,
     });
 
 final class $$TaskEntityTableReferences
@@ -2281,6 +2386,16 @@ class $$TaskEntityTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get checklistTotal => $composableBuilder(
+    column: $table.checklistTotal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get checklistCompleted => $composableBuilder(
+    column: $table.checklistCompleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$BoardEntityTableFilterComposer get boardId {
     final $$BoardEntityTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -2409,6 +2524,16 @@ class $$TaskEntityTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get checklistTotal => $composableBuilder(
+    column: $table.checklistTotal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get checklistCompleted => $composableBuilder(
+    column: $table.checklistCompleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$BoardEntityTableOrderingComposer get boardId {
     final $$BoardEntityTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -2490,6 +2615,16 @@ class $$TaskEntityTableAnnotationComposer
 
   GeneratedColumn<int> get notifyMinutesBefore => $composableBuilder(
     column: $table.notifyMinutesBefore,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get checklistTotal => $composableBuilder(
+    column: $table.checklistTotal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get checklistCompleted => $composableBuilder(
+    column: $table.checklistCompleted,
     builder: (column) => column,
   );
 
@@ -2586,6 +2721,8 @@ class $$TaskEntityTableTableManager
                 Value<int?> boardId = const Value.absent(),
                 Value<bool> shouldNotify = const Value.absent(),
                 Value<int?> notifyMinutesBefore = const Value.absent(),
+                Value<int> checklistTotal = const Value.absent(),
+                Value<int> checklistCompleted = const Value.absent(),
               }) => TaskEntityCompanion(
                 id: id,
                 title: title,
@@ -2602,6 +2739,8 @@ class $$TaskEntityTableTableManager
                 boardId: boardId,
                 shouldNotify: shouldNotify,
                 notifyMinutesBefore: notifyMinutesBefore,
+                checklistTotal: checklistTotal,
+                checklistCompleted: checklistCompleted,
               ),
           createCompanionCallback:
               ({
@@ -2620,6 +2759,8 @@ class $$TaskEntityTableTableManager
                 Value<int?> boardId = const Value.absent(),
                 Value<bool> shouldNotify = const Value.absent(),
                 Value<int?> notifyMinutesBefore = const Value.absent(),
+                Value<int> checklistTotal = const Value.absent(),
+                Value<int> checklistCompleted = const Value.absent(),
               }) => TaskEntityCompanion.insert(
                 id: id,
                 title: title,
@@ -2636,6 +2777,8 @@ class $$TaskEntityTableTableManager
                 boardId: boardId,
                 shouldNotify: shouldNotify,
                 notifyMinutesBefore: notifyMinutesBefore,
+                checklistTotal: checklistTotal,
+                checklistCompleted: checklistCompleted,
               ),
           withReferenceMapper: (p0) => p0
               .map(

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ikanban_app/core/di/app_locator.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/checklist_item_repository.dart';
+import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/create_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/delete_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/get_task_by_id_use_case.dart';
@@ -276,6 +277,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                     getIt<GetTaskByIdUseCase>(),
                     getIt<DeleteTaskUseCase>(),
                     getIt<ChecklistItemRepository>(),
+                    getIt<TaskRepository>(),
                   );
                   bloc.add(LoadChecklistItemsEvent(task.id!));
                   return bloc;
@@ -290,7 +292,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                           taskId: task.id!,
                           onAdd: (title, description) {
                             blocContext.read<TaskFormBloc>().add(
-                              AddChecklistItemEvent(
+                              AddChecklistItemImmediateEvent(
                                 title: title,
                                 description: description,
                               ),
@@ -300,7 +302,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                       },
                       onToggleItem: (itemId, index) {
                         blocContext.read<TaskFormBloc>().add(
-                          ToggleChecklistItemEvent(
+                          ToggleChecklistItemImmediateEvent(
                             itemId: itemId,
                             index: index,
                           ),
@@ -308,7 +310,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                       },
                       onDeleteItem: (itemId, index) {
                         blocContext.read<TaskFormBloc>().add(
-                          DeleteChecklistItemEvent(
+                          DeleteChecklistItemImmediateEvent(
                             itemId: itemId,
                             index: index,
                           ),
@@ -320,7 +322,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                           item: item,
                           onSave: (title, description, isCompleted) {
                             blocContext.read<TaskFormBloc>().add(
-                              EditChecklistItemEvent(
+                              EditChecklistItemImmediateEvent(
                                 itemId: item.id ?? -1,
                                 index: index,
                                 title: title,
@@ -331,7 +333,7 @@ class TaskDetailsBottomSheet extends StatelessWidget {
                           },
                           onDelete: () {
                             blocContext.read<TaskFormBloc>().add(
-                              DeleteChecklistItemEvent(
+                              DeleteChecklistItemImmediateEvent(
                                 itemId: item.id ?? -1,
                                 index: index,
                               ),

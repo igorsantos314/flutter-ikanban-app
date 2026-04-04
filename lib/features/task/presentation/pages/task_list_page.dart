@@ -18,6 +18,7 @@ import 'package:flutter_ikanban_app/features/task/domain/use_cases/list_task_use
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/update_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/bloc/task_list_bloc.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/enums/task_layout.dart';
+import 'package:flutter_ikanban_app/features/task/presentation/enums/task_size.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/form/task_form_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/events/list/task_list_events.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_type_enum_extensions.dart';
@@ -455,6 +456,9 @@ class _TaskListPageContentState extends State<TaskListPageContent>
         layoutMode: state.layoutMode == TaskLayout.list
             ? LayoutMode.fullWidth
             : LayoutMode.compact,
+        taskSize: state.layoutMode == TaskLayout.list
+            ? TaskSize.comfortable
+            : TaskSize.compact,
         onTap: () {
           context.read<TaskListBloc>().add(ShowTaskDetailsEvent(task: task));
         },

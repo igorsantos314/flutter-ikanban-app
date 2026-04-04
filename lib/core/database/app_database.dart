@@ -26,7 +26,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection(dbName));
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -44,8 +44,50 @@ class AppDatabase extends _$AppDatabase {
         // Create checklist_item_entity table
         await migrator.createTable(checklistItemEntity);
       }
+      if (from < 6) {
+        // Add checklist statistics columns to TaskEntity
+        await migrator.addColumn(taskEntity, taskEntity.checklistTotal);
+        await migrator.addColumn(taskEntity, taskEntity.checklistCompleted);
+        
+        // Update existing tasks with their checklist stats
+        await _updateExistingTaskChecklistStats();
+      }
     },
   );
+
+  // Update checklist statistics for all existing tasks
+  Future<void> _updateExistingTaskChecklistStats() async {
+    final allTasks = await select(taskEntity).get();
+    
+    for (final task in allTasks) {
+      // Count total items
+      final totalQuery = selectOnly(checklistItemEntity)
+        ..addColumns([checklistItemEntity.id.count()])
+        ..where(checklistItemEntity.taskId.equals(task.id));
+
+      final total = (await totalQuery.getSingle())
+              .read(checklistItemEntity.id.count()) ??
+          0;
+
+      // Count completed items
+      final completedQuery = selectOnly(checklistItemEntity)
+        ..addColumns([checklistItemEntity.id.count()])
+        ..where(checklistItemEntity.taskId.equals(task.id) &
+            checklistItemEntity.isCompleted.equals(true));
+
+      final completed = (await completedQuery.getSingle())
+              .read(checklistItemEntity.id.count()) ??
+          0;
+
+      // Update task stats
+      await (update(taskEntity)..where((tbl) => tbl.id.equals(task.id))).write(
+        TaskEntityCompanion(
+          checklistTotal: Value(total),
+          checklistCompleted: Value(completed),
+        ),
+      );
+    }
+  }
 }
 
 LazyDatabase _openConnection(String dbName) {

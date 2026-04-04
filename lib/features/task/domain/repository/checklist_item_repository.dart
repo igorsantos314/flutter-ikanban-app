@@ -26,6 +26,10 @@ abstract class ChecklistItemRepository {
     int id,
   );
 
+  Future<Outcome<void, ChecklistItemRepositoryErrors>> deleteAllChecklistItemsByTaskId(
+    int taskId,
+  );
+
   Stream<Outcome<List<ChecklistItemModel>, ChecklistItemRepositoryErrors>>
       watchChecklistItemsByTaskId(int taskId);
 

@@ -30,4 +30,8 @@ class TaskEntity extends Table {
   // Notification columns
   BoolColumn get shouldNotify => boolean().named('should_notify').withDefault(const Constant(false))();
   IntColumn get notifyMinutesBefore => integer().named('notify_minutes_before').nullable()();
+  
+  // Checklist statistics
+  IntColumn get checklistTotal => integer().named('checklist_total').withDefault(const Constant(0))();
+  IntColumn get checklistCompleted => integer().named('checklist_completed').withDefault(const Constant(0))();
 }

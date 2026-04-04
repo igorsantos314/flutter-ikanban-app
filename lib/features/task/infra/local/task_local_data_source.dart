@@ -9,11 +9,12 @@ import 'package:flutter_ikanban_app/features/task/domain/enums/task_sort.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
 import 'package:flutter_ikanban_app/features/task/infra/local/tables/task_table_entity.dart';
+import 'package:flutter_ikanban_app/features/task/infra/local/tables/checklist_item_entity_table.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/extensions/task_priority_enum_extensions.dart';
 
 part 'task_local_data_source.g.dart';
 
-@DriftAccessor(tables: [TaskEntity])
+@DriftAccessor(tables: [TaskEntity, ChecklistItemEntity])
 class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
     with _$TaskLocalDataSourceMixin {
   final AppDatabase db;
@@ -209,6 +210,36 @@ class TaskLocalDataSource extends DatabaseAccessor<AppDatabase>
         mode: InsertMode.insertOrReplace,
       );
     });
+  }
+
+  /// Recalculates and updates task checklist statistics
+  Future<void> updateTaskChecklistStats(int taskId) async {
+    // Count total items
+    final totalQuery = db.selectOnly(db.checklistItemEntity)
+      ..addColumns([db.checklistItemEntity.id.count()])
+      ..where(db.checklistItemEntity.taskId.equals(taskId));
+
+    final total = (await totalQuery.getSingle())
+            .read(db.checklistItemEntity.id.count()) ??
+        0;
+
+    // Count completed items
+    final completedQuery = db.selectOnly(db.checklistItemEntity)
+      ..addColumns([db.checklistItemEntity.id.count()])
+      ..where(db.checklistItemEntity.taskId.equals(taskId) &
+          db.checklistItemEntity.isCompleted.equals(true));
+
+    final completed = (await completedQuery.getSingle())
+            .read(db.checklistItemEntity.id.count()) ??
+        0;
+
+    // Update task stats
+    await (update(db.taskEntity)..where((tbl) => tbl.id.equals(taskId))).write(
+      TaskEntityCompanion(
+        checklistTotal: Value(total),
+        checklistCompleted: Value(completed),
+      ),
+    );
   }
 
   OrderingTerm _getOrderByColumn(SortField? orderBy, bool ascending) {

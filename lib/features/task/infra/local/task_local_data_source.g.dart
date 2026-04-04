@@ -6,6 +6,8 @@ part of 'task_local_data_source.dart';
 mixin _$TaskLocalDataSourceMixin on DatabaseAccessor<AppDatabase> {
   $BoardEntityTable get boardEntity => attachedDatabase.boardEntity;
   $TaskEntityTable get taskEntity => attachedDatabase.taskEntity;
+  $ChecklistItemEntityTable get checklistItemEntity =>
+      attachedDatabase.checklistItemEntity;
   TaskLocalDataSourceManager get managers => TaskLocalDataSourceManager(this);
 }
 
@@ -16,4 +18,9 @@ class TaskLocalDataSourceManager {
       $$BoardEntityTableTableManager(_db.attachedDatabase, _db.boardEntity);
   $$TaskEntityTableTableManager get taskEntity =>
       $$TaskEntityTableTableManager(_db.attachedDatabase, _db.taskEntity);
+  $$ChecklistItemEntityTableTableManager get checklistItemEntity =>
+      $$ChecklistItemEntityTableTableManager(
+        _db.attachedDatabase,
+        _db.checklistItemEntity,
+      );
 }
