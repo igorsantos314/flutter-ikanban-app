@@ -132,12 +132,19 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     outcome.when(
       success: (result) {
         log("Data exported to: $result");
+        String message = "Dados exportados com sucesso!\nArquivo: ${result?.filePath}";
+        if (result != null) {
+          message += "\n${result.tasksCount} tarefas, ${result.boardsCount} quadros";
+          if (result.checklistItemsCount > 0) {
+            message += ", ${result.checklistItemsCount} itens de checklist";
+          }
+        }
         emit(
           state.copyWith(
             isLoading: false,
             showNotification: true,
             notificationType: NotificationType.success,
-            notificationMessage: "Dados exportados com sucesso!\nArquivo: ${result?.filePath}",
+            notificationMessage: message,
           ),
         );
       },
@@ -168,13 +175,23 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       success: (importResult) {
         if (importResult != null) {
           log("Data imported: ${importResult.totalImported} items");
+          String message = "Dados importados com sucesso!\n";
+          message += "${importResult.tasksImported} tarefas importadas";
+          
+          if (importResult.checklistItemsImported > 0) {
+            message += "\n${importResult.checklistItemsImported} itens de checklist importados";
+          }
+          
+          if (importResult.checklistItemsIgnored > 0) {
+            message += "\n\nAVISO: ${importResult.checklistItemsIgnored} itens de checklist foram ignorados (limite de 50 itens por tarefa)";
+          }
+          
           emit(
             state.copyWith(
               isLoading: false,
               showNotification: true,
               notificationType: NotificationType.success,
-              notificationMessage: "Dados importados com sucesso!\n"
-                  "${importResult.tasksImported} tarefas importadas",
+              notificationMessage: message,
             ),
           );
         } else {

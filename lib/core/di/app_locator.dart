@@ -241,6 +241,7 @@ void _setupCoreServices() {
       settingsRepository: getIt(),
       taskRepository: getIt(),
       boardRepository: getIt(),
+      checklistItemRepository: getIt(),
     ),
   );
 
@@ -249,6 +250,7 @@ void _setupCoreServices() {
       settingsRepository: getIt(),
       taskRepository: getIt(),
       boardRepository: getIt(),
+      checklistItemRepository: getIt(),
       fileService: getIt(),
       fileShareService: getIt(),
     ),

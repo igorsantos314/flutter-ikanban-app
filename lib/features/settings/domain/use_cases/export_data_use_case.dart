@@ -6,12 +6,14 @@ import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/board/domain/repository/board_repository.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/repository/settings_repository.dart';
+import 'package:flutter_ikanban_app/features/task/domain/repository/checklist_item_repository.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 
 class ExportDataUseCase {
   final TaskRepository _taskRepository;
   final BoardRepository _boardRepository;
   final SettingsRepository _settingsRepository;
+  final ChecklistItemRepository _checklistItemRepository;
   final FileService _fileService;
   final FileShareService _fileShareService;
 
@@ -19,11 +21,13 @@ class ExportDataUseCase {
     required SettingsRepository settingsRepository,
     required TaskRepository taskRepository,
     required BoardRepository boardRepository,
+    required ChecklistItemRepository checklistItemRepository,
     required FileService fileService,
     required FileShareService fileShareService,
   }) : _taskRepository = taskRepository,
        _boardRepository = boardRepository,
        _settingsRepository = settingsRepository,
+       _checklistItemRepository = checklistItemRepository,
        _fileService = fileService,
        _fileShareService = fileShareService;
 
@@ -36,28 +40,57 @@ class ExportDataUseCase {
       final tasksOutcome = await _taskRepository.getAllTasks();
       
       List<Map<String, dynamic>> tasksData = [];
+      int totalChecklistItems = 0;
+      
       tasksOutcome.when(
-        success: (tasks) {
+        success: (tasks) async {
           if (tasks != null) {
-            tasksData = tasks
-                .map(
-                  (task) => {
-                    'id': task.id,
-                    'title': task.title,
-                    'description': task.description,
-                    'status': task.status.name,
-                    'priority': task.priority.name,
-                    'complexity': task.complexity.name,
-                    'type': task.type.name,
-                    'dueDate': task.dueDate?.toIso8601String(),
-                    'isActive': task.isActive,
-                    'createdAt': task.createdAt.toIso8601String(),
-                    'color': task.color.name,
-                    'boardId': task.boardId,
-                  },
-                )
-                .toList();
+            for (final task in tasks) {
+              // Get checklist items for this task
+              final checklistOutcome = await _checklistItemRepository
+                  .watchChecklistItemsByTaskId(task.id!)
+                  .first;
+              
+              List<Map<String, dynamic>> checklistItemsData = [];
+              checklistOutcome.when(
+                success: (checklistItems) {
+                  if (checklistItems != null) {
+                    checklistItemsData = checklistItems
+                        .map((item) => {
+                              'id': item.id,
+                              'title': item.title,
+                              'description': item.description,
+                              'isCompleted': item.isCompleted,
+                              'taskId': item.taskId,
+                              'createdAt': item.createdAt.toIso8601String(),
+                            })
+                        .toList();
+                    totalChecklistItems += checklistItemsData.length;
+                  }
+                },
+                failure: (error, message, throwable) {
+                  log('Error loading checklist items for task ${task.id}: $message');
+                },
+              );
+              
+              tasksData.add({
+                'id': task.id,
+                'title': task.title,
+                'description': task.description,
+                'status': task.status.name,
+                'priority': task.priority.name,
+                'complexity': task.complexity.name,
+                'type': task.type.name,
+                'dueDate': task.dueDate?.toIso8601String(),
+                'isActive': task.isActive,
+                'createdAt': task.createdAt.toIso8601String(),
+                'color': task.color.name,
+                'boardId': task.boardId,
+                'checklistItems': checklistItemsData,
+              });
+            }
             log('Tasks exported: ${tasksData.length}');
+            log('Checklist items exported: $totalChecklistItems');
           }
         },
         failure: (error, message, throwable) {
@@ -128,6 +161,7 @@ class ExportDataUseCase {
           'dataVersion': '1.0',
           'totalTasks': tasksData.length,
           'totalBoards': boardsData.length,
+          'totalChecklistItems': totalChecklistItems,
           'hasSettings': settingsData != null,
         },
       };
@@ -168,6 +202,7 @@ class ExportDataUseCase {
             fileSize: jsonData.length,
             tasksCount: tasksData.length,
             boardsCount: boardsData.length,
+            checklistItemsCount: totalChecklistItems,
             hasSettings: settingsData != null,
             shareAttempted: shareAfterExport,
           );
@@ -199,6 +234,7 @@ class ExportResult {
   final int fileSize;
   final int tasksCount;
   final int boardsCount;
+  final int checklistItemsCount;
   final bool hasSettings;
   final bool shareAttempted;
 
@@ -208,6 +244,7 @@ class ExportResult {
     required this.fileSize,
     required this.tasksCount,
     required this.boardsCount,
+    required this.checklistItemsCount,
     required this.hasSettings,
     required this.shareAttempted,
   });
@@ -220,7 +257,7 @@ class ExportResult {
     return '${(fileSize / (1024 * 1024)).toStringAsFixed(1)}MB';
   }
   
-  String get summary => '$tasksCount tasks, $boardsCount boards • $formattedSize';
+  String get summary => '$tasksCount tasks, $boardsCount boards, $checklistItemsCount checklist items • $formattedSize';
 }
 
 enum ExportDataError {
