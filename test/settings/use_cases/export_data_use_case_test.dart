@@ -17,6 +17,7 @@ void main() {
           fileSize: 512,
           tasksCount: 10,
           shareAttempted: false,
+          checklistItemsCount: 2,
         );
         expect(result.formattedSize, '512B');
       });
@@ -30,6 +31,7 @@ void main() {
           fileSize: 2048,
           tasksCount: 10,
           shareAttempted: false,
+          checklistItemsCount: 2,
         );
         expect(result.formattedSize, '2.0KB');
       });
@@ -43,6 +45,7 @@ void main() {
           fileSize: 2097152,
           tasksCount: 10,
           shareAttempted: false,
+          checklistItemsCount: 2,
         );
         expect(result.formattedSize, '2.0MB');
       });
@@ -56,8 +59,9 @@ void main() {
           fileSize: 1024,
           tasksCount: 42,
           shareAttempted: false,
+          checklistItemsCount: 5,
         );
-        expect(result.summary, '42 tasks, 5 boards • 1.0KB');
+        expect(result.summary, '42 tasks, 5 boards, 5 checklist items • 1.0KB');
       });
 
       test('should have correct file path', () {
@@ -69,6 +73,7 @@ void main() {
           fileSize: 1024,
           tasksCount: 10,
           shareAttempted: false,
+          checklistItemsCount: 2,
         );
         expect(result.filePath, '/storage/backups/backup.json');
         expect(result.fileName, 'backup.json');
@@ -83,6 +88,7 @@ void main() {
           fileSize: 1024,
           tasksCount: 10,
           shareAttempted: true,
+          checklistItemsCount: 2,
         );
         expect(resultWithShare.shareAttempted, true);
 
@@ -94,6 +100,7 @@ void main() {
           fileSize: 1024,
           tasksCount: 10,
           shareAttempted: false,
+          checklistItemsCount: 2,
         );
         expect(resultWithoutShare.shareAttempted, false);
       });

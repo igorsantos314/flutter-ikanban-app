@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/services.dart';
+import 'package:flutter_ikanban_app/core/database/app_database.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_service.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_ikanban_app/features/board/domain/repository/board_repos
 import 'package:flutter_ikanban_app/features/settings/domain/repository/settings_repository.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/checklist_item_repository.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class ExportDataUseCase {
   final TaskRepository _taskRepository;
@@ -16,6 +18,7 @@ class ExportDataUseCase {
   final ChecklistItemRepository _checklistItemRepository;
   final FileService _fileService;
   final FileShareService _fileShareService;
+  final AppDatabase _appDatabase;
 
   const ExportDataUseCase({
     required SettingsRepository settingsRepository,
@@ -24,12 +27,14 @@ class ExportDataUseCase {
     required ChecklistItemRepository checklistItemRepository,
     required FileService fileService,
     required FileShareService fileShareService,
+    required AppDatabase appDatabase,
   }) : _taskRepository = taskRepository,
        _boardRepository = boardRepository,
        _settingsRepository = settingsRepository,
        _checklistItemRepository = checklistItemRepository,
        _fileService = fileService,
-       _fileShareService = fileShareService;
+       _fileShareService = fileShareService,
+       _appDatabase = appDatabase;
 
   Future<Outcome<ExportResult, ExportDataError>> execute({
     bool shareAfterExport = false,
@@ -148,9 +153,15 @@ class ExportDataUseCase {
         },
       );
 
+      // Get app version from pubspec.yaml
+      final appVersion = await _getAppVersion();
+      
+      // Get database schema version
+      final databaseVersion = _appDatabase.schemaVersion;
+
       final exportData = {
         'app': 'iKanban',
-        'version': '1.0.0+1',
+        'version': appVersion,
         'exportDate': DateTime.now().toIso8601String(),
         'tasks': tasksData,
         'boards': boardsData,
@@ -158,7 +169,7 @@ class ExportDataUseCase {
         'metadata': {
           'exportedBy': 'iKanban Flutter App',
           'platform': 'mobile/desktop',
-          'dataVersion': '1.0',
+          'dataVersion': databaseVersion.toString(),
           'totalTasks': tasksData.length,
           'totalBoards': boardsData.length,
           'totalChecklistItems': totalChecklistItems,
@@ -224,6 +235,12 @@ class ExportDataUseCase {
         throwable: e,
       );
     }
+  }
+
+  /// Obtém a versão do aplicativo do pubspec.yaml
+  Future<String> _getAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    return '${packageInfo.version}+${packageInfo.buildNumber}';
   }
 }
 

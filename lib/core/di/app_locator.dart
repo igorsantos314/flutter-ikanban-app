@@ -242,6 +242,7 @@ void _setupCoreServices() {
       taskRepository: getIt(),
       boardRepository: getIt(),
       checklistItemRepository: getIt(),
+      appDatabase: getIt(),
     ),
   );
 
