@@ -10,11 +10,11 @@ class CreateTaskUseCase {
   
   CreateTaskUseCase(this.taskRepository);
   
-  Future<Outcome<void, CreateTaskUseCaseError>> execute(TaskModel task) async {
+  Future<Outcome<int, CreateTaskUseCaseError>> execute(TaskModel task) async {
     final result = await taskRepository.createTask(task);
     return result.when(
       success: (generatedId) async {
-        return const Outcome.success();
+        return Outcome.success(value: generatedId);
       },
       failure: (error, message, throwable) {
         switch (error) {

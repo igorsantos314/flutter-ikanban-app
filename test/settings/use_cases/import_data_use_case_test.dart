@@ -9,6 +9,8 @@ void main() {
           boardsImported: 5,
           tasksImported: 42,
           settingsImported: true,
+          checklistItemsIgnored: 3,
+          checklistItemsImported: 2,
         );
         expect(result.tasksImported, 42);
         expect(result.settingsImported, true);
@@ -19,6 +21,8 @@ void main() {
           boardsImported: 5,
           tasksImported: 10,
           settingsImported: true,
+          checklistItemsIgnored: 0,
+          checklistItemsImported: 2,
         );
         expect(result.totalImported, 16);
       });
@@ -28,6 +32,8 @@ void main() {
           boardsImported: 5,
           tasksImported: 10,
           settingsImported: false,
+          checklistItemsIgnored: 0,
+          checklistItemsImported: 2,
         );
         expect(result.totalImported, 15);
       });
@@ -37,6 +43,8 @@ void main() {
           boardsImported: 5,
           tasksImported: 0,
           settingsImported: false,
+          checklistItemsIgnored: 0,
+          checklistItemsImported: 2,
         );
         expect(result.totalImported, 5);
       });
@@ -46,6 +54,8 @@ void main() {
           boardsImported: 0,
           tasksImported: 0,
           settingsImported: true,
+          checklistItemsIgnored: 0,
+          checklistItemsImported: 0,
         );
         expect(result.totalImported, 1);
       });

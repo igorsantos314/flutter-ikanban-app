@@ -35,6 +35,9 @@ import 'package:flutter_ikanban_app/features/task/domain/use_cases/delete_task_u
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/get_task_by_id_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/list_task_use_case.dart';
 import 'package:flutter_ikanban_app/features/task/domain/use_cases/update_task_use_case.dart';
+import 'package:flutter_ikanban_app/features/task/data/checklist_item_repository_impl.dart';
+import 'package:flutter_ikanban_app/features/task/domain/repository/checklist_item_repository.dart';
+import 'package:flutter_ikanban_app/features/task/infra/local/checklist_item_local_data_source.dart';
 import 'package:flutter_ikanban_app/shared/theme/presentation/theme_provider.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/use_cases/export_data_use_case.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/use_cases/import_data_use_case.dart';
@@ -163,6 +166,15 @@ void _setupTaskModule() {
     () => TaskRepositoryImpl(getIt()),
   );
 
+  // Checklist
+  getIt.registerLazySingleton<ChecklistItemLocalDataSource>(
+    () => ChecklistItemLocalDataSource(getIt.get<AppDatabase>()),
+  );
+
+  getIt.registerLazySingleton<ChecklistItemRepository>(
+    () => ChecklistItemRepositoryImpl(getIt()),
+  );
+
   getIt.registerLazySingleton<CreateTaskUseCase>(
     () => CreateTaskUseCase(getIt()),
   );
@@ -229,6 +241,8 @@ void _setupCoreServices() {
       settingsRepository: getIt(),
       taskRepository: getIt(),
       boardRepository: getIt(),
+      checklistItemRepository: getIt(),
+      appDatabase: getIt(),
     ),
   );
 
@@ -237,6 +251,7 @@ void _setupCoreServices() {
       settingsRepository: getIt(),
       taskRepository: getIt(),
       boardRepository: getIt(),
+      checklistItemRepository: getIt(),
       fileService: getIt(),
       fileShareService: getIt(),
     ),

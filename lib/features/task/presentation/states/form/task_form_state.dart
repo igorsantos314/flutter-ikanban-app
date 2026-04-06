@@ -3,6 +3,7 @@ import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/domain/model/checklist_item_model.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -38,6 +39,12 @@ abstract class TaskFormState with _$TaskFormState {
     
     @Default(false) bool isLoading,
     String? errorMessage,
+    
+    @Default(false) bool hasUnsavedChanges,
+    
+    // Checklist fields
+    @Default([]) List<ChecklistItemModel> checklistItems,
+    @Default(0) int checklistItemCount,
   }) = _TaskFormState;
 
   factory TaskFormState.initial() =>
