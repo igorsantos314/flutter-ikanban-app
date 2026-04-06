@@ -641,6 +641,29 @@ class $TaskEntityTable extends TaskEntity
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _checklistTotalMeta = const VerificationMeta(
+    'checklistTotal',
+  );
+  @override
+  late final GeneratedColumn<int> checklistTotal = GeneratedColumn<int>(
+    'checklist_total',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _checklistCompletedMeta =
+      const VerificationMeta('checklistCompleted');
+  @override
+  late final GeneratedColumn<int> checklistCompleted = GeneratedColumn<int>(
+    'checklist_completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -658,6 +681,8 @@ class $TaskEntityTable extends TaskEntity
     boardId,
     shouldNotify,
     notifyMinutesBefore,
+    checklistTotal,
+    checklistCompleted,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -736,6 +761,24 @@ class $TaskEntityTable extends TaskEntity
         notifyMinutesBefore.isAcceptableOrUnknown(
           data['notify_minutes_before']!,
           _notifyMinutesBeforeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('checklist_total')) {
+      context.handle(
+        _checklistTotalMeta,
+        checklistTotal.isAcceptableOrUnknown(
+          data['checklist_total']!,
+          _checklistTotalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('checklist_completed')) {
+      context.handle(
+        _checklistCompletedMeta,
+        checklistCompleted.isAcceptableOrUnknown(
+          data['checklist_completed']!,
+          _checklistCompletedMeta,
         ),
       );
     }
@@ -818,6 +861,14 @@ class $TaskEntityTable extends TaskEntity
         DriftSqlType.int,
         data['${effectivePrefix}notify_minutes_before'],
       ),
+      checklistTotal: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}checklist_total'],
+      )!,
+      checklistCompleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}checklist_completed'],
+      )!,
     );
   }
 
@@ -855,6 +906,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
   final int? boardId;
   final bool shouldNotify;
   final int? notifyMinutesBefore;
+  final int checklistTotal;
+  final int checklistCompleted;
   const TaskData({
     required this.id,
     required this.title,
@@ -871,6 +924,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     this.boardId,
     required this.shouldNotify,
     this.notifyMinutesBefore,
+    required this.checklistTotal,
+    required this.checklistCompleted,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -918,6 +973,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     if (!nullToAbsent || notifyMinutesBefore != null) {
       map['notify_minutes_before'] = Variable<int>(notifyMinutesBefore);
     }
+    map['checklist_total'] = Variable<int>(checklistTotal);
+    map['checklist_completed'] = Variable<int>(checklistCompleted);
     return map;
   }
 
@@ -948,6 +1005,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       notifyMinutesBefore: notifyMinutesBefore == null && nullToAbsent
           ? const Value.absent()
           : Value(notifyMinutesBefore),
+      checklistTotal: Value(checklistTotal),
+      checklistCompleted: Value(checklistCompleted),
     );
   }
 
@@ -974,6 +1033,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       notifyMinutesBefore: serializer.fromJson<int?>(
         json['notifyMinutesBefore'],
       ),
+      checklistTotal: serializer.fromJson<int>(json['checklistTotal']),
+      checklistCompleted: serializer.fromJson<int>(json['checklistCompleted']),
     );
   }
   @override
@@ -995,6 +1056,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       'boardId': serializer.toJson<int?>(boardId),
       'shouldNotify': serializer.toJson<bool>(shouldNotify),
       'notifyMinutesBefore': serializer.toJson<int?>(notifyMinutesBefore),
+      'checklistTotal': serializer.toJson<int>(checklistTotal),
+      'checklistCompleted': serializer.toJson<int>(checklistCompleted),
     };
   }
 
@@ -1014,6 +1077,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     Value<int?> boardId = const Value.absent(),
     bool? shouldNotify,
     Value<int?> notifyMinutesBefore = const Value.absent(),
+    int? checklistTotal,
+    int? checklistCompleted,
   }) => TaskData(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -1032,6 +1097,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     notifyMinutesBefore: notifyMinutesBefore.present
         ? notifyMinutesBefore.value
         : this.notifyMinutesBefore,
+    checklistTotal: checklistTotal ?? this.checklistTotal,
+    checklistCompleted: checklistCompleted ?? this.checklistCompleted,
   );
   TaskData copyWithCompanion(TaskEntityCompanion data) {
     return TaskData(
@@ -1058,6 +1125,12 @@ class TaskData extends DataClass implements Insertable<TaskData> {
       notifyMinutesBefore: data.notifyMinutesBefore.present
           ? data.notifyMinutesBefore.value
           : this.notifyMinutesBefore,
+      checklistTotal: data.checklistTotal.present
+          ? data.checklistTotal.value
+          : this.checklistTotal,
+      checklistCompleted: data.checklistCompleted.present
+          ? data.checklistCompleted.value
+          : this.checklistCompleted,
     );
   }
 
@@ -1078,7 +1151,9 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           ..write('createdAt: $createdAt, ')
           ..write('boardId: $boardId, ')
           ..write('shouldNotify: $shouldNotify, ')
-          ..write('notifyMinutesBefore: $notifyMinutesBefore')
+          ..write('notifyMinutesBefore: $notifyMinutesBefore, ')
+          ..write('checklistTotal: $checklistTotal, ')
+          ..write('checklistCompleted: $checklistCompleted')
           ..write(')'))
         .toString();
   }
@@ -1100,6 +1175,8 @@ class TaskData extends DataClass implements Insertable<TaskData> {
     boardId,
     shouldNotify,
     notifyMinutesBefore,
+    checklistTotal,
+    checklistCompleted,
   );
   @override
   bool operator ==(Object other) =>
@@ -1119,7 +1196,9 @@ class TaskData extends DataClass implements Insertable<TaskData> {
           other.createdAt == this.createdAt &&
           other.boardId == this.boardId &&
           other.shouldNotify == this.shouldNotify &&
-          other.notifyMinutesBefore == this.notifyMinutesBefore);
+          other.notifyMinutesBefore == this.notifyMinutesBefore &&
+          other.checklistTotal == this.checklistTotal &&
+          other.checklistCompleted == this.checklistCompleted);
 }
 
 class TaskEntityCompanion extends UpdateCompanion<TaskData> {
@@ -1138,6 +1217,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
   final Value<int?> boardId;
   final Value<bool> shouldNotify;
   final Value<int?> notifyMinutesBefore;
+  final Value<int> checklistTotal;
+  final Value<int> checklistCompleted;
   const TaskEntityCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -1154,6 +1235,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     this.boardId = const Value.absent(),
     this.shouldNotify = const Value.absent(),
     this.notifyMinutesBefore = const Value.absent(),
+    this.checklistTotal = const Value.absent(),
+    this.checklistCompleted = const Value.absent(),
   });
   TaskEntityCompanion.insert({
     this.id = const Value.absent(),
@@ -1171,6 +1254,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     this.boardId = const Value.absent(),
     this.shouldNotify = const Value.absent(),
     this.notifyMinutesBefore = const Value.absent(),
+    this.checklistTotal = const Value.absent(),
+    this.checklistCompleted = const Value.absent(),
   }) : title = Value(title),
        status = Value(status),
        priority = Value(priority),
@@ -1193,6 +1278,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Expression<int>? boardId,
     Expression<bool>? shouldNotify,
     Expression<int>? notifyMinutesBefore,
+    Expression<int>? checklistTotal,
+    Expression<int>? checklistCompleted,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1211,6 +1298,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       if (shouldNotify != null) 'should_notify': shouldNotify,
       if (notifyMinutesBefore != null)
         'notify_minutes_before': notifyMinutesBefore,
+      if (checklistTotal != null) 'checklist_total': checklistTotal,
+      if (checklistCompleted != null) 'checklist_completed': checklistCompleted,
     });
   }
 
@@ -1230,6 +1319,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     Value<int?>? boardId,
     Value<bool>? shouldNotify,
     Value<int?>? notifyMinutesBefore,
+    Value<int>? checklistTotal,
+    Value<int>? checklistCompleted,
   }) {
     return TaskEntityCompanion(
       id: id ?? this.id,
@@ -1247,6 +1338,8 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
       boardId: boardId ?? this.boardId,
       shouldNotify: shouldNotify ?? this.shouldNotify,
       notifyMinutesBefore: notifyMinutesBefore ?? this.notifyMinutesBefore,
+      checklistTotal: checklistTotal ?? this.checklistTotal,
+      checklistCompleted: checklistCompleted ?? this.checklistCompleted,
     );
   }
 
@@ -1308,6 +1401,12 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
     if (notifyMinutesBefore.present) {
       map['notify_minutes_before'] = Variable<int>(notifyMinutesBefore.value);
     }
+    if (checklistTotal.present) {
+      map['checklist_total'] = Variable<int>(checklistTotal.value);
+    }
+    if (checklistCompleted.present) {
+      map['checklist_completed'] = Variable<int>(checklistCompleted.value);
+    }
     return map;
   }
 
@@ -1328,7 +1427,424 @@ class TaskEntityCompanion extends UpdateCompanion<TaskData> {
           ..write('createdAt: $createdAt, ')
           ..write('boardId: $boardId, ')
           ..write('shouldNotify: $shouldNotify, ')
-          ..write('notifyMinutesBefore: $notifyMinutesBefore')
+          ..write('notifyMinutesBefore: $notifyMinutesBefore, ')
+          ..write('checklistTotal: $checklistTotal, ')
+          ..write('checklistCompleted: $checklistCompleted')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ChecklistItemEntityTable extends ChecklistItemEntity
+    with TableInfo<$ChecklistItemEntityTable, ChecklistItemData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ChecklistItemEntityTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 100,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 200),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isCompletedMeta = const VerificationMeta(
+    'isCompleted',
+  );
+  @override
+  late final GeneratedColumn<bool> isCompleted = GeneratedColumn<bool>(
+    'is_completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_completed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _taskIdMeta = const VerificationMeta('taskId');
+  @override
+  late final GeneratedColumn<int> taskId = GeneratedColumn<int>(
+    'task_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES task_entity (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    description,
+    isCompleted,
+    taskId,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'checklist_item_entity';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ChecklistItemData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_completed')) {
+      context.handle(
+        _isCompletedMeta,
+        isCompleted.isAcceptableOrUnknown(
+          data['is_completed']!,
+          _isCompletedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('task_id')) {
+      context.handle(
+        _taskIdMeta,
+        taskId.isAcceptableOrUnknown(data['task_id']!, _taskIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_taskIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ChecklistItemData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ChecklistItemData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      isCompleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_completed'],
+      )!,
+      taskId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}task_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ChecklistItemEntityTable createAlias(String alias) {
+    return $ChecklistItemEntityTable(attachedDatabase, alias);
+  }
+}
+
+class ChecklistItemData extends DataClass
+    implements Insertable<ChecklistItemData> {
+  final int id;
+  final String title;
+  final String? description;
+  final bool isCompleted;
+  final int taskId;
+  final DateTime createdAt;
+  const ChecklistItemData({
+    required this.id,
+    required this.title,
+    this.description,
+    required this.isCompleted,
+    required this.taskId,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['is_completed'] = Variable<bool>(isCompleted);
+    map['task_id'] = Variable<int>(taskId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ChecklistItemEntityCompanion toCompanion(bool nullToAbsent) {
+    return ChecklistItemEntityCompanion(
+      id: Value(id),
+      title: Value(title),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      isCompleted: Value(isCompleted),
+      taskId: Value(taskId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ChecklistItemData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ChecklistItemData(
+      id: serializer.fromJson<int>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      description: serializer.fromJson<String?>(json['description']),
+      isCompleted: serializer.fromJson<bool>(json['isCompleted']),
+      taskId: serializer.fromJson<int>(json['taskId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'title': serializer.toJson<String>(title),
+      'description': serializer.toJson<String?>(description),
+      'isCompleted': serializer.toJson<bool>(isCompleted),
+      'taskId': serializer.toJson<int>(taskId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  ChecklistItemData copyWith({
+    int? id,
+    String? title,
+    Value<String?> description = const Value.absent(),
+    bool? isCompleted,
+    int? taskId,
+    DateTime? createdAt,
+  }) => ChecklistItemData(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    description: description.present ? description.value : this.description,
+    isCompleted: isCompleted ?? this.isCompleted,
+    taskId: taskId ?? this.taskId,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  ChecklistItemData copyWithCompanion(ChecklistItemEntityCompanion data) {
+    return ChecklistItemData(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      isCompleted: data.isCompleted.present
+          ? data.isCompleted.value
+          : this.isCompleted,
+      taskId: data.taskId.present ? data.taskId.value : this.taskId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChecklistItemData(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('taskId: $taskId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, title, description, isCompleted, taskId, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ChecklistItemData &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.description == this.description &&
+          other.isCompleted == this.isCompleted &&
+          other.taskId == this.taskId &&
+          other.createdAt == this.createdAt);
+}
+
+class ChecklistItemEntityCompanion extends UpdateCompanion<ChecklistItemData> {
+  final Value<int> id;
+  final Value<String> title;
+  final Value<String?> description;
+  final Value<bool> isCompleted;
+  final Value<int> taskId;
+  final Value<DateTime> createdAt;
+  const ChecklistItemEntityCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.description = const Value.absent(),
+    this.isCompleted = const Value.absent(),
+    this.taskId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  ChecklistItemEntityCompanion.insert({
+    this.id = const Value.absent(),
+    required String title,
+    this.description = const Value.absent(),
+    this.isCompleted = const Value.absent(),
+    required int taskId,
+    this.createdAt = const Value.absent(),
+  }) : title = Value(title),
+       taskId = Value(taskId);
+  static Insertable<ChecklistItemData> custom({
+    Expression<int>? id,
+    Expression<String>? title,
+    Expression<String>? description,
+    Expression<bool>? isCompleted,
+    Expression<int>? taskId,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (description != null) 'description': description,
+      if (isCompleted != null) 'is_completed': isCompleted,
+      if (taskId != null) 'task_id': taskId,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  ChecklistItemEntityCompanion copyWith({
+    Value<int>? id,
+    Value<String>? title,
+    Value<String?>? description,
+    Value<bool>? isCompleted,
+    Value<int>? taskId,
+    Value<DateTime>? createdAt,
+  }) {
+    return ChecklistItemEntityCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      isCompleted: isCompleted ?? this.isCompleted,
+      taskId: taskId ?? this.taskId,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (isCompleted.present) {
+      map['is_completed'] = Variable<bool>(isCompleted.value);
+    }
+    if (taskId.present) {
+      map['task_id'] = Variable<int>(taskId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChecklistItemEntityCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('taskId: $taskId, ')
+          ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
@@ -1339,11 +1855,27 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $BoardEntityTable boardEntity = $BoardEntityTable(this);
   late final $TaskEntityTable taskEntity = $TaskEntityTable(this);
+  late final $ChecklistItemEntityTable checklistItemEntity =
+      $ChecklistItemEntityTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [boardEntity, taskEntity];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    boardEntity,
+    taskEntity,
+    checklistItemEntity,
+  ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'task_entity',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('checklist_item_entity', kind: UpdateKind.delete)],
+    ),
+  ]);
 }
 
 typedef $$BoardEntityTableCreateCompanionBuilder =
@@ -1698,6 +2230,8 @@ typedef $$TaskEntityTableCreateCompanionBuilder =
       Value<int?> boardId,
       Value<bool> shouldNotify,
       Value<int?> notifyMinutesBefore,
+      Value<int> checklistTotal,
+      Value<int> checklistCompleted,
     });
 typedef $$TaskEntityTableUpdateCompanionBuilder =
     TaskEntityCompanion Function({
@@ -1716,6 +2250,8 @@ typedef $$TaskEntityTableUpdateCompanionBuilder =
       Value<int?> boardId,
       Value<bool> shouldNotify,
       Value<int?> notifyMinutesBefore,
+      Value<int> checklistTotal,
+      Value<int> checklistCompleted,
     });
 
 final class $$TaskEntityTableReferences
@@ -1738,6 +2274,30 @@ final class $$TaskEntityTableReferences
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$ChecklistItemEntityTable, List<ChecklistItemData>>
+  _checklistItemEntityRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.checklistItemEntity,
+        aliasName: $_aliasNameGenerator(
+          db.taskEntity.id,
+          db.checklistItemEntity.taskId,
+        ),
+      );
+
+  $$ChecklistItemEntityTableProcessedTableManager get checklistItemEntityRefs {
+    final manager = $$ChecklistItemEntityTableTableManager(
+      $_db,
+      $_db.checklistItemEntity,
+    ).filter((f) => f.taskId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _checklistItemEntityRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
     );
   }
 }
@@ -1826,6 +2386,16 @@ class $$TaskEntityTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get checklistTotal => $composableBuilder(
+    column: $table.checklistTotal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get checklistCompleted => $composableBuilder(
+    column: $table.checklistCompleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$BoardEntityTableFilterComposer get boardId {
     final $$BoardEntityTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -1847,6 +2417,31 @@ class $$TaskEntityTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> checklistItemEntityRefs(
+    Expression<bool> Function($$ChecklistItemEntityTableFilterComposer f) f,
+  ) {
+    final $$ChecklistItemEntityTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.checklistItemEntity,
+      getReferencedColumn: (t) => t.taskId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChecklistItemEntityTableFilterComposer(
+            $db: $db,
+            $table: $db.checklistItemEntity,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -1926,6 +2521,16 @@ class $$TaskEntityTableOrderingComposer
 
   ColumnOrderings<int> get notifyMinutesBefore => $composableBuilder(
     column: $table.notifyMinutesBefore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get checklistTotal => $composableBuilder(
+    column: $table.checklistTotal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get checklistCompleted => $composableBuilder(
+    column: $table.checklistCompleted,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2013,6 +2618,16 @@ class $$TaskEntityTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<int> get checklistTotal => $composableBuilder(
+    column: $table.checklistTotal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get checklistCompleted => $composableBuilder(
+    column: $table.checklistCompleted,
+    builder: (column) => column,
+  );
+
   $$BoardEntityTableAnnotationComposer get boardId {
     final $$BoardEntityTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -2035,6 +2650,32 @@ class $$TaskEntityTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> checklistItemEntityRefs<T extends Object>(
+    Expression<T> Function($$ChecklistItemEntityTableAnnotationComposer a) f,
+  ) {
+    final $$ChecklistItemEntityTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.checklistItemEntity,
+          getReferencedColumn: (t) => t.taskId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ChecklistItemEntityTableAnnotationComposer(
+                $db: $db,
+                $table: $db.checklistItemEntity,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$TaskEntityTableTableManager
@@ -2050,7 +2691,7 @@ class $$TaskEntityTableTableManager
           $$TaskEntityTableUpdateCompanionBuilder,
           (TaskData, $$TaskEntityTableReferences),
           TaskData,
-          PrefetchHooks Function({bool boardId})
+          PrefetchHooks Function({bool boardId, bool checklistItemEntityRefs})
         > {
   $$TaskEntityTableTableManager(_$AppDatabase db, $TaskEntityTable table)
     : super(
@@ -2080,6 +2721,8 @@ class $$TaskEntityTableTableManager
                 Value<int?> boardId = const Value.absent(),
                 Value<bool> shouldNotify = const Value.absent(),
                 Value<int?> notifyMinutesBefore = const Value.absent(),
+                Value<int> checklistTotal = const Value.absent(),
+                Value<int> checklistCompleted = const Value.absent(),
               }) => TaskEntityCompanion(
                 id: id,
                 title: title,
@@ -2096,6 +2739,8 @@ class $$TaskEntityTableTableManager
                 boardId: boardId,
                 shouldNotify: shouldNotify,
                 notifyMinutesBefore: notifyMinutesBefore,
+                checklistTotal: checklistTotal,
+                checklistCompleted: checklistCompleted,
               ),
           createCompanionCallback:
               ({
@@ -2114,6 +2759,8 @@ class $$TaskEntityTableTableManager
                 Value<int?> boardId = const Value.absent(),
                 Value<bool> shouldNotify = const Value.absent(),
                 Value<int?> notifyMinutesBefore = const Value.absent(),
+                Value<int> checklistTotal = const Value.absent(),
+                Value<int> checklistCompleted = const Value.absent(),
               }) => TaskEntityCompanion.insert(
                 id: id,
                 title: title,
@@ -2130,6 +2777,8 @@ class $$TaskEntityTableTableManager
                 boardId: boardId,
                 shouldNotify: shouldNotify,
                 notifyMinutesBefore: notifyMinutesBefore,
+                checklistTotal: checklistTotal,
+                checklistCompleted: checklistCompleted,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -2139,7 +2788,386 @@ class $$TaskEntityTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({boardId = false}) {
+          prefetchHooksCallback:
+              ({boardId = false, checklistItemEntityRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (checklistItemEntityRefs) db.checklistItemEntity,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (boardId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.boardId,
+                                    referencedTable: $$TaskEntityTableReferences
+                                        ._boardIdTable(db),
+                                    referencedColumn:
+                                        $$TaskEntityTableReferences
+                                            ._boardIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (checklistItemEntityRefs)
+                        await $_getPrefetchedData<
+                          TaskData,
+                          $TaskEntityTable,
+                          ChecklistItemData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TaskEntityTableReferences
+                              ._checklistItemEntityRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TaskEntityTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).checklistItemEntityRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.taskId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$TaskEntityTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TaskEntityTable,
+      TaskData,
+      $$TaskEntityTableFilterComposer,
+      $$TaskEntityTableOrderingComposer,
+      $$TaskEntityTableAnnotationComposer,
+      $$TaskEntityTableCreateCompanionBuilder,
+      $$TaskEntityTableUpdateCompanionBuilder,
+      (TaskData, $$TaskEntityTableReferences),
+      TaskData,
+      PrefetchHooks Function({bool boardId, bool checklistItemEntityRefs})
+    >;
+typedef $$ChecklistItemEntityTableCreateCompanionBuilder =
+    ChecklistItemEntityCompanion Function({
+      Value<int> id,
+      required String title,
+      Value<String?> description,
+      Value<bool> isCompleted,
+      required int taskId,
+      Value<DateTime> createdAt,
+    });
+typedef $$ChecklistItemEntityTableUpdateCompanionBuilder =
+    ChecklistItemEntityCompanion Function({
+      Value<int> id,
+      Value<String> title,
+      Value<String?> description,
+      Value<bool> isCompleted,
+      Value<int> taskId,
+      Value<DateTime> createdAt,
+    });
+
+final class $$ChecklistItemEntityTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $ChecklistItemEntityTable,
+          ChecklistItemData
+        > {
+  $$ChecklistItemEntityTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $TaskEntityTable _taskIdTable(_$AppDatabase db) =>
+      db.taskEntity.createAlias(
+        $_aliasNameGenerator(db.checklistItemEntity.taskId, db.taskEntity.id),
+      );
+
+  $$TaskEntityTableProcessedTableManager get taskId {
+    final $_column = $_itemColumn<int>('task_id')!;
+
+    final manager = $$TaskEntityTableTableManager(
+      $_db,
+      $_db.taskEntity,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_taskIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ChecklistItemEntityTableFilterComposer
+    extends Composer<_$AppDatabase, $ChecklistItemEntityTable> {
+  $$ChecklistItemEntityTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TaskEntityTableFilterComposer get taskId {
+    final $$TaskEntityTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.taskId,
+      referencedTable: $db.taskEntity,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TaskEntityTableFilterComposer(
+            $db: $db,
+            $table: $db.taskEntity,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ChecklistItemEntityTableOrderingComposer
+    extends Composer<_$AppDatabase, $ChecklistItemEntityTable> {
+  $$ChecklistItemEntityTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TaskEntityTableOrderingComposer get taskId {
+    final $$TaskEntityTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.taskId,
+      referencedTable: $db.taskEntity,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TaskEntityTableOrderingComposer(
+            $db: $db,
+            $table: $db.taskEntity,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ChecklistItemEntityTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ChecklistItemEntityTable> {
+  $$ChecklistItemEntityTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$TaskEntityTableAnnotationComposer get taskId {
+    final $$TaskEntityTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.taskId,
+      referencedTable: $db.taskEntity,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TaskEntityTableAnnotationComposer(
+            $db: $db,
+            $table: $db.taskEntity,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ChecklistItemEntityTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ChecklistItemEntityTable,
+          ChecklistItemData,
+          $$ChecklistItemEntityTableFilterComposer,
+          $$ChecklistItemEntityTableOrderingComposer,
+          $$ChecklistItemEntityTableAnnotationComposer,
+          $$ChecklistItemEntityTableCreateCompanionBuilder,
+          $$ChecklistItemEntityTableUpdateCompanionBuilder,
+          (ChecklistItemData, $$ChecklistItemEntityTableReferences),
+          ChecklistItemData,
+          PrefetchHooks Function({bool taskId})
+        > {
+  $$ChecklistItemEntityTableTableManager(
+    _$AppDatabase db,
+    $ChecklistItemEntityTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ChecklistItemEntityTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ChecklistItemEntityTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ChecklistItemEntityTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<bool> isCompleted = const Value.absent(),
+                Value<int> taskId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => ChecklistItemEntityCompanion(
+                id: id,
+                title: title,
+                description: description,
+                isCompleted: isCompleted,
+                taskId: taskId,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String title,
+                Value<String?> description = const Value.absent(),
+                Value<bool> isCompleted = const Value.absent(),
+                required int taskId,
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => ChecklistItemEntityCompanion.insert(
+                id: id,
+                title: title,
+                description: description,
+                isCompleted: isCompleted,
+                taskId: taskId,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ChecklistItemEntityTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({taskId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -2159,16 +3187,18 @@ class $$TaskEntityTableTableManager
                       dynamic
                     >
                   >(state) {
-                    if (boardId) {
+                    if (taskId) {
                       state =
                           state.withJoin(
                                 currentTable: table,
-                                currentColumn: table.boardId,
-                                referencedTable: $$TaskEntityTableReferences
-                                    ._boardIdTable(db),
-                                referencedColumn: $$TaskEntityTableReferences
-                                    ._boardIdTable(db)
-                                    .id,
+                                currentColumn: table.taskId,
+                                referencedTable:
+                                    $$ChecklistItemEntityTableReferences
+                                        ._taskIdTable(db),
+                                referencedColumn:
+                                    $$ChecklistItemEntityTableReferences
+                                        ._taskIdTable(db)
+                                        .id,
                               )
                               as T;
                     }
@@ -2184,19 +3214,19 @@ class $$TaskEntityTableTableManager
       );
 }
 
-typedef $$TaskEntityTableProcessedTableManager =
+typedef $$ChecklistItemEntityTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $TaskEntityTable,
-      TaskData,
-      $$TaskEntityTableFilterComposer,
-      $$TaskEntityTableOrderingComposer,
-      $$TaskEntityTableAnnotationComposer,
-      $$TaskEntityTableCreateCompanionBuilder,
-      $$TaskEntityTableUpdateCompanionBuilder,
-      (TaskData, $$TaskEntityTableReferences),
-      TaskData,
-      PrefetchHooks Function({bool boardId})
+      $ChecklistItemEntityTable,
+      ChecklistItemData,
+      $$ChecklistItemEntityTableFilterComposer,
+      $$ChecklistItemEntityTableOrderingComposer,
+      $$ChecklistItemEntityTableAnnotationComposer,
+      $$ChecklistItemEntityTableCreateCompanionBuilder,
+      $$ChecklistItemEntityTableUpdateCompanionBuilder,
+      (ChecklistItemData, $$ChecklistItemEntityTableReferences),
+      ChecklistItemData,
+      PrefetchHooks Function({bool taskId})
     >;
 
 class $AppDatabaseManager {
@@ -2206,4 +3236,6 @@ class $AppDatabaseManager {
       $$BoardEntityTableTableManager(_db, _db.boardEntity);
   $$TaskEntityTableTableManager get taskEntity =>
       $$TaskEntityTableTableManager(_db, _db.taskEntity);
+  $$ChecklistItemEntityTableTableManager get checklistItemEntity =>
+      $$ChecklistItemEntityTableTableManager(_db, _db.checklistItemEntity);
 }

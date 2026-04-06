@@ -1,31 +1,40 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/services.dart';
+import 'package:flutter_ikanban_app/core/database/app_database.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_service.dart';
 import 'package:flutter_ikanban_app/core/services/file/file_share_service.dart';
 import 'package:flutter_ikanban_app/core/utils/result/outcome.dart';
 import 'package:flutter_ikanban_app/features/board/domain/repository/board_repository.dart';
 import 'package:flutter_ikanban_app/features/settings/domain/repository/settings_repository.dart';
+import 'package:flutter_ikanban_app/features/task/domain/repository/checklist_item_repository.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class ExportDataUseCase {
   final TaskRepository _taskRepository;
   final BoardRepository _boardRepository;
   final SettingsRepository _settingsRepository;
+  final ChecklistItemRepository _checklistItemRepository;
   final FileService _fileService;
   final FileShareService _fileShareService;
+  final AppDatabase _appDatabase;
 
   const ExportDataUseCase({
     required SettingsRepository settingsRepository,
     required TaskRepository taskRepository,
     required BoardRepository boardRepository,
+    required ChecklistItemRepository checklistItemRepository,
     required FileService fileService,
     required FileShareService fileShareService,
+    required AppDatabase appDatabase,
   }) : _taskRepository = taskRepository,
        _boardRepository = boardRepository,
        _settingsRepository = settingsRepository,
+       _checklistItemRepository = checklistItemRepository,
        _fileService = fileService,
-       _fileShareService = fileShareService;
+       _fileShareService = fileShareService,
+       _appDatabase = appDatabase;
 
   Future<Outcome<ExportResult, ExportDataError>> execute({
     bool shareAfterExport = false,
@@ -36,31 +45,60 @@ class ExportDataUseCase {
       final tasksOutcome = await _taskRepository.getAllTasks();
       
       List<Map<String, dynamic>> tasksData = [];
-      tasksOutcome.when(
-        success: (tasks) {
+      int totalChecklistItems = 0;
+      
+      await tasksOutcome.when(
+        success: (tasks) async {
           if (tasks != null) {
-            tasksData = tasks
-                .map(
-                  (task) => {
-                    'id': task.id,
-                    'title': task.title,
-                    'description': task.description,
-                    'status': task.status.name,
-                    'priority': task.priority.name,
-                    'complexity': task.complexity.name,
-                    'type': task.type.name,
-                    'dueDate': task.dueDate?.toIso8601String(),
-                    'isActive': task.isActive,
-                    'createdAt': task.createdAt.toIso8601String(),
-                    'color': task.color.name,
-                    'boardId': task.boardId,
-                  },
-                )
-                .toList();
+            for (final task in tasks) {
+              // Get checklist items for this task
+              final checklistOutcome = await _checklistItemRepository
+                  .watchChecklistItemsByTaskId(task.id!)
+                  .first;
+              
+              List<Map<String, dynamic>> checklistItemsData = [];
+              await checklistOutcome.when(
+                success: (checklistItems) async {
+                  if (checklistItems != null) {
+                    checklistItemsData = checklistItems
+                        .map((item) => {
+                              'id': item.id,
+                              'title': item.title,
+                              'description': item.description,
+                              'isCompleted': item.isCompleted,
+                              'taskId': item.taskId,
+                              'createdAt': item.createdAt.toIso8601String(),
+                            })
+                        .toList();
+                    totalChecklistItems += checklistItemsData.length;
+                  }
+                },
+                failure: (error, message, throwable) async {
+                  log('Error loading checklist items for task ${task.id}: $message');
+                },
+              );
+              
+              tasksData.add({
+                'id': task.id,
+                'title': task.title,
+                'description': task.description,
+                'status': task.status.name,
+                'priority': task.priority.name,
+                'complexity': task.complexity.name,
+                'type': task.type.name,
+                'dueDate': task.dueDate?.toIso8601String(),
+                'isActive': task.isActive,
+                'createdAt': task.createdAt.toIso8601String(),
+                'color': task.color.name,
+                'boardId': task.boardId,
+                'checklistItems': checklistItemsData,
+              });
+            }
             log('Tasks exported: ${tasksData.length}');
+            log('Checklist items exported: $totalChecklistItems');
           }
         },
-        failure: (error, message, throwable) {
+        failure: (error, message, throwable) async {
           log('Error loading tasks: $message');
         },
       );
@@ -115,9 +153,15 @@ class ExportDataUseCase {
         },
       );
 
+      // Get app version from pubspec.yaml
+      final appVersion = await _getAppVersion();
+      
+      // Get database schema version
+      final databaseVersion = _appDatabase.schemaVersion;
+
       final exportData = {
         'app': 'iKanban',
-        'version': '1.0.0+1',
+        'version': appVersion,
         'exportDate': DateTime.now().toIso8601String(),
         'tasks': tasksData,
         'boards': boardsData,
@@ -125,9 +169,10 @@ class ExportDataUseCase {
         'metadata': {
           'exportedBy': 'iKanban Flutter App',
           'platform': 'mobile/desktop',
-          'dataVersion': '1.0',
+          'dataVersion': databaseVersion.toString(),
           'totalTasks': tasksData.length,
           'totalBoards': boardsData.length,
+          'totalChecklistItems': totalChecklistItems,
           'hasSettings': settingsData != null,
         },
       };
@@ -168,6 +213,7 @@ class ExportDataUseCase {
             fileSize: jsonData.length,
             tasksCount: tasksData.length,
             boardsCount: boardsData.length,
+            checklistItemsCount: totalChecklistItems,
             hasSettings: settingsData != null,
             shareAttempted: shareAfterExport,
           );
@@ -190,6 +236,12 @@ class ExportDataUseCase {
       );
     }
   }
+
+  /// Obtém a versão do aplicativo do pubspec.yaml
+  Future<String> _getAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    return '${packageInfo.version}+${packageInfo.buildNumber}';
+  }
 }
 
 /// Resultado da exportação
@@ -199,6 +251,7 @@ class ExportResult {
   final int fileSize;
   final int tasksCount;
   final int boardsCount;
+  final int checklistItemsCount;
   final bool hasSettings;
   final bool shareAttempted;
 
@@ -208,6 +261,7 @@ class ExportResult {
     required this.fileSize,
     required this.tasksCount,
     required this.boardsCount,
+    required this.checklistItemsCount,
     required this.hasSettings,
     required this.shareAttempted,
   });
@@ -220,7 +274,7 @@ class ExportResult {
     return '${(fileSize / (1024 * 1024)).toStringAsFixed(1)}MB';
   }
   
-  String get summary => '$tasksCount tasks, $boardsCount boards • $formattedSize';
+  String get summary => '$tasksCount tasks, $boardsCount boards, $checklistItemsCount checklist items • $formattedSize';
 }
 
 enum ExportDataError {

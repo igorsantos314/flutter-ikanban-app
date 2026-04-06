@@ -11,7 +11,9 @@ import 'package:flutter_ikanban_app/features/task/domain/enums/task_complexity_.
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_priority.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_status.dart';
 import 'package:flutter_ikanban_app/features/task/domain/enums/task_type.dart';
+import 'package:flutter_ikanban_app/features/task/domain/model/checklist_item_model.dart';
 import 'package:flutter_ikanban_app/features/task/domain/model/task_model.dart';
+import 'package:flutter_ikanban_app/features/task/domain/repository/checklist_item_repository.dart';
 import 'package:flutter_ikanban_app/features/task/domain/repository/task_repository.dart';
 import 'package:flutter_ikanban_app/features/task/presentation/colors/task_colors.dart';
 import 'package:flutter_ikanban_app/shared/theme/presentation/theme_enum.dart';
@@ -20,6 +22,7 @@ class ImportDataUseCase {
   final TaskRepository _taskRepository;
   final BoardRepository _boardRepository;
   final SettingsRepository _settingsRepository;
+  final ChecklistItemRepository _checklistItemRepository;
   final FileService _fileService;
   final FileShareService _fileShareService;
 
@@ -27,11 +30,13 @@ class ImportDataUseCase {
     required SettingsRepository settingsRepository,
     required TaskRepository taskRepository,
     required BoardRepository boardRepository,
+    required ChecklistItemRepository checklistItemRepository,
     required FileService fileService,
     required FileShareService fileShareService,
   }) : _taskRepository = taskRepository,
        _boardRepository = boardRepository,
        _settingsRepository = settingsRepository,
+       _checklistItemRepository = checklistItemRepository,
        _fileService = fileService,
        _fileShareService = fileShareService;
 
@@ -132,6 +137,8 @@ class ImportDataUseCase {
 
           int tasksImported = 0;
           int boardsImported = 0;
+          int checklistItemsImported = 0;
+          int checklistItemsIgnored = 0;
           bool settingsImported = false;
 
           // Import Boards first (since tasks may reference boards)
@@ -228,6 +235,52 @@ class ImportDataUseCase {
                 log('Error importing tasks: $message throwable: $throwable');
               },);
               log("Tasks imported: $tasksImported");
+              
+              // Import Checklist Items (limit 50 per task)
+              log("Starting checklist items import...");
+              for (var taskJson in tasksData) {
+                final taskMap = taskJson as Map<String, dynamic>;
+                if (taskMap.containsKey('checklistItems')) {
+                  final taskId = taskMap['id'] as int;
+                  final checklistItemsData = taskMap['checklistItems'] as List<dynamic>;
+                  
+                  // Limit to 50 items per task
+                  final itemsToImport = checklistItemsData.take(50).toList();
+                  final itemsIgnored = checklistItemsData.length - itemsToImport.length;
+                  
+                  if (itemsIgnored > 0) {
+                    log('Warning: Task $taskId has ${checklistItemsData.length} checklist items, but only 50 will be imported. $itemsIgnored items ignored.');
+                    checklistItemsIgnored += itemsIgnored;
+                  }
+                  
+                  for (var itemJson in itemsToImport) {
+                    final itemMap = itemJson as Map<String, dynamic>;
+                    final checklistItem = ChecklistItemModel(
+                      title: itemMap['title'] as String,
+                      description: itemMap['description'] as String?,
+                      isCompleted: itemMap['isCompleted'] as bool? ?? false,
+                      taskId: taskId,
+                      createdAt: itemMap['createdAt'] != null
+                          ? DateTime.parse(itemMap['createdAt'] as String)
+                          : DateTime.now(),
+                    );
+                    
+                    final itemResult = await _checklistItemRepository.createChecklistItem(checklistItem);
+                    itemResult.when(
+                      success: (value) {
+                        checklistItemsImported++;
+                      },
+                      failure: (error, message, throwable) {
+                        log('Error importing checklist item for task $taskId: $message');
+                      },
+                    );
+                  }
+                }
+              }
+              log("Checklist items imported: $checklistItemsImported");
+              if (checklistItemsIgnored > 0) {
+                log("Checklist items ignored (exceeded 50 per task): $checklistItemsIgnored");
+              }
             } catch (e) {
               return Outcome.failure(
                 error: ImportDataError.tasksImportFailed,
@@ -271,6 +324,8 @@ class ImportDataUseCase {
             value: ImportResult(
               tasksImported: tasksImported,
               boardsImported: boardsImported,
+              checklistItemsImported: checklistItemsImported,
+              checklistItemsIgnored: checklistItemsIgnored,
               settingsImported: settingsImported,
             ),
           );
@@ -303,15 +358,19 @@ class ImportDataUseCase {
 class ImportResult {
   final int tasksImported;
   final int boardsImported;
+  final int checklistItemsImported;
+  final int checklistItemsIgnored;
   final bool settingsImported;
 
   const ImportResult({
     required this.tasksImported,
     required this.boardsImported,
+    required this.checklistItemsImported,
+    required this.checklistItemsIgnored,
     required this.settingsImported,
   });
 
-  int get totalImported => tasksImported + boardsImported + (settingsImported ? 1 : 0);
+  int get totalImported => tasksImported + boardsImported + checklistItemsImported + (settingsImported ? 1 : 0);
 }
 
 enum ImportDataError {

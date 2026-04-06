@@ -26,5 +26,8 @@ abstract class TaskModel with _$TaskModel {
     // Notification fields
     @Default(false) bool shouldNotify,
     int? notifyMinutesBefore,
+    // Checklist fields
+    @Default(0) int checklistTotal,
+    @Default(0) int checklistCompleted,
   }) = _TaskModel;
 }

@@ -1,19 +1,20 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'task_local_data_source.dart';
+part of 'checklist_item_local_data_source.dart';
 
 // ignore_for_file: type=lint
-mixin _$TaskLocalDataSourceMixin on DatabaseAccessor<AppDatabase> {
+mixin _$ChecklistItemLocalDataSourceMixin on DatabaseAccessor<AppDatabase> {
   $BoardEntityTable get boardEntity => attachedDatabase.boardEntity;
   $TaskEntityTable get taskEntity => attachedDatabase.taskEntity;
   $ChecklistItemEntityTable get checklistItemEntity =>
       attachedDatabase.checklistItemEntity;
-  TaskLocalDataSourceManager get managers => TaskLocalDataSourceManager(this);
+  ChecklistItemLocalDataSourceManager get managers =>
+      ChecklistItemLocalDataSourceManager(this);
 }
 
-class TaskLocalDataSourceManager {
-  final _$TaskLocalDataSourceMixin _db;
-  TaskLocalDataSourceManager(this._db);
+class ChecklistItemLocalDataSourceManager {
+  final _$ChecklistItemLocalDataSourceMixin _db;
+  ChecklistItemLocalDataSourceManager(this._db);
   $$BoardEntityTableTableManager get boardEntity =>
       $$BoardEntityTableTableManager(_db.attachedDatabase, _db.boardEntity);
   $$TaskEntityTableTableManager get taskEntity =>
