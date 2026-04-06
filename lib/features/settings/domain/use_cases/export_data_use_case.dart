@@ -47,7 +47,7 @@ class ExportDataUseCase {
       List<Map<String, dynamic>> tasksData = [];
       int totalChecklistItems = 0;
       
-      tasksOutcome.when(
+      await tasksOutcome.when(
         success: (tasks) async {
           if (tasks != null) {
             for (final task in tasks) {
@@ -57,8 +57,8 @@ class ExportDataUseCase {
                   .first;
               
               List<Map<String, dynamic>> checklistItemsData = [];
-              checklistOutcome.when(
-                success: (checklistItems) {
+              await checklistOutcome.when(
+                success: (checklistItems) async {
                   if (checklistItems != null) {
                     checklistItemsData = checklistItems
                         .map((item) => {
@@ -73,7 +73,7 @@ class ExportDataUseCase {
                     totalChecklistItems += checklistItemsData.length;
                   }
                 },
-                failure: (error, message, throwable) {
+                failure: (error, message, throwable) async {
                   log('Error loading checklist items for task ${task.id}: $message');
                 },
               );
@@ -98,7 +98,7 @@ class ExportDataUseCase {
             log('Checklist items exported: $totalChecklistItems');
           }
         },
-        failure: (error, message, throwable) {
+        failure: (error, message, throwable) async {
           log('Error loading tasks: $message');
         },
       );
